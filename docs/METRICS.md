@@ -88,7 +88,8 @@
 | **083** | `45aaf26` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 328/328 (100%) | 0.008s | PASS | Thread-safe LRU query cache with dynamic tag invalidation and GraphClient integration |
 | **084** | `c5f5a5b` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 334/334 (100%) | 0.008s | PASS | Cryptographic tamper-evident audit ledger with HMAC-SHA256 signatures and chain verification |
 | **085** | `v0.85` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 334/334 (100%) | 0.008s | PASS | Checkpoint 15 Audit, 85-Iteration Milestone Review, and v0.85 Release Tag |
-| **086** | `ca84e82` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 339/339 (100%) | 0.008s | PASS | Interactive README showcase with architecture badges, Q1-Q26 catalog, and integrity tests |
+| **086** | `e711641` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 339/339 (100%) | 0.008s | PASS | Interactive README showcase with architecture badges, Q1-Q26 catalog, and integrity tests |
+| **087** | `77ec152` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 348/348 (100%) | 0.008s | PASS | GraphQL schema, query resolver, GraphiQL playground, and endpoints (/graphql) |
 
 ---
 

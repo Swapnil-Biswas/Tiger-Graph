@@ -308,7 +308,9 @@ Ranked by expected impact on Hackathon Judging Criteria:
 86. **[DONE - Iteration 086] [Documentation & Presentation] Interactive README & Architectural Showcase**
     - *Result:* Completely overhauled `README.md` into an enterprise-grade architectural showcase. Added 10 interactive badges (release v0.85, 334+ tests, GSQL Q1-Q26, Docker, Helm, Prometheus, FinCEN/FRE 902), 30-second quickstart guide, multi-layer Mermaid system architecture diagram, interactive terminal CLI usage guide, complete Q1-Q26 graph query catalog table with SLAs, enterprise compliance & SRE telemetry highlights, and reproducible verification gate commands. Added 5 unit tests in `tests/test_readme_integrity.py` verifying badges, quickstart, CLI docs, Q1-Q26 catalog, and relative markdown link integrity (339/339 tests pass across 69 suites).
 
-87. **[API & Protocol Integration] GraphQL Schema Definition & Query Resolver**
+87. **[DONE - Iteration 087] [API & Protocol Integration] GraphQL Schema Definition & Query Resolver**
+    - *Result:* Implemented lightweight zero-dependency `GraphQLParser`, `FraudGraphQLResolver`, and `GraphQLSchema` in `src/api/graphql_schema.py`. Supports recursive AST parsing, arguments, field aliases, variable substitution, and schema introspection (`__schema`). Resolves `case(caseId)`, `cases(limit, verdict, status)`, `customer(customerId)`, `auditLedger(limit)`, and `benchmarkSummary`. Integrated into `src/api/main.py` via `POST /graphql` and interactive dark-mode GraphiQL playground via `GET /graphql`. Added `__len__` to `CryptographicAuditLedger`. Added 9 unit tests in `tests/test_graphql_api.py` (348/348 tests pass across 70 suites).
+
 88. **[Security & Policy] Dynamic Rate Limiting & DoS Interception Filter**
 89. **[Explainability & Synthesis] Executive Case Summary PDF/Markdown Briefing Exporter**
 90. **[Release Tag v0.9] Checkpoint 16 Audit & 90-Iteration Milestone Review**

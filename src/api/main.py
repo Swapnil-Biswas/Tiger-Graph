@@ -1486,6 +1486,37 @@ def verify_audit_ledger():
     return {"verified": ok, "message": msg}
 
 
+# GraphQL Schema & Query Engine
+from src.api.graphql_schema import GraphQLSchema, FraudGraphQLResolver, get_graphiql_html
+from fastapi.responses import HTMLResponse
+
+graphql_schema = GraphQLSchema(resolver=FraudGraphQLResolver(agent=agent))
+
+
+class GraphQLRequest(BaseModel):
+    query: str
+    variables: Optional[Dict[str, Any]] = None
+    operationName: Optional[str] = None
+
+
+@app.post("/graphql")
+@app.post("/api/graphql")
+def execute_graphql(payload: GraphQLRequest):
+    """Execute arbitrary GraphQL queries against TigerGraph cases, customers, and audit ledgers."""
+    result = graphql_schema.execute(payload.query, payload.variables)
+    return JSONResponse(result)
+
+
+@app.get("/graphql")
+@app.get("/api/graphql")
+def get_graphql(query: Optional[str] = Query(default=None)):
+    """Execute GET query or render interactive GraphiQL query explorer playground."""
+    if query:
+        result = graphql_schema.execute(query)
+        return JSONResponse(result)
+    return HTMLResponse(content=get_graphiql_html())
+
+
 # Mount UI static directory
 ui_dir = os.path.join(os.path.dirname(__file__), "../../ui")
 if os.path.exists(ui_dir):

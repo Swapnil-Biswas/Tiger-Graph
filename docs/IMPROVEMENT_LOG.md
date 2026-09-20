@@ -1,4 +1,36 @@
-## Iteration 086: Interactive README & Architectural Showcase | 2026-09-21 08:30 | commit ca84e82
+## Iteration 087: GraphQL Schema Definition & Query Resolver | 2026-09-21 08:45 | commit 77ec152
+- **Lens:** 11. Agent architecture & engineering, 15. Operational readiness & runbooks, 10. Visualization & UI/UX
+- **Goal / hypothesis:** Enterprise financial crime platforms require flexible, zero-overfetch querying for mobile apps, analyst dashboards, and external microservices. Implementing a native GraphQL engine delivers:
+  1. **Zero-Dependency GraphQL AST Parser (`src/api/graphql_schema.py`)**: `GraphQLParser` performs recursive descent parsing of selection sets, arguments (`caseId: "..."`, `limit: 5`), field aliases (`targetCase: case(...)`), and variable substitutions (`$id: String!`).
+  2. **Fraud GraphQL Resolver (`FraudGraphQLResolver`)**: Coordinates data extraction across cases (`resolve_case`, `resolve_cases`), customer profiles (`resolve_customer`), cryptographic audit ledgers (`resolve_audit_ledger`), and benchmark metrics (`resolve_benchmark_summary`).
+  3. **Field Filtering & Projection**: Ensures only requested fields and nested sub-objects (`actions { action level }`, `sar { file reason }`) are returned, eliminating network payload bloat.
+  4. **Interactive Dark-Mode GraphiQL Playground**: Exposed at `GET /graphql` with 5 one-click query presets (Case Query, Cases List, Customer Profile, Audit Ledger, Benchmark Metrics) and keyboard shortcuts (`Ctrl+Enter`).
+  5. **FastAPI Endpoints**: Integrated `POST /graphql` and `GET /graphql` into `src/api/main.py`. Added `__len__` to `CryptographicAuditLedger`.
+- **Changes (files):**
+  - `src/api/graphql_schema.py`: Implemented parser, AST node, resolvers, schema runner, and GraphiQL HTML playground.
+  - `src/api/main.py`: Added `POST /graphql` and `GET /graphql` endpoints.
+  - `src/policy/audit_ledger.py`: Added `__len__` to `CryptographicAuditLedger`.
+  - `tests/test_graphql_api.py`: Created 9 unit tests covering single case, cases list, customer, audit ledger, benchmark summary, introspection, aliases/variables, syntax errors, and FastAPI testclient.
+  - `docs/METRICS.md`: Added Iteration 087 row.
+  - `docs/BACKLOG.md`: Marked item 87 as DONE.
+  - `docs/IMPROVEMENT_LOG.md`: Documented Iteration 087.
+- **Tests added/updated:**
+  - `tests/test_graphql_api.py` (9 unit tests, all pass).
+  - Total unit test suite expanded from 339 to **348** tests across 70 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 339 -> **348** (100% pass rate across 70 test suites)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Extended Benchmark Answers Valid: 50/50 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 348 passed across 70 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
+## Iteration 086: Interactive README & Architectural Showcase | 2026-09-21 08:30 | commit e711641
 - **Lens:** 15. Operational readiness & runbooks, 10. Visualization & UI/UX, 14. Testing, evaluation & benchmarks
 - **Goal / hypothesis:** A premier open-source repository requires an engaging, enterprise-grade `README.md` that immediately communicates system architecture, rapid onboarding, graph query capabilities, enterprise compliance, and verifiable reproducibility. Implementing this showcase delivers:
   1. **Comprehensive Architecture Badges**: Added badges for v0.85 release, 334+ passing tests, Python 3.10-3.14, TigerGraph GSQL (Q1-Q26), FastAPI, Docker, Kubernetes Helm, Prometheus OpenMetrics, FinCEN/FRE 902 compliance, and MIT license.

@@ -44,6 +44,10 @@ class CryptographicAuditLedger:
         self._lock = threading.RLock()
         self._entries: List[AuditLedgerEntry] = []
 
+    def __len__(self) -> int:
+        with self._lock:
+            return len(self._entries)
+
     def _canonical_bytes(self, index: int, timestamp: str, case_id: str, actor: str, action: str, payload: Dict[str, Any], prev_hash: str) -> bytes:
         """Create deterministic canonical byte representation for hashing and signing."""
         payload_json = json.dumps(payload, sort_keys=True, separators=(",", ":"))
