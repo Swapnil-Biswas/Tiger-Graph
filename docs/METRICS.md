@@ -11,7 +11,8 @@
 | **006** | `d621ef7` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 22/22 (100%) | 0.063s | PASS | Benchmark 3-run self-consistency (0.00% variance, 100% determinism) |
 | **007** | `a3b95f6` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 23/23 (100%) | 0.023s | PASS | Enhanced topological graph context brief in GraphRAG |
 | **008** | `1013f37` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 25/25 (100%) | 0.022s | PASS | Structured 5-part FinCEN SAR narrative generator |
-| **009** | `pending` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 25/25 (100%) | 0.022s | PASS | Cytoscape visual glyphs, neighborhood highlight, and HUD inspector |
+| **009** | `30f7f73` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 25/25 (100%) | 0.022s | PASS | Cytoscape visual glyphs, neighborhood highlight, and HUD inspector |
+| **010** | `pending` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 25/25 (100%) | 0.019s | PASS | Checkpoint 2 Audit, State of the Project, and v0.1 Release Tag |
 
 ---
 

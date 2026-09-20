@@ -43,13 +43,37 @@ Ranked by expected impact on Hackathon Judging Criteria:
 9. **[DONE - Iteration 009] [UI/UX] Cytoscape Custom Node Glyphs & Interactive Subgraph Expansion**
    - *Result:* Configured 6 distinct geometric vertex glyphs, interactive 1-hop neighborhood tap highlighting with background fade, multi-algorithm layout switchers, and real-time topology HUD inspector.
 
-10. **[Release Tag v0.1] Submission-Ready Checkpoint at Iteration 10**
-    - *Goal:* Verify all gates, tag repository with `v0.1`, write state-of-project summary, and confirm zero regression.
+10. **[DONE - Iteration 010] [Release Tag v0.1] Submission-Ready Checkpoint at Iteration 10**
+    - *Result:* Comprehensive PRD Section 25 audit completed. All 6 mandatory gates passed (25/25 unit tests, 100% backtest recall/precision, 0.00% variance across 3 runs, 20/20 valid benchmark answers, 0 secrets, demo path green). Tagged and pushed `v0.1`.
 
-10. **[Performance] GSQL Analytical Query Caching & Batch Ingestion**
-    - *Goal:* Sub-10ms latency for batch case runs.
-    - *Files:* `src/graph/client.py`, `src/graph/ingest.py`
-    - *Metric Impact:* Performance and scale.
+---
+
+## Phase 2: Deep Specialization & Advanced Intelligence (Iterations 11–25)
+
+11. **[Undocumented Pattern Discovery] Community Anomaly Detection & Louvain Graph Partitioning**
+    - *Goal:* Implement graph clustering algorithm to identify novel multi-card proxy rotation patterns separating confirmed vs cleared accounts on held-out months.
+    - *Files:* `src/graph/algorithms.py`, `eval/pattern_separation_test.py`
+    - *Metric Impact:* Innovation (15%) & Investigation Accuracy (25%).
+
+12. **[Security & Safety] Prompt Injection Defenses & Adversarial Input Sanitization**
+    - *Goal:* Implement strict input sanitization preventing prompt injection attacks embedded in customer disavowal text, simulated chat replies, or merchant descriptor strings.
+    - *Files:* `src/agent/security.py`, `tests/test_security.py`
+    - *Metric Impact:* Security & Safety.
+
+13. **[Case Memory] Dynamic Prior-Based Bayesian Adjustment Loop**
+    - *Goal:* Formally condition the fraud prior on historical closed-case outcomes for identical merchants/regions without leaking post-hoc ground truth.
+    - *Files:* `src/cases/memory.py`, `src/agent/assess.py`
+    - *Metric Impact:* Case Memory (Lens 8) & Uncertainty Calibration (Lens 3).
+
+14. **[Policy & Permissions] Automated Permission Bypass Penetration Tests**
+    - *Goal:* Implement exhaustive fuzzing verifying that unauthorized actions (e.g. attempting to block card on single low-confidence signal) can never execute through PolicyEngine.
+    - *Files:* `tests/test_policy_pen_test.py`
+    - *Metric Impact:* Policy & Permissions compliance (must remain 0 violations).
+
+15. **[Performance & Scale] Transaction Indexing Optimization & Sub-5ms Client Caching**
+    - *Goal:* Accelerate GraphStore multi-hop expansions by pre-indexing customer-card-device adjacency matrices.
+    - *Files:* `src/graph/client.py`
+    - *Metric Impact:* Average latency per case.
 
 ---
 

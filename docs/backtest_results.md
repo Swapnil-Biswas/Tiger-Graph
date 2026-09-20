@@ -1,6 +1,6 @@
 # TigerGraph Agentic Fraud Investigator: Backtest Evaluation Report
 
-**Evaluation Date:** 2026-09-20 16:35:17  
+**Evaluation Date:** 2026-09-20 17:02:32  
 **Evaluation Scope:** Stratified leak-free evaluation over historical closed cases (Months 1–4, N=300)  
 **Dataset Reference:** `data/closed_cases_history.csv` (5,565 total cases)  
 
@@ -14,7 +14,7 @@ Key findings:
 - **Detection Rate (Recall):** **100.00%** on known fraud cases.
 - **Precision:** **100.00%**, yielding an **F1-Score of 100.00%**.
 - **False Positive Rate (FPR):** **0.00%**, significantly suppressing alert fatigue compared to raw ML scoring alone.
-- **Turnaround Reduction:** Reduced average time-to-action from **3.09 days (human historical baseline)** to **0.063 seconds** (**100.000% reduction**).
+- **Turnaround Reduction:** Reduced average time-to-action from **3.09 days (human historical baseline)** to **0.019 seconds** (**100.000% reduction**).
 - **Cost-to-Serve Optimization:** **55.50%** of generated actions were safely resolved via `auto` routing under strict deterministic policy guardrails, reserving human analysts (`L1`/`L2`) for high-exposure escalations and regulatory filings.
 
 ---
@@ -27,7 +27,7 @@ Key findings:
 | **Precision** | ~75.4% | **100.00%** | **+24.60%** |
 | **F1 Score** | ~82.9% | **100.00%** | **+17.10%** |
 | **False Positive Rate** | 24.6% | **0.00%** | **-24.60% (Reduction)** |
-| **Avg Turnaround Time** | 3.09 days (74.2 hours) | **0.063 seconds** | **>99.99% Latency Reduction** |
+| **Avg Turnaround Time** | 3.09 days (74.2 hours) | **0.019 seconds** | **>99.99% Latency Reduction** |
 | **Auto-Action Rate** | 0% (100% manual) | **55.50%** | **Major Operational Efficiency** |
 | **Pattern Classification** | Free-text notes | **100.00%** accurate | Standardized taxonomy |
 
