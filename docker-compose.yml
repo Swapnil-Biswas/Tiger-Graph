@@ -39,6 +39,22 @@ services:
     networks:
       - fraud-net
 
+  grafana:
+    image: grafana/grafana:latest
+    container_name: tigergraph-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=tigergraph
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./deploy/grafana/fraud_sla_dashboard.json:/var/lib/grafana/dashboards/fraud_sla_dashboard.json:ro
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - fraud-net
+
 networks:
   fraud-net:
     driver: bridge

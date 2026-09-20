@@ -1,3 +1,32 @@
+## Iteration 099: Production Golden Image Docker & Compose Verification | 2026-09-21 11:45 | commit iter-099
+- **Lens:** 15. Operational readiness & runbooks, 11. Agent architecture & engineering, 14. Testing, evaluation & benchmarks
+- **Goal / hypothesis:** Production deployment in containerized enterprise environments requires strict adherence to CIS Docker benchmarks (unprivileged non-root execution across all copied assets), automated telemetry dashboard provisioning via Grafana, and complete golden image container orchestration verification:
+  1. **Dockerfile Script Inclusion & CIS Hardening**: Enhanced `Dockerfile` with `COPY --chown=appuser:appgroup scripts/ ./scripts/` ensuring that containerized instances can run the cross-platform smoke test runner (`scripts/smoke_test.py`, `scripts/smoke.sh`) and verification scripts natively under unprivileged user `appuser` (UID 10001).
+  2. **Grafana SLA Dashboard Service in Compose**: Extended `docker-compose.yml` to include a dedicated `grafana` service exposing port 3000, mounting `deploy/grafana/fraud_sla_dashboard.json` into Grafana's provisioned dashboards directory, connecting to bridge network `fraud-net`, and depending on `prometheus`.
+  3. **Automated Verification**: Added `test_05_grafana_service_in_compose` and `test_06_dockerfile_scripts_and_golden_image` in `tests/test_docker_build.py` validating compose service topology, port mappings, network attachments, and Dockerfile non-root security contexts.
+- **Changes (files):**
+  - `Dockerfile`: Copied `scripts/` with `appuser:appgroup` ownership.
+  - `docker-compose.yml`: Added `grafana` service configuration.
+  - `tests/test_docker_build.py`: Added 2 unit tests.
+  - `docs/METRICS.md`: Added Iteration 099 row.
+  - `docs/BACKLOG.md`: Marked item 99 as DONE.
+  - `docs/IMPROVEMENT_LOG.md`: Documented Iteration 099.
+- **Tests added/updated:**
+  - `tests/test_docker_build.py` (2 unit tests added, 6/6 pass).
+  - Total unit test suite expanded from 402 to **404** tests across 79 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 402 -> **404** (100% pass rate across 79 test suites)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Extended Benchmark Answers Valid: 50/50 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 404 passed across 79 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 098: Comprehensive Technical Submission Whitepaper | 2026-09-21 11:30 | commit iter-098
 - **Lens:** 6. Case summary & explainability, 10. Demo quality & presentation, 11. Agent architecture & engineering
 - **Goal / hypothesis:** An official IEEE-CIS financial crime challenge submission requires an authoritative, academic-grade technical whitepaper detailing the mathematical formulations, system architecture, empirical benchmarks, and regulatory compliance standards:

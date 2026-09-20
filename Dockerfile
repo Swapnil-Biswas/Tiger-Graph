@@ -45,6 +45,7 @@ COPY --chown=appuser:appgroup eval/ ./eval/
 COPY --chown=appuser:appgroup cases/ ./cases/
 COPY --chown=appuser:appgroup data/ ./data/
 COPY --chown=appuser:appgroup docs/ ./docs/
+COPY --chown=appuser:appgroup scripts/ ./scripts/
 COPY --chown=appuser:appgroup requirements.txt ./
 
 # Ensure runtime directories are writable by non-root user

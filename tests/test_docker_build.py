@@ -90,6 +90,27 @@ class TestDockerConfiguration(unittest.TestCase):
         targets = job["static_configs"][0]["targets"]
         self.assertIn("tigergraph-agent:8000", targets)
 
+    def test_05_grafana_service_in_compose(self):
+        """Verify grafana service in docker-compose.yml with SLA dashboard volume."""
+        with open(self.compose_path, "r", encoding="utf-8") as f:
+            compose = yaml.safe_load(f)
+
+        services = compose.get("services", {})
+        self.assertIn("grafana", services, "docker-compose.yml must include grafana service")
+        grafana_svc = services["grafana"]
+        self.assertEqual(grafana_svc["ports"], ["3000:3000"])
+        self.assertIn("prometheus", grafana_svc.get("depends_on", []))
+        self.assertIn("fraud-net", grafana_svc.get("networks", []))
+
+    def test_06_dockerfile_scripts_and_golden_image(self):
+        """Verify Dockerfile copies scripts/ directory and meets CIS golden image standards."""
+        with open(self.dockerfile_path, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        self.assertIn("scripts/", content, "Dockerfile must copy scripts/ directory")
+        self.assertIn("appuser:appgroup", content, "All files must be owned by unprivileged appuser")
+        self.assertIn("USER appuser", content, "Container must run as non-root user")
+
 
 if __name__ == "__main__":
     unittest.main()
