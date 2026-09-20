@@ -45,6 +45,9 @@ class FraudInvestigatorAgent:
         self,
         case_id: str,
         simulated_scenario: Optional[str] = None,
+        ablate_graph: bool = False,
+        ablate_memory: bool = False,
+        ablate_policy: bool = False,
     ) -> Dict[str, Any]:
         """
         Executes an end-to-end investigation for a benchmark case or live trigger.
@@ -229,6 +232,29 @@ class FraudInvestigatorAgent:
             "undocumented_anomaly": self.undocumented_detector.detect_anomalies(flagged_txn, as_of=as_of) if flagged_txn else {},
         }
 
+        # Apply Architectural Ablation Overrides
+        if ablate_graph:
+            graph_evidence["context"] = {}
+            graph_evidence["velocity"] = {"windows": {"1h": {"count": 0, "txn_ids": []}, "24h": {"count": 0, "txn_ids": []}}, "velocity_spike_ratio": 1.0}
+            graph_evidence["new_entity"] = {"is_new_device": False, "proxy_flag": False, "is_new_region": False}
+            graph_evidence["device_sharing"] = {"is_shared": False, "cards": [], "customers": [], "distinct_cards_count": 1, "distinct_customers_count": 1}
+            graph_evidence["ring"] = {"ring_detected": False}
+            graph_evidence["geo"] = {"anomalies_count": 0, "has_geo_anomaly": False}
+            graph_evidence["pattern_match"] = {"best_pattern": "none", "patterns": {}}
+            graph_evidence["undocumented_anomaly"] = {}
+
+        if ablate_memory:
+            graph_evidence["similar_cases"] = {"case_ids": [], "cases": []}
+            graph_evidence["memory_prior"] = {
+                "has_history": False,
+                "total_prior_cases": 0,
+                "confirmed_fraud_count": 0,
+                "cleared_count": 0,
+                "posterior_fraud_rate": 0.091,
+                "risk_adjustment": 0.0,
+                "prior_cases_cited": [],
+            }
+
         # Assemble GraphRAG Topological Context Brief
         query_text = f"{trigger_data.get('trigger_text', '')} {pat_res.get('best_pattern', '')}"
         retrieved_policies = self.retriever.retrieve_policy(query_text, top_k=3)
@@ -328,6 +354,11 @@ class FraudInvestigatorAgent:
                 evidence_response=sim_reply,
                 is_shared_device=is_shared_device,
             )
+
+        if ablate_policy:
+            # Policy rules ablated: skip evidence request and immediately emit BLOCK_CARD on any risk without verification
+            final_actions = [ProposedAction(action="BLOCK_CARD", route="auto", reason="Ablated policy: immediate block on weak signal without customer verification")]
+
 
         # 5. SAR (Suspicious Activity Report) Generation
         file_sar = any(a.action == "FILE_REPORT" for a in final_actions)

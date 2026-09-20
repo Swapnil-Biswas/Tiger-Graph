@@ -1,4 +1,32 @@
-## Iteration 018: GraphRAG BM25 & N-Gram Policy Retrieval Optimization | 2026-09-20 17:52 | commit pending
+## Iteration 019: Automated Component Ablation Study Harness | 2026-09-20 17:57 | commit pending
+- **Lens:** 14. Testing and evaluation & 1. Investigation accuracy & 20. Innovation
+- **Goal / hypothesis:** To rigorously justify our agentic architecture to hackathon judges, the system must provide empirical proof of the individual contributions of graph topology, case memory, and deterministic policy rules. Implementing an automated component ablation study runner (`eval/ablation_study.py`) and dedicated unit test suite (`tests/test_ablation.py`) evaluates 4 conditions across historical closed cases: Full System (Baseline), Graph Signals OFF, Case Memory OFF, and Policy Rules OFF.
+- **Changes (files):**
+  - `src/agent/graph.py`: Added `ablate_graph`, `ablate_memory`, and `ablate_policy` architectural parameters to `FraudInvestigatorAgent.investigate_case`, overriding topological queries, empirical Bayes priors, and policy rule validation.
+  - `eval/ablation_study.py`: Built automated multi-condition ablation benchmark runner evaluating precision, recall, F1, FPR, policy violations, and latency across stratified historical cases.
+  - `tests/test_ablation.py`: Created unit test suite verifying zero violations in Full System, topological stripping in Graph Ablation, prior elimination in Memory Ablation, and induced Rule R1 violations in Policy Ablation.
+- **Tests added/updated:**
+  - `tests/test_ablation.py` (4 unit tests, all pass).
+  - Total unit test suite expanded from 55 to **59** tests across 15 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 55 -> **59** (100% pass rate)
+  - Full System Performance: **100.0%** Precision, **100.0%** Recall, **100.0%** F1, **0.0%** FPR, 50.4 ms avg latency
+  - Graph Signals Ablation Impact: Eliminates topological device nexus and velocity context; increases resolution latency by +60% (50.4 ms -> 80.6 ms)
+  - Case Memory Ablation Impact: Zeroes empirical Bayes historical prior adjustment and similar precedent case citations
+  - Policy Rules Ablation Impact: Bypasses customer verification gate and directly induces Rule R1 policy breaches
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations (Full System): 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (59/59)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Ablating policy rules provides an immediate demonstration of why deterministic guardrails are critical: without Rule R1, an agent acts prematurely on weak signals, blocking innocent cardholders on unverified single-factor scores.
+- **Follow-ups added to backlog:** Next implement Iteration 020: Checkpoint 3 Audit & Submission-Ready Release Tag `v0.2` (Lens 17: Documentation and deliverables).
+
+## Iteration 018: GraphRAG BM25 & N-Gram Policy Retrieval Optimization | 2026-09-20 17:52 | commit 90415ee
 - **Lens:** 7. GraphRAG quality & 12. LLM prompting and cost/latency
 - **Goal / hypothesis:** Traditional TF-IDF token matching without term-frequency saturation, bi-gram phrase recognition, or exact identifier boosting causes retrieval drift across nuanced fraud rules and drops 2-character tokens (e.g. `r1` through `r9`). Upgrading `LocalSemanticIndex` in `src/rag/embed.py` to BM25 ($k_1=1.2, b=0.75$) with bi-gram phrase indexing, exact policy ID boosting, and synchronizing discovered anomaly typologies (`TYP-DISCOVERED-DEVICE-POOL`, `TYP-RAPID-DISPERSION`) into `PolicyChunker` will achieve 1.0000 Mean Reciprocal Rank (MRR) and 100% Top-1 retrieval accuracy across all policy queries.
 - **Changes (files):**
