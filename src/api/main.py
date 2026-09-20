@@ -1469,6 +1469,23 @@ def export_case(case_id: str):
     raise HTTPException(status_code=404, detail="Answer file not found.")
 
 
+# Cryptographic Audit Ledger
+from src.policy.audit_ledger import get_audit_ledger
+audit_ledger = get_audit_ledger()
+
+@app.get("/api/audit/ledger")
+def get_audit_entries(limit: int = Query(default=100, ge=1, le=1000)):
+    """Retrieve the latest cryptographically signed audit ledger entries."""
+    entries = audit_ledger.get_entries(limit=limit)
+    return {"entries": entries, "count": len(entries)}
+
+@app.get("/api/audit/verify")
+def verify_audit_ledger():
+    """Verify cryptographic hash chain integrity and HMAC-SHA256 signatures."""
+    ok, msg = audit_ledger.verify_chain()
+    return {"verified": ok, "message": msg}
+
+
 # Mount UI static directory
 ui_dir = os.path.join(os.path.dirname(__file__), "../../ui")
 if os.path.exists(ui_dir):

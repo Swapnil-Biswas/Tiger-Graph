@@ -1,3 +1,29 @@
+## Iteration 084: Cryptographic Audit Log Signing & Tamper Verification | 2026-09-21 08:00 | commit pending
+- **Lens:** 9. Security, safety & defenses, 5. Regulatory compliance & SAR narrative, 12. Audit trail & anti-hallucination, 8. Explainability & human-in-the-loop
+- **Goal / hypothesis:** Regulatory standards (FRE 902(13)/(14), FinCEN 31 CFR 1020.320, SOC 2 Type II) require that every autonomous action, next-best-action routing, SAR filing, and human override produce an immutable, tamper-evident audit record. Implementing a cryptographic audit ledger delivers:
+  1. **Append-Only Cryptographic Hash Chain (`src/policy/audit_ledger.py`)**: `CryptographicAuditLedger` maintains an immutable sequence of `AuditLedgerEntry` objects where each block references the preceding block's SHA-256 digest (`prev_hash`).
+  2. **HMAC-SHA256 Signatures**: Every entry computes an HMAC-SHA256 signature over its canonical representation, preventing payload alteration, block deletion, or out-of-order reinsertion.
+  3. **Instant Chain Verification**: `verify_chain()` systematically traverses the ledger, verifying sequential index continuity, previous hash pointers, canonical SHA-256 digests, and cryptographic HMAC signatures.
+  4. **REST API Exposition**: Added `GET /api/audit/ledger` and `GET /api/audit/verify` in `src/api/main.py`.
+- **Changes (files):**
+  - `src/policy/audit_ledger.py`: Implemented `CryptographicAuditLedger` and `AuditLedgerEntry`.
+  - `src/api/main.py`: Added `/api/audit/ledger` and `/api/audit/verify` REST endpoints.
+  - `tests/test_audit_ledger.py`: Created 6 unit tests validating genesis blocks, hash chaining, tamper detection, signature verification, export/import round-trip, and concurrent thread safety.
+- **Tests added/updated:**
+  - `tests/test_audit_ledger.py` (6 unit tests, all pass).
+  - Total unit test suite expanded from 328 to **334** tests across 68 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 328 -> **334** (100% pass rate across 68 test suites)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 334 passed across 68 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 083: LRU Query Cache with Dynamic Invalidation on Edge Updates | 2026-09-21 07:45 | commit 45aaf26
 - **Lens:** 13. System performance & scalability, 7. Graph query design & efficiency, 11. Agent architecture & engineering
 - **Goal / hypothesis:** In high-concurrency multi-agent swarms (Orchestrator, AML Specialist, Cyber Forensics) and real-time streaming ingestion (> 1,000 EPS), repeated queries against the same card, customer, or device generate redundant traversals. Implementing a thread-safe LRU query cache delivers:

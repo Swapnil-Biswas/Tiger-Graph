@@ -297,5 +297,7 @@ Ranked by expected impact on Hackathon Judging Criteria:
 83. **[DONE - Iteration 083] [Performance & Caching] LRU Query Cache with Dynamic Invalidation on Edge Updates**
     - *Result:* Implemented `LRUQueryCache` in `src/graph/cache.py` featuring thread-safe operations (`threading.RLock`), $O(1)$ LRU eviction, TTL expiration, and dynamic tag-based invalidation (`invalidate_by_tag`). Integrated directly into `GraphClient` (`entity_profile`, `device_sharing`, `invalidate_entity_cache`), caching repetitive subgraphs and eliminating redundant traversals during concurrent multi-agent investigations. Added 6 unit tests in `tests/test_graph_cache.py` (328/328 tests pass across 67 suites).
 
-84. **[Security & Hardening] Cryptographic Audit Log Signing & Tamper Verification**
+84. **[DONE - Iteration 084] [Security & Hardening] Cryptographic Audit Log Signing & Tamper Verification**
+    - *Result:* Implemented `CryptographicAuditLedger` in `src/policy/audit_ledger.py` adhering to FRE 902(13)/(14) and FinCEN 31 CFR 1020.320. Maintains an immutable append-only hash chain linking every agent decision, action, and override with SHA-256 block digests and HMAC-SHA256 signatures. Exposes verification and retrieval endpoints `/api/audit/ledger` and `/api/audit/verify` in `src/api/main.py`. Added 6 unit tests in `tests/test_audit_ledger.py` (334/334 tests pass across 68 suites).
+
 85. **[Release Tag v0.85] Checkpoint 15 Audit & 85-Iteration Milestone Review**
