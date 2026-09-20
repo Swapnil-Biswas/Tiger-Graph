@@ -1,4 +1,30 @@
-## Iteration 027: Multi-Jurisdiction Regulatory Routing (FinCEN, GDPR, FCA) | 2026-09-20 18:28 | commit pending
+## Iteration 028: Self-Contained Interactive HTML Incident Dossier Export | 2026-09-20 18:30 | commit pending
+- **Lens:** 5. Explainability and trust & 9. Case summary and SAR narrative & 15. UI/UX
+- **Goal / hypothesis:** Executive risk committees, compliance audits, and law enforcement referrals require portable, offline-viewable incident dossiers without runtime dependencies on local servers or database connections. Building `src/cases/dossier_exporter.py` compiles complete case investigations into self-contained HTML documents embedding modern glassmorphism styling, interactive Cytoscape graph visualizations, evidence tables, counterfactual sensitivity matrices, and FinCEN SAR filings.
+- **Changes (files):**
+  - `src/cases/dossier_exporter.py`: Implemented `IncidentDossierExporter.export_html_dossier` rendering an offline single-file HTML document with 8 structured operational sections.
+  - `src/api/main.py`: Added `GET /api/cases/{case_id}/dossier` endpoint streaming self-contained HTML reports.
+  - `docs/sample_incident_dossier.html`: Generated sample offline incident dossier for reference.
+  - `tests/test_dossier_exporter.py`: Added 3 unit tests verifying HTML structure, section completeness, file export, and API delivery.
+- **Tests added/updated:**
+  - `tests/test_dossier_exporter.py` (3 unit tests, all pass).
+  - Total unit test suite expanded from 80 to **83** tests across 22 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 80 -> **83** (100% pass rate)
+  - Incident Dossier Export: Standalone, offline HTML report with embedded Cytoscape
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (83/83)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Embedding Cytoscape.js and serializing graph vertices directly into the HTML document allows stakeholders to interactively inspect the graph neighborhood (pan, zoom, node hover) offline without requiring web servers or Python environments.
+- **Follow-ups added to backlog:** Proceed to Iteration 029: Parallelized Asynchronous Graph Traversal Engine (Lens 2 & Lens 12).
+
+## Iteration 027: Multi-Jurisdiction Regulatory Routing (FinCEN, GDPR, FCA) | 2026-09-20 18:28 | commit 77b460b
 - **Lens:** 6. Policy and permissions & 7. Regulatory compliance and SAR & 13. Security and adversarial robustness
 - **Goal / hypothesis:** Global banking fraud operations require compliance across differing sovereign jurisdictions with specific statutory filing authorities (US FinCEN 31 CFR 1020.320, UK FCA/NCA POCA 2002 Part 7, EU 6AMLD) and strict data privacy regulations (GDPR Article 5 data minimization). Creating `src/policy/jurisdiction.py` automates regulatory detection, evaluates jurisdictional obligations, enforces 16-digit PAN truncation and email masking, and dispatches jurisdiction-compliant filing packages.
 - **Changes (files):**

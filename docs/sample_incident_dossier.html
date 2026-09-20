@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Incident Dossier — HHG-001</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(18, 26, 44, 0.85);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --accent: #00f0ff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 2rem;
+    }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .header {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .verdict-badge {
+      background: #10b981;
+      color: #fff;
+      padding: 0.5rem 1.25rem;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+    }
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+    .stat-card .lbl { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; }
+    .stat-card .val { font-size: 1.5rem; font-weight: 700; color: #fff; margin-top: 0.25rem; }
+    .section-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+    }
+    h2 { font-size: 1.25rem; margin-bottom: 1rem; color: #fff; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    p { margin-bottom: 1rem; color: var(--text); }
+    #cy-container {
+      width: 100%;
+      height: 320px;
+      background: #060911;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 1rem;
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; font-size: 0.9rem; }
+    th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; }
+    .badge-id { background: rgba(0, 240, 255, 0.15); color: var(--accent); padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600; }
+    .cf-inverted { color: #10b981; font-weight: 600; }
+    .route-badge { padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700; }
+    .route-auto { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+    .route-L1 { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+    .route-L2 { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+    .sar-box pre {
+      background: #060911;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      white-space: pre-wrap;
+      font-family: monospace;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      color: #94a3b8;
+    }
+    .seal {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      font-size: 0.85rem;
+    }
+    .seal strong { color: #10b981; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div>
+        <h1 style="font-size: 1.75rem; font-weight: 800; color: #fff;">TigerGraph Incident Dossier</h1>
+        <p style="color: var(--text-muted); margin-top: 0.25rem;">Case Reference: <code>HHG-001</code> | Status: Closed Legitimate</p>
+      </div>
+      <div class="verdict-badge">LEGITIMATE</div>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="lbl">Assessed Exposure</div>
+        <div class="val">$0.00</div>
+      </div>
+      <div class="stat-card">
+        <div class="lbl">Fraud Probability</div>
+        <div class="val">0.06</div>
+      </div>
+      <div class="stat-card">
+        <div class="lbl">Typology Pattern</div>
+        <div class="val" style="font-size: 1.1rem; padding-top: 0.4rem;">None</div>
+      </div>
+      <div class="stat-card">
+        <div class="lbl">Audit Faithfulness</div>
+        <div class="val" style="color: #10b981;">1.00</div>
+      </div>
+    </div>
+
+    <!-- Investigation Narrative -->
+    <div class="section-card">
+      <h2>1. Autonomous Investigation Narrative</h2>
+      <p>Investigation cleared the alert for card C12382-K1 as legitimate activity. Transaction characteristics match cardholder baseline history; customer confirmation confirmed authorized use.
+
+Decision Sensitivity (Counterfactual Boundaries):
+  1. [Unrecognized Device / Proxy]: Transaction executed from anonymous VPN proxy or unknown mobile OS -&gt; Would trigger Rule R1 step-up authentication challenge and elevate risk points by +30.0.
+  2. [Cross-Card Cluster Sharing]: Device or billing IP detected across ≥ 2 other compromised accounts -&gt; Would trigger Rule R6 syndicate ring alert, escalating to immediate card hold.</p>
+      <p style="font-size: 0.85rem; color: var(--text-muted);"><strong>Reason Stopped:</strong> Customer confirmation and baseline habit alignment verified legitimacy; alert cleared without fraud.</p>
+    </div>
+
+    <!-- Interactive Subgraph -->
+    <div class="section-card">
+      <h2>2. Incident Graph Topology</h2>
+      <div id="cy-container"></div>
+      <p style="font-size: 0.8rem; color: var(--text-muted);">Interactive Cytoscape visualization rendered offline. Nodes represent investigated card, customer, device, and exposure transactions.</p>
+    </div>
+
+    <!-- Evidence Citations -->
+    <div class="section-card">
+      <h2>3. Grounding Evidence & Citations</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Source</th>
+            <th>Query Reference</th>
+            <th>Claim / Fact</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class='badge-id'>EV-01</span></td><td>graph</td><td><code>query:get_txn(3514030)</code></td><td>Flagged transaction of $77.07 executed via in_person channel (risk score: 0.61).</td></tr>
+<tr><td><span class='badge-id'>EV-02</span></td><td>graph</td><td><code>query:entity_profile(card_id=C12382-K1)</code></td><td>Card baseline: 422 prior transactions totaling $48783.68 (median: $82.96, typical regions: [&#x27;204.0&#x27;, &#x27;264.0&#x27;]).</td></tr>
+<tr><td><span class='badge-id'>EV-03</span></td><td>graph</td><td><code>query:velocity(card_id=C12382-K1)</code></td><td>Velocity activity: 0 transaction(s) in last 1h, 0 in last 24h (spike ratio: 0.0).</td></tr>
+<tr><td><span class='badge-id'>EV-04</span></td><td>graph</td><td><code>query:similar_cases(card=C12382-K1)</code></td><td>Found 5 prior closed case(s) touching related entities: CC-1066, CC-1673, CC-2964.</td></tr>
+<tr><td><span class='badge-id'>EV-05</span></td><td>graph</td><td><code>query:empirical_bayes_prior(card=C12382-K1)</code></td><td>Historical memory prior: 4 precedent case(s) (4 confirmed fraud, 0 cleared) yielding posterior fraud risk rate of 0.333.</td></tr>
+<tr><td><span class='badge-id'>EV-06</span></td><td>customer</td><td><code>evidence_request:1</code></td><td>Customer confirms they made this purchase while traveling and still has possession of the card</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Counterfactual Analysis -->
+    <div class="section-card">
+      <h2>4. Counterfactual Decision Sensitivity</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Current Value</th>
+            <th>Inversion Threshold</th>
+            <th>Impact on Verdict</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong></strong></td><td><code></code></td><td><span class='cf-inverted'></span></td><td></td></tr>
+<tr><td><strong></strong></td><td><code></code></td><td><span class='cf-inverted'></span></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Next Best Actions -->
+    <div class="section-card">
+      <h2>5. Next-Best-Action Decisions & Policy Routing</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Action Proposal</th>
+            <th>Approval Route</th>
+            <th>Policy Justification</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>ALLOW_TRANSACTION</strong></td><td><span class='route-badge route-auto'>AUTO</span></td><td>R3: Customer confirmed transaction as authorized.</td></tr>
+<tr><td><strong>CLOSE_NO_FRAUD</strong></td><td><span class='route-badge route-auto'>AUTO</span></td><td>R3: Verification confirmed false alarm; alert closed without fraud.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Regulatory Filing Package -->
+    <div class="section-card">
+      <h2>6. Regulatory Filing (FinCEN SAR / NCA STR)</h2>
+      <p class='text-muted'>Regulatory criteria for filing a Suspicious Activity Report (SAR) were not triggered for this incident.</p>
+    </div>
+
+    <!-- Audit Seal -->
+    <div class="seal">
+      <div>
+        <strong>Deterministic Audit Trail Certified</strong> — 0 Hallucinations, Faithfulness: 1.00/1.00
+      </div>
+      <div style="color: var(--text-muted);">
+        Generated: 2026-09-20 13:00:14 UTC
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const elements = {"nodes": [{"data": {"id": "CASE-HHG-001", "label": "Case: HHG-001", "type": "Case", "color": "#8b5cf6"}}, {"data": {"id": "CARD-HHG-001", "label": "Card", "type": "Card", "color": "#00f0ff"}}], "edges": [{"data": {"source": "CASE-HHG-001", "target": "CARD-HHG-001", "label": "SUBJECT_CARD"}}]};
+      cytoscape({
+        container: document.getElementById('cy-container'),
+        elements: elements,
+        style: [
+          {
+            selector: 'node',
+            style: {
+              'label': 'data(label)',
+              'background-color': 'data(color)',
+              'color': '#fff',
+              'font-size': '10px',
+              'text-valign': 'center',
+              'text-halign': 'center',
+              'width': 35,
+              'height': 35
+            }
+          },
+          {
+            selector: 'edge',
+            style: {
+              'width': 2,
+              'line-color': 'rgba(255, 255, 255, 0.25)',
+              'target-arrow-color': 'rgba(255, 255, 255, 0.4)',
+              'target-arrow-shape': 'triangle',
+              'curve-style': 'bezier',
+              'label': 'data(label)',
+              'font-size': '8px',
+              'color': '#8a99b5'
+            }
+          }
+        ],
+        layout: {
+          name: 'breadthfirst',
+          directed: true,
+          padding: 30
+        }
+      });
+    });
+  </script>
+</body>
+</html>

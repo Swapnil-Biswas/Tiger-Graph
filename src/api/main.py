@@ -249,6 +249,22 @@ def get_regulatory_dispatch(case_id: str, jurisdiction: Optional[str] = None):
     return bundle
 
 
+@app.get("/api/cases/{case_id}/dossier")
+def get_case_dossier(case_id: str):
+    """Generates and returns self-contained interactive HTML incident dossier."""
+    if case_id not in active_cases:
+        if case_id in agent.client.store.case_pack:
+            res = agent.investigate_case(case_id)
+            active_cases[case_id] = res
+            case_manager.write_case_to_graph(res)
+        else:
+            raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
+
+    from src.cases.dossier_exporter import IncidentDossierExporter
+    html_report = IncidentDossierExporter.export_html_dossier(active_cases[case_id])
+    return Response(content=html_report, media_type="text/html")
+
+
 @app.get("/api/memory/similar")
 def get_similar_cases(card_id: str, customer_id: Optional[str] = None):
     """Retrieves similar cases from graph memory."""

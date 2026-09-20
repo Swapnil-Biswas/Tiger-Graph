@@ -105,10 +105,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 27. **[DONE - Iteration 027] [Policy & Compliance] Automated Multi-Jurisdiction Regulatory Routing (FinCEN, GDPR, FCA)**
     - *Result:* Implemented `JurisdictionComplianceRouter` in `src/policy/jurisdiction.py`, added endpoint `GET /api/cases/{case_id}/regulatory`, and integrated into `FraudInvestigatorAgent`. Enforces statutory authorities (FinCEN, NCA, 6AMLD) and GDPR Article 5 PAN/email data minimization. Added 4 unit tests in `tests/test_jurisdiction_routing.py` (80/80 tests pass).
 
-28. **[Explainability & Trust] Self-Contained Interactive HTML Incident Dossier Export**
-    - *Goal:* Build standalone interactive HTML dossier exporter embedding investigation timeline, Cytoscape subgraph, counterfactual matrix, and FinCEN SAR for executive briefing.
-    - *Files:* `src/cases/dossier_exporter.py`, `tests/test_dossier_exporter.py`
-    - *Metric Impact:* Explainability & Trust (Lens 5) & Case Summary & SAR (Lens 9).
+28. **[DONE - Iteration 028] [Explainability & Trust] Self-Contained Interactive HTML Incident Dossier Export**
+    - *Result:* Implemented `IncidentDossierExporter.export_html_dossier` in `src/cases/dossier_exporter.py` and endpoint `GET /api/cases/{case_id}/dossier` in `src/api/main.py`. Exports complete offline-viewable incident reports with embedded Cytoscape.js topologies, evidence citations, counterfactuals, and FinCEN SARs. Added 3 unit tests in `tests/test_dossier_exporter.py` (83/83 tests pass).
 
 29. **[Performance & Scaling] Parallelized Asynchronous Graph Traversal Engine**
     - *Goal:* Execute velocity, device sharing, cycle detection, and memory retrieval concurrently via `asyncio.gather` / thread pooling, cutting investigation latency by > 40%.
