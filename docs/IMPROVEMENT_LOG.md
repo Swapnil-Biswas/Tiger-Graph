@@ -1,4 +1,4 @@
-## Iteration 043: Dynamic High-Risk Merchant MCC Blacklisting & Adaptive Velocity Multipliers | 2026-09-20 21:00 | commit pending
+## Iteration 043: Dynamic High-Risk Merchant MCC Blacklisting & Adaptive Velocity Multipliers | 2026-09-20 21:00 | commit 9918c55
 - **Lens:** 6. Fraud detection accuracy & 8. Policy engine and regulatory compliance & 14. Testing and evaluation
 - **Goal / hypothesis:** High-risk Merchant Category Codes (MCC 6051 quasi-cash/cryptocurrency, 4829 wire transfers, 7995 gambling/casinos, 5944 precious metals) are disproportionately exploited by cashout rings and money mules. Static velocity thresholds fail to account for high-risk MCC compounding. Implementing `HighRiskMCCRiskEngine` in `src/policy/jurisdiction.py` detects high-risk MCC transactions, computes adaptive velocity multipliers (up to 3.75x for rapid gambling or crypto bursts), mandates supervisory restrictions (`RESTRICT_QUASI_CASH`, `RESTRICT_OUTBOUND_WIRES`, `STEP_UP_AUTH`), triggers `FILE_SAR_HIGH_RISK_MCC` on cumulative exposure >= thresholds, and connects into `JurisdictionComplianceRouter.generate_dispatch_bundle` and `GraphClient` (Q21).
 - **Changes (files):**
