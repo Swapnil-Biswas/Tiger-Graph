@@ -21,21 +21,29 @@ wheels/
 .installed.cfg
 *.egg
 
-# Virtual Environment
-venv/
-ENV/
+# Environment & Secrets
+.env
+*.pem
+*.key
 
-# Data Files & Caches (Large files > 100MB)
+# Data Files & Caches
 data/*.csv
 data/*.pkl
+data/raw/
 scratch/
 *.log
 
-# Environment variables
-.env
+# Dependencies & Build
+node_modules/
+.venv/
+venv/
+ENV/
+build/
+dist/
 
 # IDE & OS
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
+
