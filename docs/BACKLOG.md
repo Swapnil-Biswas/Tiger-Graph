@@ -176,10 +176,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 48. **[DONE - Iteration 048] [Graph Interoperability & Knowledge Graph] Dynamic Knowledge Graph Triplet Export for External Neo4j/TigerGraph GSQL Sync**
     - *Result:* Implemented `KnowledgeTriplet` and `KnowledgeGraphTripletExporter` in `src/graph/triplets.py` and exposed `export_knowledge_triplets` (Q25) in `GraphClient`. Extracts multi-hop incident subgraphs and serializes into 4 enterprise database dialects: TigerGraph GSQL DML (`USE GRAPH`, `INSERT INTO`), Neo4j Cypher (`MERGE`), W3C RDF N-Triples, and W3C JSON-LD. Enforces 100% case provenance integrity and strict temporal isolation. Added API endpoints `GET /api/cases/{case_id}/triplets` and `POST /api/graph/triplets/export`. Added 8 unit tests in `tests/test_graph_triplets.py` (175/175 tests pass across 39 suites).
 
-49. **[Machine Learning & Continuous Retraining] Active Learning Sample Selector & Hard-Negative Mining**
-    - *Goal:* Implement active learning sample selection engine using margin sampling, entropy uncertainty, and topological diversity clustering to mine informative hard negatives and borderline cases from historical transactions for continuous GBDT/GNN classifier retraining.
-    - *Files:* `src/ml/active_learning.py`, `src/graph/client.py`, `src/api/main.py`, `tests/test_active_learning.py`
-    - *Metric Impact:* Innovation & Machine Learning (Lens 6, Lens 14).
+49. **[DONE - Iteration 049] [Machine Learning & Continuous Retraining] Active Learning Sample Selector & Hard-Negative Mining**
+    - *Result:* Implemented `ActiveLearningSampleSelector` in `src/ml/active_learning.py` and exposed `select_active_learning_samples` (Q26) in `GraphClient`. Implemented 4 sampling strategies (margin uncertainty, binary Shannon entropy, hard negative mining, and hybrid balanced) with submodular topological diversity filtering and continuous retraining loss weights ($w_i \in [1.0, 5.0]$). Added API endpoints `POST /api/ml/active-learning/mine` and `GET /api/ml/active-learning/candidates`. Added 7 unit tests in `tests/test_active_learning.py` (182/182 tests pass across 40 suites).
 
 50. **[Release Tag v0.45] 50-Iteration Milestone Review & Checkpoint 8 Audit**
     - *Goal:* Execute comprehensive 50-iteration milestone review across all 15 evaluation lenses, verifying zero regression, 100% test pass rate across 40+ suites, 0 secrets, and creating release tag `v0.45`.

@@ -1,3 +1,37 @@
+## Iteration 049: Active Learning Sample Selector & Hard-Negative Mining Engine | 2026-09-20 23:05 | commit TBD_COMMIT
+- **Lens:** 6. Machine learning, fraud classification & GNNs & 14. Performance, scale & production readiness & 11. Agent architecture & engineering
+- **Goal / hypothesis:** Highly imbalanced financial crime transaction streams (> 98% benign) cause standard GBDT and GNN classifiers to suffer from low decision margins and high false alarm rates on complex edge cases. Implementing `ActiveLearningSampleSelector` in `src/ml/active_learning.py` enables continuous active learning and automated hard-negative mining across 4 distinct sampling strategies:
+  1. `margin_uncertainty`: Identifies samples nearest to the critical decision boundary ($1.0 - 2 \cdot |P - 0.50|$).
+  2. `shannon_entropy`: Maximizes normalized binary entropy $H(P) = -P \log_2 P - (1-P) \log_2(1-P)$.
+  3. `hard_negative`: Mines unconfirmed/non-fraud transactions ($y=0$) exhibiting topological discrepancy risk flags (high-risk MCC 6051/4829/7995/5944, multi-card shared devices, CTR structuring exposure, rapid velocity bursts).
+  4. `hybrid_balanced`: Combines margin uncertainty (40%), entropy (30%), hard-negative bonus, and topological flags into a unified informativeness score.
+  The engine enforces submodular topological diversity filtering (per-card and per-merchant caps) to maximize structural representation across the graph, and assigns dynamic sample retraining weights ($w_i \in [1.0, 5.0]$) for weighted GBDT/GNN continuous loss functions.
+- **Changes (files):**
+  - `src/ml/__init__.py`: Initialized machine learning package.
+  - `src/ml/active_learning.py`: Implemented `ActiveLearningSampleSelector` with uncertainty calculations, topological flag extraction, diversity filtering, and retraining weight assignments.
+  - `src/graph/client.py`: Added Q26 method `select_active_learning_samples` to `GraphClient`.
+  - `src/api/main.py`: Added `ActiveLearningMineRequest` with `model_rebuild()`, `POST /api/ml/active-learning/mine`, and `GET /api/ml/active-learning/candidates`.
+  - `tests/test_active_learning.py`: Created 7 unit tests covering margin uncertainty, entropy symmetry, hard-negative mining, hybrid scoring, topological diversity caps, temporal isolation, and REST API endpoints.
+- **Tests added/updated:**
+  - `tests/test_active_learning.py` (7 unit tests, all pass).
+  - Total unit test suite expanded from 175 to **182** tests across 40 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 175 -> **182** (100% pass rate across 40 test suites)
+  - Active Learning: 4 sampling heuristics (margin uncertainty, entropy, hard negatives, hybrid balanced)
+  - Continuous Retraining: Loss sample weighting $w_i \in [1.0, 5.0]$ with submodular topological diversity filtering
+  - Query Library: Expanded to Q26 (`select_active_learning_samples`)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (182/182)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Hard-negative mining combined with submodular diversity filtering prevents the model from over-indexing on repetitive clusters from a single compromised merchant, guaranteeing a broad geographic and topological training distribution.
+- **Follow-ups added to backlog:** Proceed to Iteration 050: Checkpoint 8 Milestone Review, Comprehensive 50-Iteration Audit & Release Tag v0.45 (50% Milestone).
+
 ## Iteration 048: Dynamic Knowledge Graph Triplet Export & Multi-Dialect Enterprise Synchronizer | 2026-09-20 23:00 | commit 79beebc
 - **Lens:** 1. Graph schema & modeling & 14. Performance, scale & production readiness & 11. Agent architecture & engineering
 - **Goal / hypothesis:** In enterprise financial crime operations, investigations conducted in memory must be synchronized losslessly to external distributed graph databases (TigerGraph clusters, Neo4j) and semantic ontologies (W3C RDF, JSON-LD) for cross-system federated analytics and immutable regulatory archiving. Implementing `KnowledgeGraphTripletExporter` in `src/graph/triplets.py` extracts canonical semantic triplets (`Subject`, `Predicate`, `Object`, `properties`, `temporal_epoch`, `provenance_case`) from multi-hop incident subgraphs and compiles them into 4 distinct enterprise database dialects:

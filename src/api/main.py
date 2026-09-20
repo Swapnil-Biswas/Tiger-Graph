@@ -165,6 +165,15 @@ class TripletExportRequest(BaseModel):
     format: str = "bundle"
 
 
+class ActiveLearningMineRequest(BaseModel):
+    target_size: int = 20
+    strategy: str = "hybrid_balanced"
+    as_of: Optional[str] = None
+    max_scan: int = 2000
+    max_per_card: int = 2
+    max_per_merchant: int = 3
+
+
 StructuringCheckRequest.model_rebuild()
 ContagionCheckRequest.model_rebuild()
 PoolEmbeddingRequest.model_rebuild()
@@ -179,6 +188,7 @@ EdgeDecayRequest.model_rebuild()
 StreamingPruneRequest.model_rebuild()
 RefineInvestigationRequest.model_rebuild()
 TripletExportRequest.model_rebuild()
+ActiveLearningMineRequest.model_rebuild()
 
 
 @app.get("/api/health")
@@ -698,6 +708,36 @@ def post_triplets_export(req: TripletExportRequest):
         as_of=req.as_of,
         format=req.format,
     )
+
+
+@app.post("/api/ml/active-learning/mine")
+def post_active_learning_mine(req: ActiveLearningMineRequest):
+    """Q26: Mines informative and hard-negative transaction candidates for continuous model retraining."""
+    return agent.client.select_active_learning_samples(
+        target_size=req.target_size,
+        strategy=req.strategy,
+        as_of=req.as_of,
+        max_scan=req.max_scan,
+        max_per_card=req.max_per_card,
+        max_per_merchant=req.max_per_merchant,
+    )
+
+
+@app.get("/api/ml/active-learning/candidates")
+def get_active_learning_candidates(
+    target_size: int = 20,
+    strategy: str = "hybrid_balanced",
+    as_of: Optional[str] = None,
+    max_scan: int = 2000,
+):
+    """Q26: Retrieves informative candidates for continuous retraining."""
+    return agent.client.select_active_learning_samples(
+        target_size=target_size,
+        strategy=strategy,
+        as_of=as_of,
+        max_scan=max_scan,
+    )
+
 
 
 

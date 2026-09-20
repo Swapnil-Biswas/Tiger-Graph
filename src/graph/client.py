@@ -1182,6 +1182,35 @@ class GraphClient:
                 "triplets": [t.to_dict() for t in triplets],
             }
 
+    # =========================================================================
+    # Q26: select_active_learning_samples
+    # Active Learning Sample Selector & Hard-Negative Mining
+    # =========================================================================
+    def select_active_learning_samples(
+        self,
+        target_size: int = 20,
+        strategy: str = "hybrid_balanced",
+        as_of: Optional[Union[str, int]] = None,
+        max_scan: int = 2000,
+        max_per_card: int = 2,
+        max_per_merchant: int = 3,
+    ) -> dict:
+        """
+        Q26: Mines the top-K most informative transaction samples for continuous GBDT/GNN retraining
+        using margin uncertainty, Shannon entropy, hard negative mining, and topological diversity.
+        """
+        from src.ml.active_learning import ActiveLearningSampleSelector
+        selector = ActiveLearningSampleSelector(self)
+        return selector.mine_candidate_samples(
+            target_size=target_size,
+            strategy=strategy,
+            as_of=as_of,
+            max_scan=max_scan,
+            max_per_card=max_per_card,
+            max_per_merchant=max_per_merchant,
+        )
+
+
 
 
 
