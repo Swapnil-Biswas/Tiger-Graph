@@ -57,6 +57,10 @@ playback_engine = TemporalGraphPlaybackEngine(client=agent.client)
 from src.cases.evidence_bundle import ComplianceEvidencePackager
 evidence_packager = ComplianceEvidencePackager()
 
+# Syndicate Cluster & LOD Engine
+from src.graph.cluster_renderer import SyndicateClusterEngine
+cluster_engine = SyndicateClusterEngine(store=agent.client.store)
+
 # In-memory store for active cases & approvals
 active_cases: Dict[str, Dict[str, Any]] = {}
 pending_approvals: Dict[str, Dict[str, Any]] = {}
@@ -1133,6 +1137,20 @@ def verify_evidence_bundle_endpoint(bundle: Dict[str, Any]):
     """Performs full cryptographic audit on an uploaded evidence bundle to detect bit-flips or tampering."""
     report = evidence_packager.verify_bundle(bundle)
     return report
+
+
+@app.get("/api/graph/syndicates/macro-topology")
+def get_syndicates_macro_topology():
+    """Retrieves high-level macro network topology across all syndicate nexuses."""
+    return cluster_engine.extract_macro_topology()
+
+
+@app.get("/api/graph/clusters/{case_id}/lod")
+def get_case_lod_clusters(case_id: str):
+    """Retrieves multi-scale Level-of-Detail (LOD 0, 1, 2) graph views with WebGL vertex buffers."""
+    lod_views = cluster_engine.generate_case_lod_views(case_id)
+    return {k: v.to_dict() for k, v in lod_views.items()}
+
 
 
 @app.post("/api/benchmark/run")
