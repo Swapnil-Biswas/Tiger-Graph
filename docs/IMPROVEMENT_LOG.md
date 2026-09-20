@@ -1,4 +1,33 @@
-## Iteration 030: Checkpoint 5 & Release Tag v0.3 (Major Milestone Review) | 2026-09-20 18:40 | commit v0.3
+## Iteration 031: Dynamic Graph Community Detection & Dense Fraud Subgraph Discovery | 2026-09-20 18:52 | commit pending
+- **Lens:** 1. Graph schema and ingestion & 2. Graph database and query performance & 14. Testing and evaluation
+- **Goal / hypothesis:** Fraud syndicates operate across interconnected networks of cards, devices, and customer accounts. Standard 1-hop queries fail to capture multi-hop community density and contagion. Implementing `GraphCommunityDetector` in `src/graph/algorithms.py` extracts multi-hop ego-networks, applies deterministic Label Propagation (LPA), computes internal edge density and fraud contagion, filters high-card generic browser profiles, and classifies dense fraud communities while preserving strict temporal isolation.
+- **Changes (files):**
+  - `src/graph/algorithms.py`: Created `GraphCommunityDetector.detect_community` with multi-hop BFS ego-network expansion, deterministic LPA, internal edge density calculation ($2E / (V(V-1))$), and fraud contagion scoring.
+  - `src/graph/client.py`: Added `detect_community` (Q13) to `GraphClient` and enhanced `parse_as_of_epoch` to scale timestamps > 20,000,000 to match transaction epoch units.
+  - `src/graph/traverser.py`: Added `_get_community` task to `ConcurrentGraphTraverser.gather_graph_evidence`.
+  - `src/agent/budgeter.py`: Added `allow_community_detection` flag across budget tiers.
+  - `src/agent/graph.py`: Integrated community detection evidence citations and topological context into `FraudInvestigatorAgent.investigate_case`.
+  - `tests/test_community_detection.py`: Added 4 unit tests verifying isolated entity communities, multi-card syndicate dense fraud cluster detection, strict temporal cutoff isolation, and sub-15ms execution latency.
+- **Tests added/updated:**
+  - `tests/test_community_detection.py` (4 unit tests, all pass).
+  - Total unit test suite expanded from 85 to **89** tests across 24 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 85 -> **89** (100% pass rate)
+  - Community Detection: Multi-hop LPA with internal density and fraud contagion scoring
+  - Execution Latency: ~10.7ms for complete multi-hop community extraction
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (89/89)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Generic browser user agents (e.g. mobile Safari headers) appear on dozens of unrelated cards, forming artificial mega-hubs. Filtering out devices with > 15 distinct cards prevents cluster pollution while allowing true physical hardware fingerprints (2-14 cards) to form tightly coupled fraud communities.
+- **Follow-ups added to backlog:** Proceed to Iteration 032: Topological Feature Vector & GNN-Ready Adjacency Matrix Exporter (Lens 2 & Lens 14).
+
+## Iteration 030: Checkpoint 5 & Release Tag v0.3 (Major Milestone Review) | 2026-09-20 18:40 | commit 5f5f7d6
 - **Lens:** 17. Documentation and deliverables & All Lenses 1-16
 - **Goal / hypothesis:** Conduct the comprehensive Major Milestone Review (Iteration 30/100) evaluating all system components against PRD Section 25 deliverables, verifying 0 regressions across all 23 unit test suites (85 unit tests), certifying all 20 benchmark case schemas, validating uncertainty calibration, confirming parallelized asynchronous graph traversal, multi-jurisdiction compliance routing, and self-contained HTML incident dossier generation, and creating release tag `v0.3`.
 - **Changes (files):**

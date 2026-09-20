@@ -219,6 +219,15 @@ class FraudInvestigatorAgent:
                 mem_prior.get("prior_cases_cited", []),
             )
 
+        comm_res = graph_evidence.get("community", {})
+        if comm_res.get("is_dense_fraud_cluster"):
+            add_evidence(
+                "graph",
+                f"query:community_detection({comm_res.get('community_id', 'cluster')})",
+                f"Dense fraud community {comm_res.get('community_id')} detected ({comm_res.get('card_count')} cards, {comm_res.get('device_count')} devices, internal density {comm_res.get('internal_edge_density')}, fraud contagion {comm_res.get('fraud_contagion_score')}).",
+                comm_res.get("cards", [])[:4],
+            )
+
         # Apply Architectural Ablation Overrides
         if ablate_graph:
             graph_evidence["context"] = {}
@@ -229,6 +238,7 @@ class FraudInvestigatorAgent:
             graph_evidence["geo"] = {"anomalies_count": 0, "has_geo_anomaly": False}
             graph_evidence["pattern_match"] = {"best_pattern": "none", "patterns": {}}
             graph_evidence["undocumented_anomaly"] = {}
+            graph_evidence["community"] = {"is_dense_fraud_cluster": False, "community_size": 1, "card_count": 1, "fraud_contagion_score": 0.0}
 
         if ablate_memory:
             graph_evidence["similar_cases"] = {"case_ids": [], "cases": []}
@@ -259,6 +269,7 @@ class FraudInvestigatorAgent:
                 "velocity": vel,
                 "geo": graph_evidence.get("geo"),
                 "ring": graph_evidence.get("ring"),
+                "community": comm_res,
                 "as_of": as_of,
             },
             max_chars=3000,

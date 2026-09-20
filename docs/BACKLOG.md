@@ -118,10 +118,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 
 ## Phase 4: Network Dynamics, Embeddings, & Deep Graph Intelligence (Iterations 31–45)
 
-31. **[Investigation Accuracy & Graph Algorithms] Dynamic Graph Community Detection & Dense Fraud Subgraph Discovery**
-    - *Goal:* Implement Louvain / label propagation community partitioner in `src/graph/algorithms.py` to identify tightly-knit multi-card/device clusters and calculate community-level fraud contagion risk.
-    - *Files:* `src/graph/algorithms.py`, `src/agent/graph.py`, `tests/test_community_detection.py`
-    - *Metric Impact:* Investigation Accuracy (Lens 1, 2).
+31. **[DONE - Iteration 031] [Investigation Accuracy & Graph Algorithms] Dynamic Graph Community Detection & Dense Fraud Subgraph Discovery**
+    - *Result:* Implemented `GraphCommunityDetector.detect_community` in `src/graph/algorithms.py` utilizing multi-hop ego-network extraction and deterministic Label Propagation Algorithm (LPA). Added `detect_community` to `GraphClient` (Q13) and integrated into `ConcurrentGraphTraverser` and `FraudInvestigatorAgent`. Computes internal edge density, modularity clusters, and fraud contagion risk while filtering high-card hub profiles and strictly enforcing temporal isolation. Added 4 unit tests in `tests/test_community_detection.py` (89/89 tests pass).
 
 32. **[Agent Architecture & GNN / Machine Learning] Topological Feature Vector & GNN-Ready Adjacency Matrix Exporter**
     - *Goal:* Build `src/graph/embeddings.py` exporting normalized topological node feature vectors (degree centrality, clustering coefficient, ego-net density, cycle participation, temporal velocity) and sparse adjacency matrices ready for PyG / DGL graph neural network ingestion.

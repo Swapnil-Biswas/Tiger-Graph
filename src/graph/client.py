@@ -25,18 +25,21 @@ def parse_as_of_epoch(as_of: Optional[Union[str, int, float]]) -> int:
     if as_of is None:
         return 9999999999
     if isinstance(as_of, (int, float)):
-        return int(as_of)
+        val = int(as_of)
+        return val // 1000 if val > 20_000_000 else val
     as_of_str = str(as_of).strip()
     if not as_of_str:
         return 9999999999
     try:
         # Check standard datetime format
         dt = datetime.strptime(as_of_str, "%Y-%m-%d %H:%M:%S")
-        return int(dt.timestamp())
+        val = int(dt.timestamp())
+        return val // 1000 if val > 20_000_000 else val
     except ValueError:
         try:
             dt = datetime.fromisoformat(as_of_str)
-            return int(dt.timestamp())
+            val = int(dt.timestamp())
+            return val // 1000 if val > 20_000_000 else val
         except Exception:
             return 9999999999
 
@@ -368,6 +371,25 @@ class GraphClient:
             "is_ring_candidate": is_ring_candidate,
             "density_score": round(min(1.0, len(connected_cards) / 5.0), 2),
         }
+
+    # =========================================================================
+    # Q13: detect_community
+    # Dynamic Graph Community Detection & Dense Fraud Subgraph Discovery
+    # =========================================================================
+    def detect_community(
+        self,
+        seed_id: str,
+        entity_type: str = "card",
+        as_of: Optional[Union[str, int]] = None,
+        max_hops: int = 2,
+    ) -> dict:
+        """
+        Q13: Partitions local ego-network via deterministic Label Propagation (LPA)
+        to identify dense multi-card/device fraud communities and evaluate contagion.
+        """
+        from src.graph.algorithms import GraphCommunityDetector
+        detector = GraphCommunityDetector(self)
+        return detector.detect_community(seed_id, entity_type=entity_type, as_of=as_of, max_hops=max_hops)
 
     # =========================================================================
     # Q7: new_entity_check

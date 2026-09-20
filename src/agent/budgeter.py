@@ -34,6 +34,7 @@ class AdaptiveGraphBudgeter:
                 "allow_deep_ring_scan": True,
                 "allow_geo_dispersion_scan": True,
                 "allow_undocumented_detector": True,
+                "allow_community_detection": True,
                 "prune_rationale": "High-uncertainty ambiguous signal requires comprehensive multi-hop graph expansion and anomaly detection.",
             }
 
@@ -45,6 +46,7 @@ class AdaptiveGraphBudgeter:
                 "allow_deep_ring_scan": True,
                 "allow_geo_dispersion_scan": True,
                 "allow_undocumented_detector": True,
+                "allow_community_detection": True,
                 "prune_rationale": "Direct customer report focuses on transaction context, device nexus, and immediate compromise confirmation.",
             }
 
@@ -56,6 +58,7 @@ class AdaptiveGraphBudgeter:
                 "allow_deep_ring_scan": True,
                 "allow_geo_dispersion_scan": True,
                 "allow_undocumented_detector": True,
+                "allow_community_detection": True,
                 "prune_rationale": "Critical risk score triggers targeted syndication checks and ring perimeter defense.",
             }
 
@@ -67,6 +70,7 @@ class AdaptiveGraphBudgeter:
                 "allow_deep_ring_scan": False,
                 "allow_geo_dispersion_scan": False,
                 "allow_undocumented_detector": False,
+                "allow_community_detection": False,
                 "prune_rationale": "Low-risk transaction on established account; pruned expensive multi-hop ring scans to accelerate turnaround.",
             }
 
@@ -77,5 +81,6 @@ class AdaptiveGraphBudgeter:
             "allow_deep_ring_scan": True,
             "allow_geo_dispersion_scan": True,
             "allow_undocumented_detector": True,
+            "allow_community_detection": True,
             "prune_rationale": "Standard balanced investigation plan with complete telemetry.",
         }

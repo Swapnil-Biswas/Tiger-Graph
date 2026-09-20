@@ -81,6 +81,11 @@ class ConcurrentGraphTraverser:
                 return "undocumented_anomaly", undocumented_detector.detect_anomalies(flagged_txn, as_of=as_of)
             return "undocumented_anomaly", {}
 
+        def _get_community():
+            if budget_plan.get("allow_community_detection", True):
+                return "community", client.detect_community(card_id, as_of=as_of)
+            return "community", {"is_dense_fraud_cluster": False, "community_size": 1}
+
         tasks = [
             _get_profile,
             _get_context,
@@ -93,6 +98,7 @@ class ConcurrentGraphTraverser:
             _get_ring,
             _get_geo,
             _get_undocumented,
+            _get_community,
         ]
 
         results = {}

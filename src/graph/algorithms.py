@@ -5,7 +5,244 @@ proxy rotation syndicate detection, and cross-card device nexus expansion)
 to uncover organized financial crime patterns beyond the 5 documented typologies.
 """
 
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Set, Union, Tuple
+from collections import defaultdict, Counter
+
+
+class GraphCommunityDetector:
+    """
+    Dynamic Graph Community Detection & Dense Fraud Subgraph Discovery.
+    Uses multi-hop ego-network extraction and deterministic Label Propagation Algorithm (LPA)
+    to discover cohesive clusters of cards, devices, and customers, computing internal edge density,
+    inter-entity connectivity, and community-level fraud contagion risk.
+    """
+
+    def __init__(self, client):
+        self.client = client
+
+    def detect_community(
+        self,
+        seed_id: str,
+        entity_type: str = "card",
+        as_of: Optional[Union[str, int]] = None,
+        max_hops: int = 2,
+        max_nodes: int = 60,
+    ) -> Dict[str, Any]:
+        """
+        Extracts the multi-hop ego-network around seed_id up to as_of,
+        partitions the local graph via deterministic Label Propagation,
+        and evaluates density, modularity, and fraud contagion.
+        """
+        from src.graph.client import parse_as_of_epoch
+        as_of_epoch = parse_as_of_epoch(as_of)
+
+        # 1. Resolve seed entity node
+        if entity_type == "card":
+            seed_card = seed_id
+        elif entity_type == "customer":
+            cust_txns = self.client.store.txns_by_customer.get(seed_id, [])
+            seed_card = cust_txns[0]["card_id"] if cust_txns else seed_id
+        elif entity_type == "transaction":
+            txn = self.client.store.transactions.get(seed_id, {})
+            seed_card = txn.get("card_id", seed_id)
+        else:
+            seed_card = seed_id
+
+        seed_node = f"CARD:{seed_card}"
+
+        # 2. Extract Multi-Hop Ego-Network
+        adj: Dict[str, Set[str]] = defaultdict(set)
+        node_types: Dict[str, str] = {seed_node: "card"}
+        visited: Set[str] = {seed_node}
+        queue: List[Tuple[str, int]] = [(seed_node, 0)]
+
+        while queue and len(visited) < max_nodes:
+            curr_node, hop = queue.pop(0)
+            if hop >= max_hops:
+                continue
+
+            if curr_node.startswith("CARD:"):
+                cid = curr_node[5:]
+                all_txns = self.client.store.txns_by_card.get(cid, [])
+                txns = [t for t in all_txns if t["epoch_s"] <= as_of_epoch]
+                for t in txns:
+                    # Customer edge
+                    cust = t.get("customer_id")
+                    if cust:
+                        c_node = f"CUST:{cust}"
+                        node_types[c_node] = "customer"
+                        if c_node not in visited:
+                            if len(visited) < max_nodes:
+                                visited.add(c_node)
+                                queue.append((c_node, hop + 1))
+                                adj[curr_node].add(c_node)
+                                adj[c_node].add(curr_node)
+                        else:
+                            adj[curr_node].add(c_node)
+                            adj[c_node].add(curr_node)
+
+                    # Device edge - exclude placeholders and generic browser hubs (> 15 cards)
+                    dev = t.get("device_profile")
+                    if dev and dev != "None | None | None | None" and not dev.startswith("UnknownDevice"):
+                        dev_card_count = len(set(x["card_id"] for x in self.client.store.txns_by_device.get(dev, [])))
+                        if dev_card_count <= 15:
+                            d_node = f"DEV:{dev}"
+                            node_types[d_node] = "device"
+                            if d_node not in visited:
+                                if len(visited) < max_nodes:
+                                    visited.add(d_node)
+                                    queue.append((d_node, hop + 1))
+                                    adj[curr_node].add(d_node)
+                                    adj[d_node].add(curr_node)
+                            else:
+                                adj[curr_node].add(d_node)
+                                adj[d_node].add(curr_node)
+
+            elif curr_node.startswith("DEV:"):
+                dev_id = curr_node[4:]
+                all_dev_txns = self.client.store.txns_by_device.get(dev_id, [])
+                dev_txns = [t for t in all_dev_txns if t["epoch_s"] <= as_of_epoch]
+                for t in dev_txns:
+                    other_card = t.get("card_id")
+                    if other_card:
+                        card_node = f"CARD:{other_card}"
+                        node_types[card_node] = "card"
+                        if card_node not in visited:
+                            if len(visited) < max_nodes:
+                                visited.add(card_node)
+                                queue.append((card_node, hop + 1))
+                                adj[curr_node].add(card_node)
+                                adj[card_node].add(curr_node)
+                        else:
+                            adj[curr_node].add(card_node)
+                            adj[card_node].add(curr_node)
+
+            elif curr_node.startswith("CUST:"):
+                cust_id = curr_node[5:]
+                all_cust_txns = self.client.store.txns_by_customer.get(cust_id, [])
+                for t in all_cust_txns:
+                    if t["epoch_s"] <= as_of_epoch:
+                        c = t.get("card_id")
+                        if c:
+                            card_node = f"CARD:{c}"
+                            node_types[card_node] = "card"
+                            if card_node not in visited:
+                                if len(visited) < max_nodes:
+                                    visited.add(card_node)
+                                    queue.append((card_node, hop + 1))
+                                    adj[curr_node].add(card_node)
+                                    adj[card_node].add(curr_node)
+                            else:
+                                adj[curr_node].add(card_node)
+                                adj[card_node].add(curr_node)
+
+        # 3. Deterministic Label Propagation Algorithm (LPA)
+        nodes_list = sorted(list(visited))
+        labels = {v: v for v in nodes_list}
+
+        if len(nodes_list) > 1:
+            for _ in range(10):
+                changed = False
+                for v in nodes_list:
+                    neighbors = [nbr for nbr in adj.get(v, set()) if nbr in labels]
+                    if not neighbors:
+                        continue
+                    counts = Counter(labels[nbr] for nbr in neighbors)
+                    max_c = max(counts.values())
+                    best_candidates = [lbl for lbl, c in counts.items() if c == max_c]
+                    best_label = min(best_candidates)  # Deterministic tie-breaking
+                    if labels[v] != best_label:
+                        labels[v] = best_label
+                        changed = True
+                if not changed:
+                    break
+
+        # 4. Extract Seed Community
+        seed_label = labels.get(seed_node, seed_node)
+        comm_nodes = [v for v in nodes_list if labels.get(v) == seed_label]
+        comm_set = set(comm_nodes)
+
+        cards = sorted([v[5:] for v in comm_nodes if v.startswith("CARD:")])
+        devices = sorted([v[4:] for v in comm_nodes if v.startswith("DEV:")])
+        customers = sorted([v[5:] for v in comm_nodes if v.startswith("CUST:")])
+
+        # 5. Internal Edges and Density
+        internal_edges = 0
+        for u in comm_nodes:
+            for w in adj.get(u, set()):
+                if w in comm_set and u < w:
+                    internal_edges += 1
+
+        comm_size = len(comm_nodes)
+        if comm_size > 1:
+            possible_edges = (comm_size * (comm_size - 1)) / 2.0
+            density = round(internal_edges / possible_edges, 3)
+        else:
+            density = 0.0
+
+        # 6. Fraud Contagion Evaluation
+        fraud_cases = []
+        for c in cards:
+            for case_obj in self.client.store.cases_by_card.get(c, []):
+                if parse_as_of_epoch(case_obj.get("opened_at")) <= as_of_epoch:
+                    if case_obj.get("outcome") == "confirmed_fraud":
+                        fraud_cases.append(case_obj["case_id"])
+
+        total_txns = 0
+        fraud_txns = 0
+        for c in cards:
+            for t in self.client.store.txns_by_card.get(c, []):
+                if t["epoch_s"] <= as_of_epoch:
+                    total_txns += 1
+                    if t.get("is_fraud") == 1:
+                        fraud_txns += 1
+
+        fraud_txn_rate = (fraud_txns / total_txns) if total_txns > 0 else 0.0
+        unique_fraud_cases = sorted(list(set(fraud_cases)))
+
+        if len(unique_fraud_cases) > 0:
+            contagion = min(1.0, 0.45 + (0.15 * len(unique_fraud_cases)) + (0.20 * fraud_txn_rate))
+        elif fraud_txn_rate > 0.05:
+            contagion = min(1.0, 0.30 + (0.50 * fraud_txn_rate))
+        else:
+            contagion = 0.0
+
+        fraud_contagion_score = round(contagion, 3)
+
+        # 7. Dense Fraud Cluster Classification
+        is_dense_fraud_cluster = (
+            len(cards) >= 2
+            and (len(devices) >= 1 or density >= 0.25)
+            and (fraud_contagion_score >= 0.40 or len(unique_fraud_cases) >= 1)
+        )
+
+        clean_comm_id = f"COMM-{seed_label.replace(':', '_').replace('|', '_').replace(' ', '_')[:30]}"
+
+        description = (
+            f"Dense fraud community {clean_comm_id} detected with {len(cards)} cards, "
+            f"{len(devices)} devices, internal density {density}, and contagion score {fraud_contagion_score}."
+            if is_dense_fraud_cluster else
+            f"Routine community of size {comm_size} ({len(cards)} card(s), {len(devices)} device(s))."
+        )
+
+        return {
+            "seed_id": seed_id,
+            "seed_node": seed_node,
+            "community_id": clean_comm_id,
+            "community_size": comm_size,
+            "card_count": len(cards),
+            "device_count": len(devices),
+            "customer_count": len(customers),
+            "cards": cards,
+            "devices": devices[:10],
+            "customers": customers[:10],
+            "internal_edges_count": internal_edges,
+            "internal_edge_density": density,
+            "fraud_contagion_score": fraud_contagion_score,
+            "fraud_cases_in_community": unique_fraud_cases,
+            "is_dense_fraud_cluster": is_dense_fraud_cluster,
+            "description": description,
+        }
 
 
 class UndocumentedPatternDetector:
