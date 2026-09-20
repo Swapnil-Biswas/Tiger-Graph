@@ -920,6 +920,55 @@ class GraphClient:
             window_hours=window_hours,
         )
 
+    # =========================================================================
+    # Syndicate Intelligence & Shared Merchant Collusion Expansion
+    # =========================================================================
+    def expand_syndicate(self, nexus_id: str, as_of: Optional[Union[str, int]] = None) -> dict:
+        """
+        Traverses multi-case transactions across all syndicate member cards and cases
+        to detect shared merchant collusions, testing grounds, and proxy hubs.
+        """
+        from src.cases.manager import CaseManager
+        cm = CaseManager(self)
+        return cm.expand_syndicate_merchants(nexus_id, as_of=as_of)
+
+    def expand_syndicate_for_card(self, card_id: str, as_of: Optional[Union[str, int]] = None) -> dict:
+        """
+        Finds any syndicate nexus associated with card_id and expands its shared merchant network.
+        If no nexus exists, analyzes device-sharing peers for merchant overlap.
+        """
+        if hasattr(self.store, "graph_syndicates"):
+            for nid, n in self.store.graph_syndicates.items():
+                if card_id in n.get("member_cards", []):
+                    return self.expand_syndicate(nid, as_of=as_of)
+
+        # Fallback to local device peers
+        as_of_epoch = parse_as_of_epoch(as_of)
+        card_devs = self.store.devices_by_card.get(card_id, set())
+        peer_cards = set()
+        for dev in card_devs:
+            peer_cards.update(self.store.cards_by_device.get(dev, set()))
+
+        if len(peer_cards) < 2:
+            return {"shared_merchants_count": 0, "collusion_risk_score": 0.0, "collusive_merchants": []}
+
+        # Check merchant overlap across peer cards
+        merchants_seen = {}
+        for cid in peer_cards:
+            for t in self.store.txns_by_card.get(cid, []):
+                if t.get("epoch_s", 0) <= as_of_epoch:
+                    m = t.get("merchant_id") or t.get("merchant") or f"MERCH-{t.get('addr1', 'NA')}-{t.get('product_code', 'NA')}"
+                    merchants_seen.setdefault(m, set()).add(cid)
+
+        shared = [m for m, cards in merchants_seen.items() if len(cards) >= 2]
+        return {
+            "peer_cards_count": len(peer_cards),
+            "shared_merchants_count": len(shared),
+            "collusion_risk_score": min(0.99, round(0.30 * len(shared), 2)),
+            "collusive_merchants": [{"merchant_id": m, "card_count": len(merchants_seen[m])} for m in shared[:5]],
+        }
+
+
 
 
 

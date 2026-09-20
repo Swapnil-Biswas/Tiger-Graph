@@ -378,6 +378,15 @@ def run_cross_border_check(req: CrossBorderCheckRequest):
     )
 
 
+@app.get("/api/syndicates/{nexus_id}/merchants")
+def get_syndicate_merchants(nexus_id: str, as_of: Optional[str] = None):
+    """Retrieves multi-case shared merchant and proxy hub expansion for a syndicate nexus."""
+    if not hasattr(agent.client.store, "graph_syndicates") or nexus_id not in agent.client.store.graph_syndicates:
+        raise HTTPException(status_code=404, detail=f"Syndicate nexus {nexus_id} not found.")
+    
+    return case_manager.expand_syndicate_merchants(nexus_id=nexus_id, as_of=as_of)
+
+
 @app.get("/api/cases/{case_id}/contagion")
 def get_case_contagion(case_id: str, restart_prob: float = 0.15):
     """Calculates Personalized PageRank fraud contagion score from confirmed fraud seeds."""

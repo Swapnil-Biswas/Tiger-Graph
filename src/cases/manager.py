@@ -176,6 +176,141 @@ class CaseManager:
                     })
         return links
 
+    def expand_syndicate_merchants(self, nexus_id: str, as_of: Optional[Any] = None) -> Dict[str, Any]:
+        """
+        Traverses multi-case transactions across all syndicate member cards and cases
+        to detect shared merchant collusions, testing grounds, and proxy hubs.
+        """
+        from src.graph.client import parse_as_of_epoch
+        as_of_epoch = parse_as_of_epoch(as_of)
+        
+        nexus = self.store.graph_syndicates.get(nexus_id)
+        if not nexus:
+            return {"nexus_id": nexus_id, "error": f"Syndicate nexus {nexus_id} not found."}
+
+        member_cards = nexus.get("member_cards", [])
+        member_cases = nexus.get("member_cases", [])
+
+        # Gather transactions across member cards
+        all_txns = []
+        for card_id in member_cards:
+            card_txns = self.store.txns_by_card.get(card_id, [])
+            valid_txns = [t for t in card_txns if t.get("epoch_s", 0) <= as_of_epoch]
+            all_txns.extend(valid_txns)
+
+        # Aggregate by merchant
+        merchants_map: Dict[str, Dict[str, Any]] = {}
+        for t in all_txns:
+            m_id = t.get("merchant_id") or t.get("merchant")
+            if not m_id:
+                addr1 = t.get("addr1")
+                prod = t.get("product_code")
+                m_id = f"MERCH-{addr1 or 'NA'}-{prod or 'NA'}"
+
+            amt = float(t.get("amount", 0.0) or 0.0)
+            risk = float(t.get("risk_score", 0.0) or 0.0)
+            cid = t.get("card_id")
+
+            if m_id not in merchants_map:
+                merchants_map[m_id] = {
+                    "merchant_id": m_id,
+                    "txn_count": 0,
+                    "total_exposure_usd": 0.0,
+                    "cards": set(),
+                    "risk_scores": [],
+                    "channels": set(),
+                }
+            merchants_map[m_id]["txn_count"] += 1
+            merchants_map[m_id]["total_exposure_usd"] += amt
+            if cid:
+                merchants_map[m_id]["cards"].add(cid)
+            merchants_map[m_id]["risk_scores"].append(risk)
+            if t.get("channel"):
+                merchants_map[m_id]["channels"].add(t.get("channel"))
+
+        # Detect collusive merchants (shared across >= 2 member cards or concentrated exposure)
+        collusive_merchants = []
+        collusive_exposure = 0.0
+
+        for m_id, m_data in merchants_map.items():
+            card_count = len(m_data["cards"])
+            avg_risk = sum(m_data["risk_scores"]) / len(m_data["risk_scores"]) if m_data["risk_scores"] else 0.0
+            is_shared = (card_count >= 2)
+            is_collusive = is_shared and (card_count >= 2 or m_data["total_exposure_usd"] >= 2000.0 or avg_risk >= 0.60)
+
+            if is_collusive:
+                m_info = {
+                    "merchant_id": m_id,
+                    "card_count": card_count,
+                    "txn_count": m_data["txn_count"],
+                    "exposure_usd": round(m_data["total_exposure_usd"], 2),
+                    "avg_risk_score": round(avg_risk, 3),
+                    "cards": sorted(list(m_data["cards"])),
+                    "channels": sorted(list(m_data["channels"])),
+                    "collusion_indicators": [],
+                }
+                if card_count >= 2:
+                    m_info["collusion_indicators"].append("MULTI_CARD_SHARED_MERCHANT")
+                if m_data["total_exposure_usd"] >= 2000.0:
+                    m_info["collusion_indicators"].append("HIGH_VOLUME_CONCENTRATION")
+                if avg_risk >= 0.60:
+                    m_info["collusion_indicators"].append("ELEVATED_FRAUD_RISK")
+
+                collusive_merchants.append(m_info)
+                collusive_exposure += m_data["total_exposure_usd"]
+
+        collusive_merchants.sort(key=lambda x: (x["card_count"], x["exposure_usd"]), reverse=True)
+
+        # Calculate collusion risk score
+        shared_count = len(collusive_merchants)
+        collusion_risk = 0.0
+        if shared_count >= 3:
+            collusion_risk += 0.50
+        elif shared_count >= 1:
+            collusion_risk += 0.30
+
+        if collusive_exposure >= 5000.0:
+            collusion_risk += 0.35
+        elif collusive_exposure >= 2000.0:
+            collusion_risk += 0.20
+
+        if any(m["card_count"] >= 3 for m in collusive_merchants):
+            collusion_risk += 0.15
+
+        collusion_risk = min(0.99, round(collusion_risk, 2))
+
+        # Store in nexus
+        nexus["collusive_merchants"] = collusive_merchants
+        nexus["collusion_risk_score"] = collusion_risk
+        nexus["collusive_exposure_usd"] = round(collusive_exposure, 2)
+        nexus["shared_merchants_count"] = shared_count
+
+        # Create COLLUSIVE_MERCHANT_LINK edges in graph
+        now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        for m in collusive_merchants:
+            for c_id in member_cases:
+                edge = {
+                    "from_case": c_id,
+                    "to_merchant": m["merchant_id"],
+                    "type": "COLLUSIVE_MERCHANT_LINK",
+                    "via_nexus": nexus_id,
+                    "shared_cards_count": m["card_count"],
+                    "exposure_usd": m["exposure_usd"],
+                    "established_at": now_str,
+                }
+                self.store.graph_case_edges.append(edge)
+
+        return {
+            "nexus_id": nexus_id,
+            "member_cases_count": len(member_cases),
+            "member_cards_count": len(member_cards),
+            "total_merchants_contacted": len(merchants_map),
+            "shared_merchants_count": shared_count,
+            "collusive_exposure_usd": round(collusive_exposure, 2),
+            "collusion_risk_score": collusion_risk,
+            "collusive_merchants": collusive_merchants[:10],
+        }
+
     def reconstruct_case_from_graph(self, case_id: str) -> Dict[str, Any]:
         """
         Reconstructs the full investigation case record solely from graph vertices.
@@ -209,6 +344,9 @@ class CaseManager:
                     "reason": act_obj["reason"],
                 })
 
+        nexus_id = c_vertex.get("syndicate_nexus_id")
+        nexus_data = self.store.graph_syndicates.get(nexus_id) if nexus_id else None
+
         return {
             "graph_case_id": graph_case_id,
             "case_id": c_vertex["case_id"],
@@ -222,7 +360,9 @@ class CaseManager:
             "connected_card_ids": c_vertex["connected_cards"],
             "similar_prior_cases": c_vertex["similar_cases"],
             "affected_txn_ids": c_vertex["affected_txns"],
-            "syndicate_nexus_id": c_vertex.get("syndicate_nexus_id"),
+            "syndicate_nexus_id": nexus_id,
+            "syndicate_collusion_risk": nexus_data.get("collusion_risk_score", 0.0) if nexus_data else 0.0,
+            "collusive_merchants": nexus_data.get("collusive_merchants", []) if nexus_data else [],
             "cross_case_links": self.get_cross_case_links(graph_case_id),
             "evidence": evidence_list,
             "actions": action_list,

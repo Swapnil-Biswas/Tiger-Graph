@@ -1,3 +1,31 @@
+## Iteration 041: Cross-Case Syndicate Expansion & Shared Merchant Collusion | 2026-09-20 20:30 | commit pending
+- **Lens:** 1. Graph schema and ingestion & 2. Undocumented pattern discovery & 14. Testing and evaluation
+- **Goal / hypothesis:** Sophisticated cybercrime syndicates frequently funnel stolen cards through shared collusive merchant accounts or coordinated testing merchant endpoints. Individual card-level views fail to detect that multiple cards in a syndicate nexus overlap on specific merchants. Implementing `expand_syndicate_merchants` in `src/cases/manager.py` analyzes transaction activity across all member cards and cases, detects multi-card merchant overlaps, flags high-risk merchant concentration, computes syndicate collusion risk scores, creates `COLLUSIVE_MERCHANT_LINK` graph edges, and integrates into `ConcurrentGraphTraverser` and the REST API.
+- **Changes (files):**
+  - `src/cases/manager.py`: Created `expand_syndicate_merchants` with multi-card merchant aggregation, collusion risk scoring ($[0, 1]$), `COLLUSIVE_MERCHANT_LINK` graph edge creation, and integrated collusion details into `reconstruct_case_from_graph`.
+  - `src/graph/traverser.py`: Added `_get_syndicate_merchants` task to `ConcurrentGraphTraverser.gather_graph_evidence`.
+  - `src/graph/client.py`: Added `expand_syndicate` and `expand_syndicate_for_card` to `GraphClient`.
+  - `src/api/main.py`: Added `GET /api/syndicates/{nexus_id}/merchants` endpoint.
+  - `tests/test_syndicate_merchant_expansion.py`: Created 6 unit tests covering multi-card shared merchant collusion, single-card baseline, graph edge persistence, temporal isolation, case reconstruction, and API endpoint.
+- **Tests added/updated:**
+  - `tests/test_syndicate_merchant_expansion.py` (6 unit tests, all pass).
+  - Total unit test suite expanded from 128 to **134** tests across 33 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 128 -> **134** (100% pass rate across 33 test suites)
+  - Syndicate Intelligence: Cross-case shared merchant expansion and collusion risk scoring
+  - Graph Topology: Automated creation of `COLLUSIVE_MERCHANT_LINK` graph edges
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (134/134)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Analyzing transaction endpoints across all syndicate member cards reveals shared collusive merchants that are otherwise invisible from isolated card investigations, allowing proactive blacklisting of compromised merchant accounts across all cards in the nexus.
+- **Follow-ups added to backlog:** Proceed to Iteration 042: Decision Boundary Visualization in HTML Incident Dossier (Lens 9 & Lens 10).
+
 ## Iteration 040: Checkpoint 7 Milestone Review & Release Tag v0.4 | 2026-09-20 20:15 | commit 12285c5
 - **Lens:** 14. Testing and evaluation & 17. Documentation & deliverables & 11. Agent architecture & engineering
 - **Goal / hypothesis:** Conduct comprehensive 40% milestone audit of the TigerGraph Agentic Fraud Investigation Agent, certifying system calibration, query scalability across Q1-Q20, deterministic reliability across repeated benchmark runs, complete schema conformance, and release tag `v0.4`.

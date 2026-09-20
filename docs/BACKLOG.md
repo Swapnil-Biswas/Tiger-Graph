@@ -152,10 +152,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 
 ## Phase 5: Advanced Syndication & Operational Hardening (Iterations 41–60)
 
-41. **[Syndicate Intelligence] Cross-Case Syndicate Expansion & Shared Merchant Traversal**
-    - *Goal:* Implement multi-case shared merchant and proxy hub expansion in `SyndicateNexus` to track distributed merchant collusions.
-    - *Files:* `src/cases/manager.py`, `src/graph/traverser.py`, `tests/test_syndicate_merchant_expansion.py`
-    - *Metric Impact:* Syndicate Detection (Lens 1, 2).
+41. **[DONE - Iteration 041] [Syndicate Intelligence] Cross-Case Syndicate Expansion & Shared Merchant Traversal**
+    - *Result:* Implemented `expand_syndicate_merchants` in `src/cases/manager.py` analyzing transactions across all member cards and cases in a `SyndicateNexus`. Flags multi-card shared merchants, evaluates merchant collusion risk scores ($[0, 1]$), creates `COLLUSIVE_MERCHANT_LINK` graph edges, and integrates into `reconstruct_case_from_graph` and `ConcurrentGraphTraverser`. Exposed `expand_syndicate` and `expand_syndicate_for_card` in `GraphClient`. Added API endpoint `/api/syndicates/{nexus_id}/merchants`. Added 6 unit tests in `tests/test_syndicate_merchant_expansion.py` (134/134 tests pass).
 
 42. **[Explainability & Compliance] Decision Boundary Visualization in HTML Incident Dossier**
     - *Goal:* Render interactive counterfactual sensitivity sliders and decision boundary charts directly inside `IncidentDossierExporter` HTML reports.

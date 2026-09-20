@@ -101,6 +101,11 @@ class ConcurrentGraphTraverser:
                 return "contagion", client.calculate_fraud_contagion(card_id, as_of=as_of)
             return "contagion", {"target_contagion_score": 0.0, "contagion_risk_level": "none"}
 
+        def _get_syndicate_merchants():
+            if budget_plan.get("allow_deep_ring_scan", True) and hasattr(client, "expand_syndicate_for_card"):
+                return "syndicate_merchants", client.expand_syndicate_for_card(card_id, as_of=as_of)
+            return "syndicate_merchants", {"shared_merchants_count": 0, "collusive_merchants": []}
+
         tasks = [
             _get_profile,
             _get_context,
@@ -117,6 +122,7 @@ class ConcurrentGraphTraverser:
             _get_burst_cluster,
             _get_structuring,
             _get_contagion,
+            _get_syndicate_merchants,
         ]
 
         results = {}
