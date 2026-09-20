@@ -1,3 +1,31 @@
+## Iteration 080: Checkpoint 14 Audit, 80-Iteration Milestone Review, and v0.8 Release Tag | 2026-09-21 07:00 | commit v0.8
+- **Lens:** 14. Testing, evaluation & benchmarks, 11. Agent architecture & engineering, 10. Case summary, explanation & visual reporting
+- **Goal / hypothesis:** Reaching 80 iterations (80% milestone — four-fifths of the 100-iteration continuous improvement loop) requires a comprehensive audit across all 15 PRD evaluation lenses to verify architectural documentation, sanity verification scripts, type annotation coverage, CLI tooling, and operational stability before tagging `v0.8`.
+  1. **Audit Scope**: Verified all 312 unit tests across 64 test suites passing at 100%.
+  2. **Mandatory Gates**: Verified 20/20 valid benchmark answers (`eval/validate_answers.py cases/`), green demo path (`tests/test_phase4.py`), 0.00% run-to-run variance, 88.92% type annotation coverage, 0 policy violations, and 0 secrets staged.
+  3. **Milestone Documentation**: Updated `docs/MILESTONES.md` with Section 3.5 detailing the architecture, metrics, and production readiness at 80 iterations.
+  4. **Release Tag**: Created and pushed Git tag `v0.8`.
+- **Changes (files):**
+  - `docs/MILESTONES.md`: Added Section 3.5 (Checkpoint 14 Audit & 80-Iteration Review) and updated release tag catalog with `v0.8`.
+  - `docs/METRICS.md`: Added row 080 with tag `v0.8`.
+  - `docs/BACKLOG.md`: Marked item 80 as DONE and scheduled Iterations 81–85.
+  - `docs/IMPROVEMENT_LOG.md`: Documented Iteration 080.
+- **Tests added/updated:**
+  - Full suite verified: 312/312 tests pass across 64 suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 312/312 tests pass (100% across 64 suites)
+  - Milestone: 80% completed (80/100 iterations), Release Tag `v0.8`
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Type Annotation Coverage: 88.92%
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 312 passed across 64 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 079: Interactive CLI Fraud Investigator & Terminal Dashboard | 2026-09-21 06:45 | commit 6a530d1
 - **Lens:** 8. Explainability & human-in-the-loop, 10. Case summary, explanation & visual reporting, 11. Agent architecture & engineering, 7. Graph query design & efficiency
 - **Goal / hypothesis:** Security Operations Center (SOC) fraud investigators, compliance officers, and command-line power users require rapid terminal access to inspect cases, view multi-hop graph evidence, evaluate multi-agent consensus verdicts, and monitor streaming transactions without launching a full browser. Building `src/cli/investigate_cli.py` delivers:
