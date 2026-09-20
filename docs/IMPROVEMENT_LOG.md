@@ -1,4 +1,4 @@
-## Iteration 082: Extended 50-Case High-Stress Benchmark Suite | 2026-09-21 07:30 | commit pending
+## Iteration 082: Extended 50-Case High-Stress Benchmark Suite | 2026-09-21 07:30 | commit 00c9d5f
 - **Lens:** 14. Testing, evaluation & benchmarks, 11. Agent architecture & engineering, 3. Next best action & policy guidance
 - **Goal / hypothesis:** Beyond the 20 official benchmark cases, mission-critical fraud systems must prove robustness against diverse, synthetic edge cases (impossible travel, circular mule chains, dormant card bursts, sub-threshold BSA smurfing, quasi-cash crypto bursts) without overfitting or schema drift. Creating the extended 50-case benchmark suite delivers:
   1. **50 Synthetic High-Stress Cases (`eval/extended_cases/EXT-001.json` - `EXT-050.json`)**: Synthesizes 50 edge-case scenarios covering 12 typologies, realistic exposure amounts ($15 to $2,500), multi-card linkages, counterfactuals, and dual-gate actions.
