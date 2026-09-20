@@ -1,4 +1,4 @@
-## Iteration 051: Multi-Agent Federation: Specialized AML Sub-Agent & Statutory Grounding | 2026-09-20 23:15 | commit TBD_COMMIT
+## Iteration 051: Multi-Agent Federation: Specialized AML Sub-Agent & Statutory Grounding | 2026-09-20 23:15 | commit 1ccc3b0
 - **Lens:** 5. Regulatory compliance, BSA & SAR narrative & 11. Agent architecture & engineering
 - **Goal / hypothesis:** In enterprise risk operations, real-time fraud containment (blocking cards, declining transactions) must be decoupled from and federated with Anti-Money Laundering (AML) compliance (longitudinal structuring analysis, correspondent transit screening, FinCEN/FATF reporting). Implementing `AMLSpecialistAgent` in `src/agent/aml_agent.py` establishes a dedicated domain sub-agent that synthesizes multi-entity structuring (Q16), correspondent layering (Q20), and quasi-cash MCCs (Q21) into an immutable `AMLAssessment`. The sub-agent formulates statutory legal citations (`31 USC 5324(a)`, `31 CFR 1020.320`, `FATF Recommendation 16`), determines mandatory SAR obligations, and federates into `FraudInvestigatorAgent.investigate_case` as Step 13.
 - **Changes (files):**
