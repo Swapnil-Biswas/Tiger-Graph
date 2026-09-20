@@ -84,10 +84,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 
 ## Phase 3: Advanced Agentic Autonomy, Streaming, & Calibration (Iterations 21–40)
 
-21. **[Agent Architecture & LLM Cost/Latency] Dynamic Graph Query Budgeting & Adaptive Traversal Pruning**
-    - *Goal:* Implement `AdaptiveGraphBudgeter` dynamically allocating tool call budgets based on initial risk entropy and early evidence sufficiency, pruning redundant 2-hop neighborhood traversals when single-hop evidence is already conclusive.
-    - *Files:* `src/agent/budgeter.py`, `src/agent/graph.py`, `tests/test_budgeter.py`
-    - *Metric Impact:* Agent Architecture (Lens 11) & LLM Prompting/Cost (Lens 12).
+21. **[DONE - Iteration 021] [Agent Architecture & LLM Cost/Latency] Dynamic Graph Query Budgeting & Adaptive Traversal Pruning**
+    - *Result:* Built `AdaptiveGraphBudgeter` in `src/agent/budgeter.py` and integrated into `FraudInvestigatorAgent`. Allocates 4 operational tiers (exhaustive 12 tools, targeted escalation 8 tools, targeted confirmation 9 tools, fast path 5 tools). Prunes expensive multi-hop scans on routine accounts. Added 4 unit tests in `tests/test_budgeter.py` (63 tests, 100% pass).
 
 22. **[UI/UX & Streaming] Real-Time SSE Investigation Progress & Evidence Timeline in Web UI**
     - *Goal:* Wire Server-Sent Events (SSE) from `/api/investigate/stream` to the web dashboard (`ui/app.js`), showing live step-by-step progress, graph query execution times, and dynamic uncertainty gauge updates during live runs.

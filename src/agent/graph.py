@@ -31,6 +31,7 @@ from src.graph.algorithms import UndocumentedPatternDetector
 from src.agent.security import InputSanitizer
 from src.cases.memory import BayesianCaseMemoryPrior
 from src.agent.explainer_validator import AuditTrailSelfCritiqueVerifier
+from src.agent.budgeter import AdaptiveGraphBudgeter
 
 
 class FraudInvestigatorAgent:
@@ -217,6 +218,9 @@ class FraudInvestigatorAgent:
                 mem_prior.get("prior_cases_cited", []),
             )
 
+        # Determine Adaptive Tool Budget & Pruning Plan
+        budget_plan = AdaptiveGraphBudgeter.determine_plan(trigger_data, profile)
+
         # Compile Graph Evidence Bundle
         graph_evidence = {
             "profile": profile,
@@ -224,12 +228,13 @@ class FraudInvestigatorAgent:
             "velocity": vel,
             "new_entity": new_ent,
             "device_sharing": sharing,
-            "ring": self.client.ring_detection(card_id, as_of=as_of),
-            "geo": self.client.geo_impossible(card_id, as_of=as_of),
+            "ring": self.client.ring_detection(card_id, as_of=as_of) if budget_plan["allow_deep_ring_scan"] else {"ring_detected": False},
+            "geo": self.client.geo_impossible(card_id, as_of=as_of) if budget_plan["allow_geo_dispersion_scan"] else {"anomalies_count": 0, "has_geo_anomaly": False},
             "similar_cases": similar_cases_res,
             "memory_prior": mem_prior,
             "pattern_match": pat_res,
-            "undocumented_anomaly": self.undocumented_detector.detect_anomalies(flagged_txn, as_of=as_of) if flagged_txn else {},
+            "undocumented_anomaly": self.undocumented_detector.detect_anomalies(flagged_txn, as_of=as_of) if (flagged_txn and budget_plan["allow_undocumented_detector"]) else {},
+            "budget_plan": budget_plan,
         }
 
         # Apply Architectural Ablation Overrides
@@ -459,5 +464,6 @@ class FraudInvestigatorAgent:
             active_evidence_items=[ev.model_dump() for ev in evidence_items],
         )
         answer["audit_critique"] = critique
+        answer["budget_plan"] = budget_plan
 
         return answer

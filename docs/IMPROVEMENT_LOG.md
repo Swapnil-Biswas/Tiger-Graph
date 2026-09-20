@@ -1,4 +1,30 @@
-## Iteration 020: Checkpoint 3 Audit, State of the Project v0.2, and Tag v0.2 | 2026-09-20 18:00 | commit pending
+## Iteration 021: Adaptive Graph Query Budgeting & Traversal Pruning | 2026-09-20 18:03 | commit pending
+- **Lens:** 11. Agent architecture and robustness & 12. LLM prompting and cost/latency
+- **Goal / hypothesis:** Uniformly executing exhaustive multi-hop graph traversals (ring cycle detection, geo travel dispersion, undocumented anomaly checks) on routine low-risk accounts creates unnecessary latency and computational sprawl. Implementing an `AdaptiveGraphBudgeter` in `src/agent/budgeter.py` dynamically allocates tool budgets and expansion flags based on initial risk entropy: allocating an exhaustive 12-call budget for ambiguous/high-uncertainty cases (0.40-0.75 risk), while granting a 5-call fast-path for low-risk established accounts (< 0.30 risk), reducing latency and tool overhead while preserving 100% investigation recall and precision.
+- **Changes (files):**
+  - `src/agent/budgeter.py`: Created `AdaptiveGraphBudgeter` allocating tool budgets across 4 tiers: `exhaustive` (12 tools), `targeted_escalation` (8 tools), `targeted_confirmation` (9 tools), and `fast_path_clearing` (5 tools).
+  - `src/agent/graph.py`: Integrated `AdaptiveGraphBudgeter.determine_plan` after baseline entity profile retrieval, conditionally pruning ring detection, geo dispersion, and undocumented anomaly detection. Attached `budget_plan` to case payload.
+  - `tests/test_budgeter.py`: Added 4 unit tests verifying exhaustive budget allocation on ambiguous cases, targeted escalation on customer reports, fast-path pruning on low-risk accounts, and payload attachment.
+- **Tests added/updated:**
+  - `tests/test_budgeter.py` (4 unit tests, all pass).
+  - Total unit test suite expanded from 59 to **63** tests across 16 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 59 -> **63** (100% pass rate)
+  - Tool Budget Allocation: Dynamic risk-entropy allocation across 4 distinct operational tiers
+  - Fast-Path Latency Reduction: Pruned multi-hop scans on routine accounts
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (63/63)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** By evaluating initial entity history and risk score before deep expansion, the agent avoids expensive ring cycle searches on routine grocery charges, reserving deep graph compute for accounts exhibiting genuine syndication indicators.
+- **Follow-ups added to backlog:** Next implement Iteration 022: Real-Time SSE Investigation Progress & Evidence Timeline in Web UI (Lens 15: UI/UX & 16: Demo and storytelling).
+
+## Iteration 020: Checkpoint 3 Audit, State of the Project v0.2, and Tag v0.2 | 2026-09-20 18:00 | commit 08e92de
 - **Lens:** 17. Documentation and deliverables & 11. Agent architecture and robustness
 - **Goal / hypothesis:** Perform Checkpoint 3 audit (PRD Section 2, Step 9) at Iteration 20 to verify that all PRD Section 25 deliverables, accuracy gates, and agentic capabilities are 100% intact, robust, and submission-ready. Tag and push release `v0.2`.
 - **Changes (files):**
