@@ -1,4 +1,4 @@
-## Iteration 046: Streaming Graph Edge Decay & Memory Management Engine | 2026-09-20 22:45 | commit iter-046
+## Iteration 046: Streaming Graph Edge Decay & Memory Management Engine | 2026-09-20 22:45 | commit 21306bd
 - **Lens:** 15. Real-time streaming & latency & 1. Graph schema & modeling & 11. Agent architecture & engineering
 - **Goal / hypothesis:** Financial transaction graphs accumulate massive numbers of historical edges over time, causing degree explosion at merchant and high-velocity card hubs that degrades multi-hop graph traversal latencies. However, naive TTL pruning destroys historical fraud seeds and critical syndicate links. Implementing `ExponentialTemporalDecay` in `src/graph/decay.py` applies continuous temporal exponential decay ($w(e) = \min(1.0, \alpha(e) \cdot 2^{-\Delta t / \tau})$) with half-life $\tau$ (30 days), priority-boosting multipliers ($\alpha = 4.0$ for confirmed fraud, $\alpha = 3.0$ for syndicate links, $\alpha = 2.0$ for high risk), guaranteed fraud seed preservation immunity, and bounded-degree top-$K$ pruning to achieve bounded memory and sub-millisecond graph traversal without information loss.
 - **Changes (files):**
