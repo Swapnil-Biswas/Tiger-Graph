@@ -1,4 +1,4 @@
-## Iteration 084: Cryptographic Audit Log Signing & Tamper Verification | 2026-09-21 08:00 | commit pending
+## Iteration 084: Cryptographic Audit Log Signing & Tamper Verification | 2026-09-21 08:00 | commit c5f5a5b
 - **Lens:** 9. Security, safety & defenses, 5. Regulatory compliance & SAR narrative, 12. Audit trail & anti-hallucination, 8. Explainability & human-in-the-loop
 - **Goal / hypothesis:** Regulatory standards (FRE 902(13)/(14), FinCEN 31 CFR 1020.320, SOC 2 Type II) require that every autonomous action, next-best-action routing, SAR filing, and human override produce an immutable, tamper-evident audit record. Implementing a cryptographic audit ledger delivers:
   1. **Append-Only Cryptographic Hash Chain (`src/policy/audit_ledger.py`)**: `CryptographicAuditLedger` maintains an immutable sequence of `AuditLedgerEntry` objects where each block references the preceding block's SHA-256 digest (`prev_hash`).
