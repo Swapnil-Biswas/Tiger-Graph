@@ -24,7 +24,8 @@
 | **019** | `0d5b1c5` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 59/59 (100%) | 0.050s | PASS | Automated component ablation study harness (Graph, Memory, Policy) |
 | **020** | `08e92de` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 59/59 (100%) | 0.015s | PASS | Checkpoint 3 Audit, State of the Project, and v0.2 Release Tag |
 | **021** | `18b2e5a` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 63/63 (100%) | 0.012s | PASS | Adaptive graph query budgeting & traversal pruning |
-| **022** | pending | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 65/65 (100%) | 0.012s | PASS | Real-time SSE investigation streaming (11 event types) |
+| **022** | `807c4f0` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 65/65 (100%) | 0.012s | PASS | Real-time SSE investigation streaming (11 event types) |
+| **023** | pending | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 69/69 (100%) | 0.012s | PASS | Uncertainty calibration (ECE 0.0116 < 0.08, Brier 0.0006 < 0.12) |
 
 ---
 

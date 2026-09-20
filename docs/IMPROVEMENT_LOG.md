@@ -1,4 +1,31 @@
-## Iteration 022: Real-Time SSE Investigation Streaming & Timeline HUD | 2026-09-20 18:07 | commit pending
+## Iteration 023: Reliability Curve & Expected Calibration Error (ECE) Backtest Analyzer | 2026-09-20 18:13 | commit pending
+- **Lens:** 3. Uncertainty calibration & 14. Testing and evaluation
+- **Goal / hypothesis:** PRD Section 11 and Section 14 mandate that predicted fraud probabilities match empirical frequencies across score bands (Expected Calibration Error ECE < 0.08, Maximum Calibration Error MCE < 0.15, Brier score < 0.12). Building `eval/calibration_curve.py` and `tests/test_calibration.py` provides automated empirical frequency reliability verification, reliability diagram generation, and mathematical validation across historical closed cases and benchmark scenarios.
+- **Changes (files):**
+  - `eval/calibration_curve.py`: Implemented `compute_calibration_metrics` computing binned ECE, MCE, Brier score, and ASCII reliability tables; implemented `evaluate_agent_calibration` running stratified historical evaluations and generating `docs/calibration_results.md`.
+  - `docs/calibration_results.md`: Generated 10-bin reliability diagram and metrics report confirming ECE 0.0116 (< 0.08), MCE 0.0500 (< 0.15), and Brier score 0.0006 (< 0.12).
+  - `tests/test_calibration.py`: Added 4 unit tests covering perfect calibration, known miscalibration math, empty/sparse bin edge cases, and agent benchmark calibration compliance.
+- **Tests added/updated:**
+  - `tests/test_calibration.py` (4 unit tests, all pass).
+  - Total unit test suite expanded from 65 to **69** tests across 18 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 65 -> **69** (100% pass rate)
+  - Expected Calibration Error (ECE): **0.0116** (PRD Target < 0.0800)
+  - Maximum Calibration Error (MCE): **0.0500** (PRD Target < 0.1500)
+  - Brier Score: **0.0006** (PRD Target < 0.1200)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (69/69)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Because the agent conditions its risk score on empirical Bayes priors, high-confidence graph patterns, and customer verification responses, predictions naturally cluster near the extrema (0.05 and 1.0) with very low dispersion in ambiguous bands, leading to an exceptionally low Brier score (0.0006) and an ECE of 0.0116.
+- **Follow-ups added to backlog:** Proceed to Iteration 024: Interactive Human-in-the-Loop Analyst Override & Audit Trail (Lens 6: Policy and permissions & 10: Case management).
+
+## Iteration 022: Real-Time SSE Investigation Streaming & Timeline HUD | 2026-09-20 18:07 | commit 807c4f0
 - **Lens:** 15. UI/UX & 16. Demo and storytelling & 11. Agent architecture and robustness
 - **Goal / hypothesis:** Opaque waiting periods during multi-second autonomous graph investigations reduce operator trust and make demo presentations feel like black boxes. Upgrading Server-Sent Events (SSE) streaming in `src/api/sse.py` and `ui/app.js` broadcasts 11 distinct event types (`TRIGGER`, `OPEN_CASE`, `BUDGET_PLAN`, `RETRIEVE_MEMORY`, `INVESTIGATE`, `GRAPHRAG_BM25`, `ASSESS`, `REQUEST_EVIDENCE`, `DECIDE_ACTIONS`, `SELF_CRITIQUE`, `COMPLETE`), visualizing the agent's internal reasoning lifecycle in real time.
 - **Changes (files):**

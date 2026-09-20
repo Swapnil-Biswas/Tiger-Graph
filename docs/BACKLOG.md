@@ -90,10 +90,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 22. **[DONE - Iteration 022] [UI/UX & Streaming] Real-Time SSE Investigation Progress & Evidence Timeline in Web UI**
     - *Result:* Upgraded Server-Sent Events (SSE) in `src/api/sse.py` and `ui/app.js` with 11 distinct event types (`TRIGGER`, `OPEN_CASE`, `BUDGET_PLAN`, `RETRIEVE_MEMORY`, `INVESTIGATE`, `GRAPHRAG_BM25`, `ASSESS`, `REQUEST_EVIDENCE`, `DECIDE_ACTIONS`, `SELF_CRITIQUE`, `COMPLETE`). Added tests in `tests/test_sse_streaming.py` (65/65 tests pass).
 
-23. **[Uncertainty Calibration] Reliability Curve & Expected Calibration Error (ECE) Backtest Analyzer**
-    - *Goal:* Build `eval/calibration_curve.py` computing binned Expected Calibration Error (ECE) and Brier Score across historical closed cases, ensuring that predicted fraud probabilities match empirical frequencies.
-    - *Files:* `eval/calibration_curve.py`, `tests/test_calibration.py`
-    - *Metric Impact:* Uncertainty Calibration (Lens 3) & Testing & Evaluation (Lens 14).
+23. **[DONE - Iteration 023] [Uncertainty Calibration] Reliability Curve & Expected Calibration Error (ECE) Backtest Analyzer**
+    - *Result:* Built `eval/calibration_curve.py` and `tests/test_calibration.py`. Verified ECE 0.0116 (target < 0.08), MCE 0.0500 (target < 0.15), and Brier score 0.0006 (target < 0.12). Generated 10-bin reliability diagram in `docs/calibration_results.md`. Total tests: 69/69 passing.
 
 24. **[Policy & Approvals] Interactive Human-in-the-Loop Analyst Override & Audit Trail**
     - *Goal:* Implement analyst override endpoint `/api/cases/{case_id}/override` allowing human fraud analysts to override verdicts, record structured justifications, and append immutable audit log entries to the case record in the graph.
