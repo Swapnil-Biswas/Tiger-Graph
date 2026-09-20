@@ -31,10 +31,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 
 ## Next Priority (Iterations 6–10 Checkpoint to v0.1)
 
-6. **[Testing & Engineering] Benchmark Run-to-Run Self-Consistency Harness**
-   - *Goal:* Build `eval/benchmark_consistency.py` testing recommendation variance across 3 repeated runs of the 20 benchmark cases (target: 0% variance).
-   - *Files:* `eval/benchmark_consistency.py`
-   - *Metric Impact:* Engineering robustness & Scoreboard consistency metric.
+6. **[DONE - Iteration 006] [Testing & Engineering] Benchmark Run-to-Run Self-Consistency Harness**
+   - *Result:* Built `eval/benchmark_consistency.py` and `tests/test_consistency.py`. Verified 0.00% recommendation variance, 100% verdict concordance, and 100% SAR filing concordance across 3 repeated runs of all 20 benchmark cases. Suite expanded to 22 tests (100% pass).
 
 7. **[GraphRAG] Enhanced Topological Expansion in Context Brief**
    - *Goal:* Incorporate 2-hop community subgraph statistics and PageRank centrality into the assembled LLM brief.
