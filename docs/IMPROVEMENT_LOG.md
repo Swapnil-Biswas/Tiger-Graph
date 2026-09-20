@@ -1,4 +1,32 @@
-## Iteration 089: Executive Case Summary PDF/Markdown Briefing Exporter | 2026-09-21 09:15 | commit 4763854
+## Iteration 090: Checkpoint 16 Audit, 90-Iteration Milestone Review, and v0.9 Release Tag | 2026-09-21 09:30 | commit v0.9
+- **Lens:** 14. Testing, evaluation & benchmarks, 11. Agent architecture & engineering, 15. Operational readiness & runbooks
+- **Goal / hypothesis:** Reaching 90 iterations (90% milestone — nine-tenths complete, entering the final 10-iteration sprint) requires a comprehensive audit across all 15 PRD evaluation lenses to verify GraphQL schemas, dynamic rate limiters, executive briefing exporters, and overall platform stability before tagging `v0.9`.
+  1. **Audit Scope**: Verified all 361 unit tests across 72 test suites passing at 100%.
+  2. **Mandatory Gates**: Verified 20/20 valid official benchmark answers, 50/50 valid extended benchmark cases, green demo path (`tests/test_phase4.py`), 0.00% run-to-run variance, 0 policy violations, and 0 secrets staged.
+  3. **Milestone Documentation**: Updated `docs/MILESTONES.md` with Section 3.7 detailing the architecture, metrics, and production readiness at 90 iterations.
+  4. **Release Tag**: Created and pushed Git tag `v0.9`.
+- **Changes (files):**
+  - `docs/MILESTONES.md`: Added Section 3.7 (Checkpoint 16 Audit & 90-Iteration Review) and updated release tag catalog with `v0.9`.
+  - `docs/METRICS.md`: Added row 090 with tag `v0.9`.
+  - `docs/BACKLOG.md`: Marked item 90 as DONE and scheduled the final sprint (Iterations 91–100).
+  - `docs/IMPROVEMENT_LOG.md`: Documented Iteration 090.
+- **Tests added/updated:**
+  - Full suite verified: 361/361 tests pass across 72 suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 361/361 tests pass (100% across 72 suites)
+  - Milestone: 90% completed (90/100 iterations), Release Tag `v0.9`
+  - Official Benchmark Answers Valid: 20/20 (100%)
+  - Extended Benchmark Answers Valid: 50/50 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 361 passed across 72 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
+## Iteration 089: Executive Case Summary PDF/Markdown Briefing Exporter | 2026-09-21 09:15 | commit 56dd4a7
 - **Lens:** 8. Explainability & human-in-the-loop, 10. Visualization & UI/UX, 5. Regulatory compliance & SAR narrative
 - **Goal / hypothesis:** Compliance officers, risk committees, legal counsel, and banking regulators require publication-grade executive summaries of complex fraud investigations without manual compilation. Implementing an executive briefing exporter delivers:
   1. **Executive Markdown Briefings (`export_markdown_briefing`)**: Formats high-level incident summaries, financial exposure metrics, multi-hop graph evidence tables, next-best-action timelines, counterfactual decision boundaries, FinCEN SAR determinations, and official cryptographic certifications.
