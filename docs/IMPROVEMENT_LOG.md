@@ -1,3 +1,32 @@
+## Iteration 076: Architecture Diagrams & End-to-End Visual Flow in Docs | 2026-09-21 06:00 | commit pending
+- **Lens:** 10. Case summary, explanation & visual reporting, 11. Agent architecture & engineering, 8. Explainability & human-in-the-loop
+- **Goal / hypothesis:** Enterprise fraud detection architectures require clear, publication-grade visual and technical documentation to allow compliance auditors, platform engineers, and operations teams to understand the end-to-end data flow, multi-agent consensus protocols, and authorization gates. Creating `docs/ARCHITECTURE.md` provides:
+  1. **5 Comprehensive Mermaid Diagrams**:
+     - System-Level Layered Architecture (Client/API, Agent Swarm, Policy/RBAC, GraphRAG/GraphStore).
+     - Multi-Agent Collaborative Consensus & Swarm Workflow (Orchestrator, AML Specialist, Cyber Forensics, MultiAgentConsensusEngine).
+     - Temporal Multi-Hop GraphRAG Traversal (Query budgeter, concurrent traverser, temporal decay attention pooler, inductive rule miner).
+     - Dual-Gate Action Authorization & L1/L2 RBAC Pipeline (Synthesizer, ActionPolicyGate R1-R10, RBACManager, human supervisor review).
+     - Real-Time Streaming Influx & Anomaly Detection Pipeline (Transaction stream, sliding window deque, rule evaluators, HMAC webhook dispatcher).
+  2. **Component Mapping Reference**: Clickable links to primary Python modules with descriptions and SLAs.
+  3. **Security & Compliance Boundaries**: Strict documentation of non-root execution, HMAC-SHA256 signatures, and role-based action enforcement.
+- **Changes (files):**
+  - `docs/ARCHITECTURE.md`: Created comprehensive architecture specification with 5 Mermaid diagrams and component cross-references.
+  - `tests/test_architecture_docs.py`: Created 3 unit tests validating documentation presence, Mermaid diagram syntax, and source component paths.
+- **Tests added/updated:**
+  - `tests/test_architecture_docs.py` (3 unit tests, all pass).
+  - Total unit test suite expanded from 289 to **292** tests across 61 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 289 -> **292** (100% pass rate across 61 test suites)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 292 passed across 61 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 075: Checkpoint 13 Audit, 75-Iteration Milestone Review, and v0.75 Release Tag | 2026-09-21 05:45 | commit v0.75
 - **Lens:** 14. Testing, evaluation & benchmarks, 11. Agent architecture & engineering, 13. System performance & scalability
 - **Goal / hypothesis:** Reaching 75 iterations (75% milestone — three quarters of the 100-iteration loop) requires a comprehensive audit across all 15 PRD evaluation lenses to verify system stability, mathematical calibration, cloud-native Helm packaging, Grafana SLA dashboards, cryptographic webhook event bridges, and chaos engineering fault resilience before tagging `v0.75`.
