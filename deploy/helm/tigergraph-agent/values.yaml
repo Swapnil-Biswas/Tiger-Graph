@@ -1,0 +1,92 @@
+# Default values for tigergraph-agent Helm chart
+replicaCount: 2
+
+image:
+  repository: tigergraph-fraud-agent
+  pullPolicy: IfNotPresent
+  tag: "0.7.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: "tigergraph-agent-sa"
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/path: "/metrics"
+  prometheus.io/port: "8000"
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  type: ClusterIP
+  port: 8000
+  targetPort: 8000
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: fraud-investigator.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 4Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 75
+  targetMemoryUtilizationPercentage: 80
+
+probes:
+  liveness:
+    httpGet:
+      path: /api/telemetry/dashboard
+      port: 8000
+    initialDelaySeconds: 15
+    periodSeconds: 20
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readiness:
+    httpGet:
+      path: /api/telemetry/dashboard
+      port: 8000
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 2
+
+serviceMonitor:
+  enabled: true
+  interval: 5s
+  scrapeTimeout: 3s
+  path: /metrics
+
+env:
+  PYTHONUNBUFFERED: "1"
+  ENVIRONMENT: "production"

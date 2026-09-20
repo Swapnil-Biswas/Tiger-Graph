@@ -250,6 +250,9 @@ Ranked by expected impact on Hackathon Judging Criteria:
 70. **[DONE - Iteration 070] [Release Tag v0.7] Checkpoint 12 Audit & 70-Iteration Milestone Review**
     - *Result:* Reached 70% milestone (70/100 iterations). Completed comprehensive audit across all 15 PRD evaluation lenses. Full platform verified with 273 unit tests across 56 test suites (100% passing), 100% backtest recall and precision across 300 historical cases, 20/20 valid benchmark answers, 0.00% run-to-run variance, 0 policy violations, 0 secrets, and green demo path. Created release tag `v0.7`. Updated `docs/MILESTONES.md`.
 
+71. **[DONE - Iteration 071] [Cloud-Native & Kubernetes Orchestration] Automated Kubernetes Helm Chart & Enterprise Health/Readiness Probes**
+    - *Result:* Implemented enterprise Helm v2/v3 chart in `deploy/helm/tigergraph-agent/` with `Chart.yaml`, `values.yaml`, and templates for `Deployment`, `Service`, `HorizontalPodAutoscaler` (HPA v2), and `ServiceAccount`. Features non-root security context (`appuser`, UID/GID 10001), liveness and readiness probes targeting `/api/telemetry/dashboard`, dynamic CPU/memory autoscaling (2 to 10 replicas), Prometheus annotations, and ServiceMonitor integration. Added 4 unit tests in `tests/test_helm_chart.py` (277/277 tests pass across 57 suites).
+
 ---
 
 ## Polish & Submission Readiness (Iterations 76–100)

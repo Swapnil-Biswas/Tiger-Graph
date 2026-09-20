@@ -1,0 +1,15 @@
+apiVersion: v2
+name: tigergraph-agent
+description: Enterprise Helm Chart for TigerGraph Agentic Fraud Investigator
+type: application
+version: 0.7.0
+appVersion: "0.7.0"
+keywords:
+  - fraud-detection
+  - tigergraph
+  - agentic-ai
+  - kubernetes
+  - compliance
+maintainers:
+  - name: FraudOps Platform Team
+    email: fraud-ops@tigergraph.example.com
