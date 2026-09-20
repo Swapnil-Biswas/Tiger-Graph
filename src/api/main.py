@@ -8,7 +8,7 @@ import os
 import sys
 import json
 from typing import Dict, Any, Optional, List, Union
-from fastapi import FastAPI, HTTPException, Query, Body, Response
+from fastapi import FastAPI, HTTPException, Query, Body, Response, Depends
 from fastapi.responses import StreamingResponse, JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -60,6 +60,17 @@ evidence_packager = ComplianceEvidencePackager()
 # Syndicate Cluster & LOD Engine
 from src.graph.cluster_renderer import SyndicateClusterEngine
 cluster_engine = SyndicateClusterEngine(store=agent.client.store)
+
+# Multi-Tenant Role-Based Access Control (RBAC)
+from src.auth.rbac import (
+    Role,
+    Permission,
+    AuthUser,
+    get_current_user,
+    require_permission,
+    mask_pii_dict,
+    ROLE_PERMISSIONS,
+)
 
 # In-memory store for active cases & approvals
 active_cases: Dict[str, Dict[str, Any]] = {}
@@ -240,6 +251,11 @@ class RunSimulationRequest(BaseModel):
     notes: Optional[str] = ""
 
 
+class ActionAuthorizeRequest(BaseModel):
+    action_name: str
+    exposure_usd: Optional[float] = 0.0
+
+
 StructuringCheckRequest.model_rebuild()
 ContagionCheckRequest.model_rebuild()
 PoolEmbeddingRequest.model_rebuild()
@@ -261,6 +277,7 @@ ConsensusDeliberateRequest.model_rebuild()
 EnqueueTaskRequest.model_rebuild()
 MemorySearchRequest.model_rebuild()
 RunSimulationRequest.model_rebuild()
+ActionAuthorizeRequest.model_rebuild()
 
 
 @app.get("/api/health")
@@ -302,19 +319,26 @@ def get_all_cases():
 
 
 @app.get("/api/cases/{case_id}")
-def get_case(case_id: str):
-    """Retrieves full investigation record for a case."""
+def get_case(case_id: str, user: AuthUser = Depends(get_current_user)):
+    """Retrieves full investigation record for a case, with role-based PII masking."""
+    import copy
     if case_id in active_cases:
-        return active_cases[case_id]
-    
-    # Auto-run if not yet investigated
-    if case_id in agent.client.store.case_pack:
+        res = active_cases[case_id]
+    elif case_id in agent.client.store.case_pack:
         res = agent.investigate_case(case_id)
         active_cases[case_id] = res
         case_manager.write_case_to_graph(res)
-        return res
-        
-    raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
+    else:
+        raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
+
+    res_copy = copy.deepcopy(res)
+    pack_item = agent.client.store.case_pack.get(case_id, {})
+    if "card_id" not in res_copy.get("case", {}) and pack_item.get("card_id"):
+        res_copy.setdefault("case", {})["card_id"] = pack_item["card_id"]
+    if "customer_id" not in res_copy.get("case", {}) and pack_item.get("customer_id"):
+        res_copy.setdefault("case", {})["customer_id"] = pack_item["customer_id"]
+
+    return mask_pii_dict(res_copy, user)
 
 
 @app.post("/api/investigate")
@@ -1150,6 +1174,45 @@ def get_case_lod_clusters(case_id: str):
     """Retrieves multi-scale Level-of-Detail (LOD 0, 1, 2) graph views with WebGL vertex buffers."""
     lod_views = cluster_engine.generate_case_lod_views(case_id)
     return {k: v.to_dict() for k, v in lod_views.items()}
+
+
+@app.get("/api/auth/me")
+def get_auth_me(user: AuthUser = Depends(get_current_user)):
+    """Returns current authenticated user, assigned role, permissions, and tenant."""
+    return {
+        "user_id": user.user_id,
+        "role": user.role.value,
+        "department": user.department,
+        "tenant_id": user.tenant_id,
+        "permissions": sorted([p.value for p in user.permissions]),
+    }
+
+
+@app.get("/api/auth/roles")
+def get_auth_roles():
+    """Returns the matrix of system roles and their assigned permissions."""
+    return {
+        role.value: sorted([p.value for p in perms])
+        for role, perms in ROLE_PERMISSIONS.items()
+    }
+
+
+@app.post("/api/cases/{case_id}/actions/authorize")
+def authorize_case_action(
+    case_id: str,
+    req: ActionAuthorizeRequest,
+    user: AuthUser = Depends(get_current_user),
+):
+    """Checks whether the authenticated user has authority to execute a specific action on a case."""
+    authorized, reason = user.can_execute_action(req.action_name, req.exposure_usd or 0.0)
+    return {
+        "case_id": case_id,
+        "action_name": req.action_name,
+        "user_id": user.user_id,
+        "role": user.role.value,
+        "authorized": authorized,
+        "reason": reason,
+    }
 
 
 

@@ -1,3 +1,35 @@
+## Iteration 063: Dynamic Multi-Tenant Role-Based Access Control (RBAC) & Fine-Grained Policy Authorization Matrix | 2026-09-21 02:45 | commit PENDING
+- **Lens:** 3. Next best action & policy enforcement, 5. Statutory grounding & regulatory alignment, 11. Agent architecture & engineering
+- **Goal / hypothesis:** In enterprise fraud operations and regulatory bank examinations, investigators, AML compliance officers, external auditors, and regulatory examiners must have strictly segregated access rights, action execution authorities, and PII exposure controls. By implementing dynamic multi-tenant RBAC and PII masking, the platform delivers:
+  1. **Statutory Role Partitioning**: Defined 6 institutional roles (`L1_ANALYST`, `L2_SENIOR_INVESTIGATOR`, `AML_COMPLIANCE_OFFICER`, `AUDITOR`, `REGULATOR_EXAMINER`, `ADMIN_SUPERVISOR`).
+  2. **Action Execution Tiers & Financial Exposure Gates**:
+     - Tier 1: `VERIFY_WITH_CUSTOMER`, `STEP_UP_AUTH`, `MONITOR_CARD`, `WARN_CUSTOMER` (L1+).
+     - Tier 2: `BLOCK_CARD`, `DECLINE_TRANSACTION`, `CREATE_CASE` (L2+).
+     - Tier 3: `BLOCK_ALL_CARDS`, `FILE_SAR`, `CLOSE_NO_FRAUD` (AML Officer or Admin only).
+     - Exposure thresholds: L1 capped at $2,500; Non-AML officers capped at $10,000.
+  3. **GDPR Art. 5 Data Minimization & Dynamic PII Masking**: Automatically masks card IDs (`C****-K1`), customer IDs (`C***82`), email addresses (`j***e@example.com`), and entity lists when accessed by roles without `PII_READ_UNMASKED` permission (e.g., `AUDITOR`, `L1_ANALYST`).
+  4. **FastAPI Authorization Endpoints**: Added `GET /api/auth/me`, `GET /api/auth/roles`, and `POST /api/cases/{case_id}/actions/authorize`.
+- **Changes (files):**
+  - `src/auth/__init__.py`: Created authentication module exports.
+  - `src/auth/rbac.py`: Created `Role`, `Permission`, `AuthUser`, `RBACManager`, `mask_pii_dict`, `get_current_user`, and `require_permission`.
+  - `src/api/main.py`: Integrated RBAC dependency, updated `get_case` with PII masking, added `/api/auth/me`, `/api/auth/roles`, and `/api/cases/{case_id}/actions/authorize`.
+  - `tests/test_rbac.py`: Created 5 unit tests validating role matrix, action tiers, exposure limits, PII masking, and FastAPI endpoints.
+- **Tests added/updated:**
+  - `tests/test_rbac.py` (5 unit tests, all pass).
+  - Total unit test suite expanded from 243 to **248** tests across 51 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 243 -> **248** (100% pass rate across 51 test suites)
+  - Security & Governance: 6 Institutional Roles, 9 Granular Permissions, 3 Action Tiers, GDPR Art. 5 PII Masking
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 248 passed across 51 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 062: WebGL Subgraph Acceleration, Syndicate Cluster Engine & Level-of-Detail (LOD) Spatial Renderer | 2026-09-21 02:30 | commit 4249865
 - **Lens:** 12. Visuals & UI experience, 10. Graph data modeling & schema design, 13. System performance & scalability
 - **Goal / hypothesis:** Visualizing large-scale financial crime networks (10,000+ nodes) causes browser DOM bottlenecks and canvas stuttering when rendering raw individual transactions. By implementing a hierarchical Level-of-Detail (LOD) spatial aggregation engine, the system can dynamically project complex fraud networks across three distinct scales:
