@@ -1133,6 +1133,56 @@ class GraphClient:
             max_degree=max_degree,
         )
 
+    # =========================================================================
+    # Q25: export_knowledge_triplets
+    # Dynamic Knowledge Graph Triplet & Enterprise Graph Synchronizer
+    # =========================================================================
+    def export_knowledge_triplets(
+        self,
+        case_id: str,
+        max_hops: int = 2,
+        max_triplets: int = 150,
+        as_of: Optional[Union[str, int]] = None,
+        format: str = "bundle",
+    ) -> dict:
+        """
+        Q25: Extracts multi-hop semantic incident subgraphs as canonical knowledge triplets
+        and serializes them into enterprise formats (TigerGraph GSQL, Neo4j Cypher, RDF N-Triples, JSON-LD).
+        """
+        from src.graph.triplets import KnowledgeGraphTripletExporter
+        exporter = KnowledgeGraphTripletExporter(self)
+        if format == "bundle":
+            return exporter.export_export_bundle(
+                case_id=case_id,
+                max_hops=max_hops,
+                max_triplets=max_triplets,
+                as_of=as_of,
+            )
+
+        triplets = exporter.extract_case_triplets(
+            case_id=case_id,
+            max_hops=max_hops,
+            max_triplets=max_triplets,
+            as_of=as_of,
+        )
+
+        if format == "gsql":
+            return {"case_id": case_id, "format": "gsql", "output": exporter.to_tigergraph_gsql(triplets)}
+        elif format == "cypher":
+            return {"case_id": case_id, "format": "cypher", "output": exporter.to_neo4j_cypher(triplets)}
+        elif format == "ntriples":
+            return {"case_id": case_id, "format": "ntriples", "output": exporter.to_rdf_ntriples(triplets)}
+        elif format == "jsonld":
+            return {"case_id": case_id, "format": "jsonld", "output": exporter.to_jsonld(triplets)}
+        else:
+            return {
+                "case_id": case_id,
+                "format": "json",
+                "total_triplets": len(triplets),
+                "triplets": [t.to_dict() for t in triplets],
+            }
+
+
 
 
 

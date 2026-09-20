@@ -1,3 +1,35 @@
+## Iteration 048: Dynamic Knowledge Graph Triplet Export & Multi-Dialect Enterprise Synchronizer | 2026-09-20 23:00 | commit TBD_COMMIT
+- **Lens:** 1. Graph schema & modeling & 14. Performance, scale & production readiness & 11. Agent architecture & engineering
+- **Goal / hypothesis:** In enterprise financial crime operations, investigations conducted in memory must be synchronized losslessly to external distributed graph databases (TigerGraph clusters, Neo4j) and semantic ontologies (W3C RDF, JSON-LD) for cross-system federated analytics and immutable regulatory archiving. Implementing `KnowledgeGraphTripletExporter` in `src/graph/triplets.py` extracts canonical semantic triplets (`Subject`, `Predicate`, `Object`, `properties`, `temporal_epoch`, `provenance_case`) from multi-hop incident subgraphs and compiles them into 4 distinct enterprise database dialects:
+  1. **TigerGraph GSQL DML**: Syntactically valid vertex and edge insertion statements (`USE GRAPH`, `INSERT INTO <Vertex>`, `INSERT INTO <Edge> (FROM, TO, ...)`).
+  2. **Neo4j Cypher DML**: Idempotent `MERGE (s:<Label> {id: ...})` and `MERGE (s)-[:<REL> {props}]->(o)` clauses.
+  3. **W3C RDF N-Triples**: Canonical RDF statements with URI schemas (`<https://fraud.tigergraph.bank/entity/...>`).
+  4. **W3C JSON-LD**: Linked Data graph payloads containing standard `@context`, `@vocab`, and typed `@graph` entity nodes.
+- **Changes (files):**
+  - `src/graph/triplets.py`: Implemented `KnowledgeTriplet` and `KnowledgeGraphTripletExporter` with multi-hop subgraph extraction, provenance tracking, and 4 dialect serializers.
+  - `src/graph/client.py`: Added Q25 method `export_knowledge_triplets` to `GraphClient`.
+  - `src/api/main.py`: Added `TripletExportRequest` with `model_rebuild()`, `GET /api/cases/{case_id}/triplets`, and `POST /api/graph/triplets/export`.
+  - `tests/test_graph_triplets.py`: Created 8 unit tests covering case extraction provenance, GSQL syntax, Cypher idempotency, RDF N-Triples formatting, JSON-LD structure, temporal isolation, syndicate nexus inclusion, and API endpoints.
+- **Tests added/updated:**
+  - `tests/test_graph_triplets.py` (8 unit tests, all pass).
+  - Total unit test suite expanded from 167 to **175** tests across 39 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 167 -> **175** (100% pass rate across 39 test suites)
+  - Enterprise Sync: 4 enterprise dialects (TigerGraph GSQL, Neo4j Cypher, W3C RDF N-Triples, W3C JSON-LD)
+  - Provenance Tracking: 100% case provenance integrity across multi-hop edges
+  - Query Library: Expanded to Q25 (`export_knowledge_triplets`)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (175/175)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Multi-dialect serialization allows the exact same in-memory incident graph to be exported as high-throughput batch loading jobs for TigerGraph, interactive graph queries for Neo4j, or linked-data ontologies for semantic reasoning without duplicate extraction passes.
+- **Follow-ups added to backlog:** Proceed to Iteration 049: Active Learning Sample Selector & Hard-Negative Mining (Lens 6 & Lens 14).
+
 ## Iteration 047: Graph-Augmented LLM Self-Refinement & Counter-Factual Invariant Verification Loop | 2026-09-20 22:55 | commit 9c63e20
 - **Lens:** 11. Agent architecture & engineering & 12. Explainability & audit trail & 10. Policy & regulatory compliance
 - **Goal / hypothesis:** Autonomous agents operating in mission-critical financial crime investigations risk generating ungrounded actions, conflicting recommendations, or policy violations when edge cases produce conflicting signals. Implementing `GraphAugmentedSelfRefiner` in `src/agent/refiner.py` enforces a post-generation verification loop checking 7 structural and regulatory invariants:

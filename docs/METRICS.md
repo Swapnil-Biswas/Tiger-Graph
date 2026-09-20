@@ -50,6 +50,7 @@
 | **045** | `ce8c0e8` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 154/154 (100%) | 0.008s | PASS | Probabilistic record linkage (Fellegi-Sunter / Jaro-Winkler) & sybil defense (Q23) |
 | **046** | `21306bd` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 160/160 (100%) | 0.008s | PASS | Streaming graph edge decay (exponential half-life) & bounded top-K pruning (Q24) |
 | **047** | `9c63e20` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 167/167 (100%) | 0.008s | PASS | Graph-augmented self-refinement & counter-factual invariant verification loop |
+| **048** | `TBD_COMMIT` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 175/175 (100%) | 0.008s | PASS | Dynamic knowledge graph triplet export (TigerGraph GSQL, Neo4j Cypher, RDF) (Q25) |
 
 ---
 

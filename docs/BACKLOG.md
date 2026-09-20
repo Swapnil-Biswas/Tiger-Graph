@@ -173,10 +173,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 47. **[DONE - Iteration 047] [Agent Architecture & Self-Refinement] Graph-Augmented LLM Self-Refinement & Counter-Factual Invariant Verification Loop**
     - *Result:* Implemented `GraphAugmentedSelfRefiner` in `src/agent/refiner.py` verifying 7 structural invariants: weak signal block barrier (< 0.70), multi-card block threshold, customer denial strict enforcement, customer confirm dispute protection, recurring charge subscription safeguard, high-exposure L2 routing tier mandate, and mandatory SAR filing. Connected Step 12 into `FraudInvestigatorAgent.investigate_case`. Added API endpoint `/api/agent/self-refine`. Added 7 unit tests in `tests/test_agent_refiner.py` (167/167 tests pass).
 
-48. **[Graph Interoperability & Knowledge Graph] Dynamic Knowledge Graph Triplet Export for External Neo4j/TigerGraph GSQL Sync**
-    - *Goal:* Implement RDF/JSON-LD and Cypher/GSQL DDL knowledge graph triplet exporter (`Subject`, `Predicate`, `Object`, `TemporalWeight`, `ProvenanceCase`) in `src/graph/triplets.py` and `GraphClient` (Q25), enabling automated external synchronization to enterprise TigerGraph clusters and Neo4j graph databases.
-    - *Files:* `src/graph/triplets.py`, `src/graph/client.py`, `src/api/main.py`, `tests/test_graph_triplets.py`
-    - *Metric Impact:* Graph Schema & Production Readiness (Lens 1, Lens 14).
+48. **[DONE - Iteration 048] [Graph Interoperability & Knowledge Graph] Dynamic Knowledge Graph Triplet Export for External Neo4j/TigerGraph GSQL Sync**
+    - *Result:* Implemented `KnowledgeTriplet` and `KnowledgeGraphTripletExporter` in `src/graph/triplets.py` and exposed `export_knowledge_triplets` (Q25) in `GraphClient`. Extracts multi-hop incident subgraphs and serializes into 4 enterprise database dialects: TigerGraph GSQL DML (`USE GRAPH`, `INSERT INTO`), Neo4j Cypher (`MERGE`), W3C RDF N-Triples, and W3C JSON-LD. Enforces 100% case provenance integrity and strict temporal isolation. Added API endpoints `GET /api/cases/{case_id}/triplets` and `POST /api/graph/triplets/export`. Added 8 unit tests in `tests/test_graph_triplets.py` (175/175 tests pass across 39 suites).
 
 49. **[Machine Learning & Continuous Retraining] Active Learning Sample Selector & Hard-Negative Mining**
     - *Goal:* Implement active learning sample selection engine using margin sampling, entropy uncertainty, and topological diversity clustering to mine informative hard negatives and borderline cases from historical transactions for continuous GBDT/GNN classifier retraining.

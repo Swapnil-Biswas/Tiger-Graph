@@ -157,6 +157,14 @@ class RefineInvestigationRequest(BaseModel):
     max_refinements: int = 3
 
 
+class TripletExportRequest(BaseModel):
+    case_id: str
+    max_hops: int = 2
+    max_triplets: int = 150
+    as_of: Optional[str] = None
+    format: str = "bundle"
+
+
 StructuringCheckRequest.model_rebuild()
 ContagionCheckRequest.model_rebuild()
 PoolEmbeddingRequest.model_rebuild()
@@ -170,6 +178,7 @@ SybilCheckRequest.model_rebuild()
 EdgeDecayRequest.model_rebuild()
 StreamingPruneRequest.model_rebuild()
 RefineInvestigationRequest.model_rebuild()
+TripletExportRequest.model_rebuild()
 
 
 @app.get("/api/health")
@@ -659,6 +668,37 @@ def run_self_refine(req: RefineInvestigationRequest):
     from src.agent.refiner import GraphAugmentedSelfRefiner
     refiner = GraphAugmentedSelfRefiner(max_refinements=req.max_refinements)
     return refiner.refine_investigation(req.answer)
+
+
+@app.get("/api/cases/{case_id}/triplets")
+def get_case_triplets(
+    case_id: str,
+    format: str = "bundle",
+    max_hops: int = 2,
+    max_triplets: int = 150,
+    as_of: Optional[str] = None,
+):
+    """Q25: Extracts semantic knowledge graph triplets and exports in TigerGraph GSQL, Neo4j Cypher, or RDF formats."""
+    return agent.client.export_knowledge_triplets(
+        case_id=case_id,
+        max_hops=max_hops,
+        max_triplets=max_triplets,
+        as_of=as_of,
+        format=format,
+    )
+
+
+@app.post("/api/graph/triplets/export")
+def post_triplets_export(req: TripletExportRequest):
+    """Q25: Dynamic knowledge graph triplet export endpoint."""
+    return agent.client.export_knowledge_triplets(
+        case_id=req.case_id,
+        max_hops=req.max_hops,
+        max_triplets=req.max_triplets,
+        as_of=req.as_of,
+        format=req.format,
+    )
+
 
 
 @app.get("/api/rules/mined")
