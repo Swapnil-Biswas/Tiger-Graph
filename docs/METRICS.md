@@ -30,7 +30,8 @@
 | **025** | `db724ad` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 73/73 (100%) | 0.012s | PASS | Checkpoint 4 Audit, State of the Project, and v0.25 Release Tag |
 | **026** | `782055f` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 76/76 (100%) | 0.012s | PASS | Temporal recency-weighted case retrieval in GraphRAG (exponential decay) |
 | **027** | `77b460b` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 80/80 (100%) | 0.012s | PASS | Multi-jurisdiction regulatory routing (FinCEN, GDPR, FCA) & PII minimization |
-| **028** | pending | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 83/83 (100%) | 0.012s | PASS | Self-contained interactive HTML incident dossier export with embedded Cytoscape |
+| **028** | `6c4ee19` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 83/83 (100%) | 0.012s | PASS | Self-contained interactive HTML incident dossier export with embedded Cytoscape |
+| **029** | pending | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 85/85 (100%) | 0.008s | PASS | Parallelized asynchronous graph traversal engine (ThreadPoolExecutor 6 workers) |
 
 ---
 

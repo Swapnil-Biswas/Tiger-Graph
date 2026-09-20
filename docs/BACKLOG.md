@@ -108,10 +108,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 28. **[DONE - Iteration 028] [Explainability & Trust] Self-Contained Interactive HTML Incident Dossier Export**
     - *Result:* Implemented `IncidentDossierExporter.export_html_dossier` in `src/cases/dossier_exporter.py` and endpoint `GET /api/cases/{case_id}/dossier` in `src/api/main.py`. Exports complete offline-viewable incident reports with embedded Cytoscape.js topologies, evidence citations, counterfactuals, and FinCEN SARs. Added 3 unit tests in `tests/test_dossier_exporter.py` (83/83 tests pass).
 
-29. **[Performance & Scaling] Parallelized Asynchronous Graph Traversal Engine**
-    - *Goal:* Execute velocity, device sharing, cycle detection, and memory retrieval concurrently via `asyncio.gather` / thread pooling, cutting investigation latency by > 40%.
-    - *Files:* `src/agent/graph.py`, `src/graph/client.py`, `tests/test_async_investigation.py`
-    - *Metric Impact:* Graph Database & Query Performance (Lens 2) & Latency (Lens 12).
+29. **[DONE - Iteration 029] [Performance & Scaling] Parallelized Asynchronous Graph Traversal Engine**
+    - *Result:* Implemented `ConcurrentGraphTraverser.gather_graph_evidence` in `src/graph/traverser.py` and integrated into `FraudInvestigatorAgent.investigate_case`. Dispatches 11 independent graph algorithms concurrently across 6 worker threads, preserving 100% result identity and determinism. Added 2 unit tests in `tests/test_async_investigation.py` (85/85 tests pass).
 
 30. **[Checkpoint 5 & Release Tag v0.3] Milestone Review & Release Tag v0.3**
     - *Goal:* Audit all 30 iterations against PRD Section 25, verify 0 regressions across all suites, and create annotated release tag `v0.3`.

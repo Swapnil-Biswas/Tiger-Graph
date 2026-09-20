@@ -123,9 +123,36 @@ class FraudInvestigatorAgent:
             )
             tool_calls += 1
 
-        # (b) Q1 Entity profile
+        # (b) Q1 Entity profile & Adaptive Budget Plan
         profile = self.client.entity_profile(card_id, entity_type="card", as_of=as_of)
-        tool_calls += 1
+        budget_plan = AdaptiveGraphBudgeter.determine_plan(trigger_data, profile)
+        dev_profile = txn_obj.get("device_profile", "") if txn_obj else ""
+
+        # Parallelized Concurrent Graph Traversal
+        from src.graph.traverser import ConcurrentGraphTraverser
+        graph_evidence = ConcurrentGraphTraverser.gather_graph_evidence(
+            client=self.client,
+            memory_prior_engine=self.memory_prior_engine,
+            undocumented_detector=self.undocumented_detector,
+            card_id=card_id,
+            customer_id=cust_id,
+            flagged_txn=flagged_txn,
+            dev_profile=dev_profile,
+            as_of=as_of,
+            budget_plan=budget_plan,
+            max_workers=6,
+        )
+
+        ctx = graph_evidence["context"]
+        vel = graph_evidence["velocity"]
+        new_ent = graph_evidence["new_entity"]
+        sharing = graph_evidence["device_sharing"]
+        pat_res = graph_evidence["pattern_match"]
+        similar_cases_res = graph_evidence["similar_cases"]
+        mem_prior = graph_evidence["memory_prior"]
+        tool_calls += 8
+
+        # Grounding Evidence Assembly
         add_evidence(
             "graph",
             f"query:entity_profile(card_id={card_id})",
@@ -133,10 +160,6 @@ class FraudInvestigatorAgent:
             [card_id],
         )
 
-        # (c) Q2 Txn Context & Q3 Velocity
-        ctx = self.client.txn_context(flagged_txn, window_hours=48, as_of=as_of) if flagged_txn else {}
-        vel = self.client.velocity(card_id, as_of=as_of)
-        tool_calls += 2
         vel_1h = vel["windows"]["1h"]["count"]
         vel_24h = vel["windows"]["24h"]["count"]
         add_evidence(
@@ -146,9 +169,6 @@ class FraudInvestigatorAgent:
             vel["windows"]["24h"]["txn_ids"][:4],
         )
 
-        # (d) Q7 New Entity Check
-        new_ent = self.client.new_entity_check(flagged_txn, as_of=as_of) if flagged_txn else {}
-        tool_calls += 1
         if new_ent.get("is_new_device") or new_ent.get("proxy_flag") or new_ent.get("is_new_region"):
             claims = []
             if new_ent.get("is_new_device"):
@@ -164,23 +184,14 @@ class FraudInvestigatorAgent:
                 [flagged_txn],
             )
 
-        # (e) Q4 Device Sharing & Q5 Link Expansion
-        dev_profile = txn_obj.get("device_profile", "") if txn_obj else ""
-        sharing = {}
-        if dev_profile and dev_profile != "None | None | None | None":
-            sharing = self.client.device_sharing(dev_profile, as_of=as_of)
-            tool_calls += 1
-            if sharing.get("is_shared"):
-                add_evidence(
-                    "graph",
-                    f"query:device_sharing({dev_profile[:25]}...)",
-                    f"Device profile is shared across {sharing['distinct_cards_count']} cards and {sharing['distinct_customers_count']} customers.",
-                    sharing["cards"][:4],
-                )
+        if sharing.get("is_shared"):
+            add_evidence(
+                "graph",
+                f"query:device_sharing({dev_profile[:25]}...)",
+                f"Device profile is shared across {sharing['distinct_cards_count']} cards and {sharing['distinct_customers_count']} customers.",
+                sharing["cards"][:4],
+            )
 
-        # (f) Q11 Pattern Matching (for all 5 typologies)
-        pat_res = self.client.pattern_match(flagged_txn, as_of=as_of) if flagged_txn else {"best_pattern": "none", "patterns": {}}
-        tool_calls += 1
         best_pat = pat_res.get("best_pattern", "none")
         best_conf = pat_res.get("patterns", {}).get(best_pat, {}).get("confidence", 0.0)
         if best_conf > 0.40:
@@ -191,9 +202,6 @@ class FraudInvestigatorAgent:
                 [flagged_txn],
             )
 
-        # (g) Q10 & Q12 Memory Retrieval (prior closed cases)
-        similar_cases_res = self.client.similar_cases(card_id, customer_id=cust_id, as_of=as_of)
-        tool_calls += 1
         prior_case_ids = similar_cases_res.get("case_ids", [])
         if prior_case_ids:
             add_evidence(
@@ -203,13 +211,6 @@ class FraudInvestigatorAgent:
                 prior_case_ids[:3],
             )
 
-        # (h) Dynamic Empirical Bayes Case Memory Prior
-        mem_prior = self.memory_prior_engine.compute_prior(
-            card_id=card_id,
-            customer_id=cust_id,
-            device_profile=dev_profile,
-            as_of=as_of,
-        )
         if mem_prior.get("has_history"):
             add_evidence(
                 "graph",
@@ -217,25 +218,6 @@ class FraudInvestigatorAgent:
                 f"Historical memory prior: {mem_prior['total_prior_cases']} precedent case(s) ({mem_prior['confirmed_fraud_count']} confirmed fraud, {mem_prior['cleared_count']} cleared) yielding posterior fraud risk rate of {mem_prior['posterior_fraud_rate']:.3f}.",
                 mem_prior.get("prior_cases_cited", []),
             )
-
-        # Determine Adaptive Tool Budget & Pruning Plan
-        budget_plan = AdaptiveGraphBudgeter.determine_plan(trigger_data, profile)
-
-        # Compile Graph Evidence Bundle
-        graph_evidence = {
-            "profile": profile,
-            "context": ctx,
-            "velocity": vel,
-            "new_entity": new_ent,
-            "device_sharing": sharing,
-            "ring": self.client.ring_detection(card_id, as_of=as_of) if budget_plan["allow_deep_ring_scan"] else {"ring_detected": False},
-            "geo": self.client.geo_impossible(card_id, as_of=as_of) if budget_plan["allow_geo_dispersion_scan"] else {"anomalies_count": 0, "has_geo_anomaly": False},
-            "similar_cases": similar_cases_res,
-            "memory_prior": mem_prior,
-            "pattern_match": pat_res,
-            "undocumented_anomaly": self.undocumented_detector.detect_anomalies(flagged_txn, as_of=as_of) if (flagged_txn and budget_plan["allow_undocumented_detector"]) else {},
-            "budget_plan": budget_plan,
-        }
 
         # Apply Architectural Ablation Overrides
         if ablate_graph:
