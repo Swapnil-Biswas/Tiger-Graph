@@ -41,6 +41,10 @@ app.add_middleware(
 agent = FraudInvestigatorAgent()
 case_manager = CaseManager(client=agent.client)
 
+# Asynchronous Investigation Task Queue
+from src.agent.queue import InvestigationTaskQueue
+task_queue = InvestigationTaskQueue(max_workers=2, agent=agent)
+
 # In-memory store for active cases & approvals
 active_cases: Dict[str, Dict[str, Any]] = {}
 pending_approvals: Dict[str, Dict[str, Any]] = {}
@@ -189,6 +193,15 @@ class ConsensusDeliberateRequest(BaseModel):
     investigation_answer: Dict[str, Any]
 
 
+class EnqueueTaskRequest(BaseModel):
+    task_type: str = "CASE_INVESTIGATION"
+    payload: Dict[str, Any]
+    priority: str = "NORMAL"
+    idempotency_key: Optional[str] = None
+    max_retries: int = 3
+    backoff_factor: float = 0.05
+
+
 StructuringCheckRequest.model_rebuild()
 ContagionCheckRequest.model_rebuild()
 PoolEmbeddingRequest.model_rebuild()
@@ -207,6 +220,7 @@ ActiveLearningMineRequest.model_rebuild()
 AMLAssessmentRequest.model_rebuild()
 CyberAssessmentRequest.model_rebuild()
 ConsensusDeliberateRequest.model_rebuild()
+EnqueueTaskRequest.model_rebuild()
 
 
 @app.get("/api/health")
@@ -807,6 +821,64 @@ def get_case_consensus(case_id: str, as_of: Optional[str] = None):
     """Executes full multi-agent investigation and retrieves federated consensus dossier."""
     answer = agent.investigate_case(case_id)
     return answer.get("federated_consensus", {})
+
+
+@app.post("/api/queue/tasks")
+def post_enqueue_task(req: EnqueueTaskRequest):
+    """Submits an asynchronous investigation/screening task with idempotency deduplication."""
+    task, is_dedup = task_queue.submit_task(
+        task_type=req.task_type,
+        payload=req.payload,
+        priority=req.priority,
+        idempotency_key=req.idempotency_key,
+        max_retries=req.max_retries,
+        backoff_factor=req.backoff_factor,
+    )
+    return {
+        "task": task.to_dict(),
+        "is_deduplicated": is_dedup,
+    }
+
+
+@app.get("/api/queue/tasks/{task_id}")
+def get_queued_task(task_id: str):
+    """Retrieves current execution status, progress, timing, and result for a queued task."""
+    task = task_queue.get_task(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail=f"Task '{task_id}' not found.")
+    return task.to_dict()
+
+
+@app.post("/api/queue/tasks/{task_id}/cancel")
+def cancel_queued_task(task_id: str):
+    """Cancels a pending or running task in the investigation queue."""
+    ok = task_queue.cancel_task(task_id)
+    if not ok:
+        raise HTTPException(status_code=400, detail=f"Task '{task_id}' could not be cancelled or was not found.")
+    task = task_queue.get_task(task_id)
+    return {"status": "cancelled", "task": task.to_dict() if task else None}
+
+
+@app.get("/api/queue/stats")
+def get_queue_stats():
+    """Returns queue depth, worker concurrency, throughput, and DLQ statistics."""
+    return task_queue.get_stats()
+
+
+@app.get("/api/queue/dlq")
+def get_queue_dlq():
+    """Retrieves all failed tasks in the Dead Letter Queue for auditing."""
+    tasks = task_queue.get_dead_letter_tasks()
+    return {"count": len(tasks), "dead_letter_tasks": [t.to_dict() for t in tasks]}
+
+
+@app.post("/api/queue/dlq/{task_id}/retry")
+def retry_dlq_task(task_id: str):
+    """Retries a failed task from the Dead Letter Queue."""
+    task = task_queue.retry_dlq_task(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail=f"Task '{task_id}' not found in DLQ.")
+    return {"status": "requeued", "task": task.to_dict()}
 
 
 

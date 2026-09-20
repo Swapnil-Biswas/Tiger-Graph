@@ -195,10 +195,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 53. **[DONE - Iteration 053] [Agentic Consensus & Debate] Multi-Agent Debate & Weighted Majority Voting Protocol**
     - *Result:* Implemented `MultiAgentConsensusEngine` and `FederatedConsensusDossier` in `src/agent/consensus.py`. Coordinates deliberation across Fraud, AML, and Cyber sub-agents with dynamic domain weighting ($w_{\text{fraud}} + w_{\text{aml}} + w_{\text{cyber}} = 1.00$), inter-agent concordance variance confidence scoring, conflict detection, statutory AML regulatory veto enforcement, and cyber hardware isolation. Integrated as Step 15 in `FraudInvestigatorAgent.investigate_case`. Added API endpoints `POST /api/agents/consensus/deliberate` and `GET /api/cases/{case_id}/consensus`. Added 6 unit tests in `tests/test_consensus.py` (200/200 tests pass across 43 suites).
 
-54. **[Distributed Queue & Worker] Asynchronous Investigation Event Queue & Distributed Task Dispatcher**
-    - *Goal:* Implement persistent FIFO/priority task queue with idempotency keys, backoff retries, and worker concurrency controls for high-volume enterprise ingestion.
-    - *Files:* `src/agent/queue.py`, `src/api/main.py`, `tests/test_agent_queue.py`
-    - *Metric Impact:* Performance, Scale & Streaming (Lens 14, Lens 15).
+54. **[DONE - Iteration 054] [Distributed Queue & Worker] Asynchronous Investigation Event Queue & Distributed Task Dispatcher**
+    - *Result:* Implemented `InvestigationTaskQueue`, `InvestigationTask`, and `TaskPriority` in `src/agent/queue.py`. Supports priority-ordered task dispatching (`CRITICAL`, `HIGH`, `NORMAL`, `LOW`) with monotonic sequence FIFO tie-breaking, SHA-256 and caller-specified idempotency deduplication, exponential retry backoff, Dead Letter Queue (DLQ) isolation with replay capability, and thread-safe daemon worker concurrency. Connected lazy `queue` property to `FraudInvestigatorAgent`. Exposed 6 REST endpoints in `src/api/main.py` (`POST /api/queue/tasks`, `GET /api/queue/tasks/{task_id}`, `POST /api/queue/tasks/{task_id}/cancel`, `GET /api/queue/stats`, `GET /api/queue/dlq`, `POST /api/queue/dlq/{task_id}/retry`). Added 7 unit tests in `tests/test_agent_queue.py` (207/207 tests pass across 44 suites).
 
 55. **[Release Tag v0.5] Checkpoint 9 Audit & 55-Iteration Milestone Review**
     - *Goal:* Comprehensive verification across multi-agent consensus, 45+ test suites, 0 secrets, and release tag `v0.5`.

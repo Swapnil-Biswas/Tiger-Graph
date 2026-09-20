@@ -1,3 +1,35 @@
+## Iteration 054: Asynchronous Investigation Event Queue & Distributed Task Dispatcher | 2026-09-20 23:45 | commit TBD_COMMIT
+- **Lens:** 14. Scale & throughput, 15. Real-time streaming & event queue, 11. Agent architecture & engineering
+- **Goal / hypothesis:** Enterprise financial crime and fraud detection platforms require resilient, non-blocking ingestion pipelines to handle transaction spikes, batch historical backfills, and multi-agent investigations without blocking API servers or dropping events. Implementing `InvestigationTaskQueue` in `src/agent/queue.py` establishes an enterprise-grade asynchronous event dispatcher:
+  1. **Priority Heap & FIFO Tie-Breaking**: Priority-ordered task execution (`CRITICAL=0`, `HIGH=1`, `NORMAL=2`, `LOW=3`) with monotonic sequence numbers guaranteeing deterministic FIFO processing within identical priority tiers.
+  2. **Idempotency Deduplication**: Native deduplication via explicit caller keys or canonical payload SHA-256 digests, preventing redundant investigations for active or completed cases.
+  3. **Exponential Backoff Retries & Dead Letter Queue (DLQ)**: Automatic fault tolerance with exponential retry backoff delays ($t_{\text{backoff}} = f \cdot 2^{r-1}$) and dead-letter queue routing for poison-pill tasks with audit inspection and replay capabilities.
+  4. **Multi-Threaded Worker Concurrency**: Scalable daemon worker threads (`start_workers`, `stop_workers`) with thread-safe condition synchronization and synchronous execution modes (`process_next_sync`, `process_all_sync`) for deterministic testing.
+  5. **Snapshot Persistence & Observability**: State serialization for crash recovery (`export_snapshot`, `load_snapshot`) and latency/throughput metrics reporting (`get_stats`).
+  6. **Enterprise REST API**: Six dedicated endpoints (`POST /api/queue/tasks`, `GET /api/queue/tasks/{task_id}`, `POST /api/queue/tasks/{task_id}/cancel`, `GET /api/queue/stats`, `GET /api/queue/dlq`, `POST /api/queue/dlq/{task_id}/retry`).
+- **Changes (files):**
+  - `src/agent/queue.py`: Implemented `InvestigationTaskQueue`, `InvestigationTask`, `TaskPriority`, `TaskStatus`, and `TaskType` with priority heap, idempotency mapping, retry backoff, worker threads, and DLQ.
+  - `src/agent/graph.py`: Added lazy `queue` property to `FraudInvestigatorAgent`.
+  - `src/api/main.py`: Initialized global `task_queue`, registered `EnqueueTaskRequest`, and exposed 6 queue management endpoints.
+  - `tests/test_agent_queue.py`: Created 7 unit tests covering priority heap ordering, idempotency deduplication, backoff retries, DLQ routing, cancellation, worker concurrency, snapshot persistence, and REST endpoints.
+- **Tests added/updated:**
+  - `tests/test_agent_queue.py` (7 unit tests, all pass).
+  - Total unit test suite expanded from 200 to **207** tests across 44 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 200 -> **207** (100% pass rate across 44 test suites)
+  - Queue Architecture: Enterprise priority heap with FIFO tie-breaking and idempotency
+  - Fault Tolerance: Exponential backoff retries and Dead Letter Queue (DLQ) with manual replay
+  - Worker Concurrency: Thread-safe multi-worker dispatching with condition variables
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 207 passed, 0 failed.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 053: Multi-Agent Debate & Weighted Majority Voting Consensus Protocol | 2026-09-20 23:25 | commit 37ba769
 - **Lens:** 2. Investigation accuracy & decision making & 11. Agent architecture & engineering
 - **Goal / hypothesis:** In mission-critical financial crime investigations, specialized domain sub-agents (Fraud, AML, Cyber) frequently generate conflicting signals on complex edge cases (e.g. cardholder confirms transaction authorization, but Cyber agent flags critical hardware virtualization pooling, or cumulative account spend mandates BSA FinCEN SAR filing). Implementing `MultiAgentConsensusEngine` in `src/agent/consensus.py` formalizes a multi-agent debate and calibrated majority voting protocol:

@@ -41,6 +41,14 @@ class FraudInvestigatorAgent:
         self.undocumented_detector = UndocumentedPatternDetector(self.client)
         self.memory_prior_engine = BayesianCaseMemoryPrior(self.client)
         self.mock_api = MockActionsAPI()
+        self._task_queue = None
+
+    @property
+    def queue(self):
+        if self._task_queue is None:
+            from src.agent.queue import InvestigationTaskQueue
+            self._task_queue = InvestigationTaskQueue(agent=self)
+        return self._task_queue
 
     def investigate_case(
         self,
