@@ -968,6 +968,31 @@ class GraphClient:
             "collusive_merchants": [{"merchant_id": m, "card_count": len(merchants_seen[m])} for m in shared[:5]],
         }
 
+    # =========================================================================
+    # Q21: detect_high_risk_mcc
+    # High-Risk Merchant Category Code & Adaptive Velocity Multiplier Engine
+    # =========================================================================
+    def detect_high_risk_mcc(
+        self,
+        card_id: str,
+        transactions: Optional[List[Dict[str, Any]]] = None,
+        as_of: Optional[Union[str, int]] = None,
+        window_hours: float = 48.0,
+    ) -> Dict[str, Any]:
+        """
+        Q21: Evaluates card transactions for high-risk MCC activity (crypto 6051, wires 4829,
+        gambling 7995), applies adaptive velocity multipliers, and enforces regulatory restrictions.
+        """
+        from src.policy.jurisdiction import HighRiskMCCRiskEngine
+        return HighRiskMCCRiskEngine.evaluate_mcc_risk(
+            card_id=card_id,
+            transactions=transactions,
+            as_of=as_of,
+            client=self,
+            window_hours=window_hours,
+        )
+
+
 
 
 

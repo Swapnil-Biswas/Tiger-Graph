@@ -1,3 +1,29 @@
+## Iteration 043: Dynamic High-Risk Merchant MCC Blacklisting & Adaptive Velocity Multipliers | 2026-09-20 21:00 | commit pending
+- **Lens:** 6. Fraud detection accuracy & 8. Policy engine and regulatory compliance & 14. Testing and evaluation
+- **Goal / hypothesis:** High-risk Merchant Category Codes (MCC 6051 quasi-cash/cryptocurrency, 4829 wire transfers, 7995 gambling/casinos, 5944 precious metals) are disproportionately exploited by cashout rings and money mules. Static velocity thresholds fail to account for high-risk MCC compounding. Implementing `HighRiskMCCRiskEngine` in `src/policy/jurisdiction.py` detects high-risk MCC transactions, computes adaptive velocity multipliers (up to 3.75x for rapid gambling or crypto bursts), mandates supervisory restrictions (`RESTRICT_QUASI_CASH`, `RESTRICT_OUTBOUND_WIRES`, `STEP_UP_AUTH`), triggers `FILE_SAR_HIGH_RISK_MCC` on cumulative exposure >= thresholds, and connects into `JurisdictionComplianceRouter.generate_dispatch_bundle` and `GraphClient` (Q21).
+- **Changes (files):**
+  - `src/policy/jurisdiction.py`: Created `HighRiskMCCRiskEngine` with MCC specifications, adaptive compounding velocity multipliers, and integrated into `JurisdictionComplianceRouter.generate_dispatch_bundle`.
+  - `src/graph/client.py`: Added `detect_high_risk_mcc` (Q21) to `GraphClient`.
+  - `src/api/main.py`: Added `GET /api/cases/{case_id}/mcc-risk` and `POST /api/regulatory/mcc-check` endpoints; added `MCCCheckRequest` with `model_rebuild()`.
+  - `tests/test_mcc_risk.py`: Created 6 unit tests covering routine retail baseline, crypto/quasi-cash restrictions, rapid gambling velocity compounding, cumulative exposure SAR filing, dispatch bundle integration, and API endpoints.
+- **Tests added/updated:**
+  - `tests/test_mcc_risk.py` (6 unit tests, all pass).
+  - Total unit test suite expanded from 135 to **141** tests across 34 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 135 -> **141** (100% pass rate across 34 test suites)
+  - Policy & MCC Intelligence: High-risk MCC classification (6051, 4829, 7995, 5944) and adaptive velocity multipliers (up to 3.75x)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (141/141)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Compounding the velocity multiplier dynamically when multiple high-risk MCC transactions occur within short rolling windows allows the policy engine to catch rapid cashout attempts before the total dollar amount crosses traditional reporting thresholds.
+- **Follow-ups added to backlog:** Proceed to Iteration 044: Temporal Transaction Subgraph Motif Mining (Lens 1 & Lens 2).
+
 ## Iteration 042: Decision Boundary Visualization in HTML Incident Dossier | 2026-09-20 20:45 | commit 023feca
 - **Lens:** 9. Case summary and explainability & 10. Demo quality and UI/UX & 14. Testing and evaluation
 - **Goal / hypothesis:** Human fraud analysts and compliance auditors reviewing incident dossiers require clear visibility into why a decision was reached and how sensitive the verdict is to specific evidentiary changes. Static counterfactual tables describe thresholds in text but lack interactive intuition. Implementing interactive decision boundary gauges and real-time sensitivity sliders in `IncidentDossierExporter` renders a dynamic gradient decision boundary bar (Legitimate < 0.30, Review 0.30–0.70, Fraud > 0.70) with an interactive JavaScript simulator that recalculates simulated probabilities, flips verdicts, and updates action recommendations on-the-fly in standalone HTML reports.

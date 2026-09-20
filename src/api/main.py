@@ -112,12 +112,20 @@ class CrossBorderCheckRequest(BaseModel):
     window_hours: float = 48.0
 
 
+class MCCCheckRequest(BaseModel):
+    card_id: str
+    transactions: Optional[List[Dict[str, Any]]] = None
+    as_of: Optional[str] = None
+    window_hours: float = 48.0
+
+
 StructuringCheckRequest.model_rebuild()
 ContagionCheckRequest.model_rebuild()
 PoolEmbeddingRequest.model_rebuild()
 MineRulesRequest.model_rebuild()
 EvaluateRulesRequest.model_rebuild()
 CrossBorderCheckRequest.model_rebuild()
+MCCCheckRequest.model_rebuild()
 
 
 @app.get("/api/health")
@@ -385,6 +393,40 @@ def get_syndicate_merchants(nexus_id: str, as_of: Optional[str] = None):
         raise HTTPException(status_code=404, detail=f"Syndicate nexus {nexus_id} not found.")
     
     return case_manager.expand_syndicate_merchants(nexus_id=nexus_id, as_of=as_of)
+
+
+@app.get("/api/cases/{case_id}/mcc-risk")
+def get_case_mcc_risk(case_id: str, window_hours: float = 48.0):
+    """Evaluates high-risk Merchant Category Code (MCC) exposure and adaptive velocity multipliers."""
+    if case_id not in active_cases:
+        if case_id in agent.client.store.case_pack:
+            res = agent.investigate_case(case_id)
+            active_cases[case_id] = res
+            case_manager.write_case_to_graph(res)
+        else:
+            raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
+
+    case_data = active_cases[case_id]
+    card_id = case_data.get("case", {}).get("card_id")
+    as_of = case_data.get("case", {}).get("as_of")
+    analysis = agent.client.detect_high_risk_mcc(
+        card_id=card_id,
+        transactions=case_data.get("case", {}).get("transactions"),
+        as_of=as_of,
+        window_hours=window_hours,
+    )
+    return {"case_id": case_id, "mcc_risk_analysis": analysis}
+
+
+@app.post("/api/regulatory/mcc-check")
+def run_mcc_check(req: MCCCheckRequest):
+    """On-demand high-risk MCC and adaptive velocity multiplier evaluation."""
+    return agent.client.detect_high_risk_mcc(
+        card_id=req.card_id,
+        transactions=req.transactions,
+        as_of=req.as_of,
+        window_hours=req.window_hours,
+    )
 
 
 @app.get("/api/cases/{case_id}/contagion")

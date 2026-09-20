@@ -158,10 +158,13 @@ Ranked by expected impact on Hackathon Judging Criteria:
 42. **[DONE - Iteration 042] [Explainability & Compliance] Decision Boundary Visualization in HTML Incident Dossier**
     - *Result:* Implemented interactive counterfactual decision boundary bar (Legitimate < 0.30, Review 0.30–0.70, Fraud > 0.70) with live probability marker and sensitivity sliders (customer verification, device history, geographic alignment, velocity burst) in `IncidentDossierExporter`. Embedded standalone client-side JavaScript simulator recalculating simulated probabilities and action recommendations offline. Updated `tests/test_dossier_exporter.py` (135/135 tests pass).
 
-43. **[Policy & Compliance] Dynamic High-Risk Merchant MCC Blacklisting & Adaptive Velocity Multipliers**
-    - *Goal:* Implement adaptive velocity multipliers and risk tier escalation for high-risk Merchant Category Codes (MCC 7995 gambling, 6051 crypto/quasi-cash, 4829 wire transfers).
-    - *Files:* `src/policy/jurisdiction.py`, `src/graph/client.py`, `tests/test_mcc_risk.py`
-    - *Metric Impact:* Policy Engine & Fraud Accuracy (Lens 6, 8).
+43. **[DONE - Iteration 043] [Policy & Compliance] Dynamic High-Risk Merchant MCC Blacklisting & Adaptive Velocity Multipliers**
+    - *Result:* Implemented `HighRiskMCCRiskEngine` in `src/policy/jurisdiction.py` and exposed `detect_high_risk_mcc` (Q21) in `GraphClient`. Classifies high-risk MCCs (6051 quasi-cash/crypto, 4829 wire transfers, 7995 gambling/casinos, 5944 precious metals) and compounds adaptive velocity multipliers (up to 3.75x) on rapid bursts. Enforces automated restrictions (`RESTRICT_QUASI_CASH`, `STEP_UP_AUTH`) and triggers `FILE_SAR_HIGH_RISK_MCC` on cumulative spend >= thresholds. Integrated into `JurisdictionComplianceRouter.generate_dispatch_bundle`. Added API endpoints `/api/cases/{case_id}/mcc-risk` and `/api/regulatory/mcc-check`. Added 6 unit tests in `tests/test_mcc_risk.py` (141/141 tests pass).
+
+44. **[Graph Analytics & Pattern Discovery] Temporal Transaction Subgraph Motif Mining**
+    - *Goal:* Implement network motif mining to discover recurrent topological subgraphs (bipartite stars, cycles, fan-in/fan-out testing hubs) across multi-card clusters.
+    - *Files:* `src/graph/algorithms.py`, `src/graph/client.py`, `tests/test_graph_motifs.py`
+    - *Metric Impact:* Graph Algorithms & Innovation (Lens 1, 20).
 
 ---
 

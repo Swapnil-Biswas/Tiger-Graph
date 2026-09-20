@@ -470,6 +470,186 @@ class CrossBorderAMLRiskDetector:
         }
 
 
+class HighRiskMCCRiskEngine:
+    """
+    Evaluates high-risk Merchant Category Codes (MCC) including cryptocurrency /
+    quasi-cash exchanges (6051), wire transfers (4829), gambling/casinos (7995),
+    and precious metals/bullion (5944). Applies adaptive velocity multipliers
+    and enforces regulatory restrictions.
+    """
+
+    HIGH_RISK_MCCS = {
+        "6051": {
+            "category": "Quasi-Cash / Cryptocurrency / Money Orders",
+            "risk_multiplier": 2.0,
+            "edd_threshold_usd": 1000.0,
+            "sar_threshold_usd": 2000.0,
+            "action": "RESTRICT_QUASI_CASH",
+        },
+        "4829": {
+            "category": "Wire Transfer / Money Transmission",
+            "risk_multiplier": 2.0,
+            "edd_threshold_usd": 1500.0,
+            "sar_threshold_usd": 2500.0,
+            "action": "RESTRICT_OUTBOUND_WIRES",
+        },
+        "7995": {
+            "category": "Betting / Gambling / Casino Gaming",
+            "risk_multiplier": 2.5,
+            "edd_threshold_usd": 2000.0,
+            "sar_threshold_usd": 3000.0,
+            "action": "STEP_UP_AUTH",
+        },
+        "5944": {
+            "category": "Precious Stones / Metals / Jewelry",
+            "risk_multiplier": 1.75,
+            "edd_threshold_usd": 2500.0,
+            "sar_threshold_usd": 5000.0,
+            "action": "ENHANCED_DUE_DILIGENCE",
+        },
+        "6211": {
+            "category": "Securities / Commodity Brokers / High-Risk Trading",
+            "risk_multiplier": 1.5,
+            "edd_threshold_usd": 3000.0,
+            "sar_threshold_usd": 5000.0,
+            "action": "STEP_UP_AUTH",
+        },
+    }
+
+    # Product code mapping to high risk categories if explicit MCC is absent
+    PRODUCT_CODE_MAPPINGS = {
+        "C": "6051",  # Quasi-cash / Credit / Crypto
+        "W": "4829",  # Wires / Web Transfers
+    }
+
+    @classmethod
+    def evaluate_mcc_risk(
+        cls,
+        card_id: str,
+        transactions: Optional[List[Dict[str, Any]]] = None,
+        as_of: Optional[Any] = None,
+        client: Optional[Any] = None,
+        window_hours: float = 48.0,
+    ) -> Dict[str, Any]:
+        """
+        Evaluates transactions for high-risk MCC exposure, computes adaptive velocity multipliers,
+        and mandates supervisory actions.
+        """
+        from src.graph.client import parse_as_of_epoch
+        as_of_epoch = parse_as_of_epoch(as_of)
+
+        gathered_txns: List[Dict[str, Any]] = []
+        if transactions is not None:
+            gathered_txns = list(transactions)
+        elif client is not None and hasattr(client, "store"):
+            all_card_txns = client.store.txns_by_card.get(card_id, [])
+            gathered_txns = list(all_card_txns)
+
+        # Normalize and filter strictly by as_of_epoch
+        valid_txns = []
+        for t in gathered_txns:
+            ep = t.get("epoch_s")
+            if ep is None:
+                ep = t.get("ts")
+            try:
+                ep = float(ep) if ep is not None else 0.0
+            except (ValueError, TypeError):
+                ep = 0.0
+            t_copy = dict(t)
+            t_copy["_epoch"] = ep
+            valid_txns.append(t_copy)
+
+        if as_of_epoch is not None:
+            valid_txns = [t for t in valid_txns if t["_epoch"] <= as_of_epoch]
+
+        if not valid_txns:
+            return {
+                "card_id": card_id,
+                "window_hours": window_hours,
+                "total_transactions_evaluated": 0,
+                "high_risk_mcc_count": 0,
+                "high_risk_mccs_detected": [],
+                "high_risk_exposure_usd": 0.0,
+                "max_risk_multiplier": 1.0,
+                "effective_velocity_multiplier": 1.0,
+                "enhanced_due_diligence_required": False,
+                "mandatory_actions": [],
+                "description": "No transactions evaluated.",
+            }
+
+        ref_epoch = as_of_epoch if as_of_epoch is not None and as_of_epoch < 9000000000 else max(t["_epoch"] for t in valid_txns)
+        window_seconds = int(window_hours * 3600)
+        window_start = ref_epoch - window_seconds
+
+        window_txns = [t for t in valid_txns if t["_epoch"] >= window_start]
+        if not window_txns and valid_txns:
+            window_txns = valid_txns
+
+        detected_mccs = set()
+        high_risk_txns = []
+        high_risk_exposure = 0.0
+        multipliers = []
+        mandatory_actions = []
+        edd_required = False
+
+        for t in window_txns:
+            mcc = str(t.get("mcc") or "")
+            if not mcc:
+                prod = str(t.get("product_code") or "").upper()
+                mcc = cls.PRODUCT_CODE_MAPPINGS.get(prod, "")
+
+            if mcc in cls.HIGH_RISK_MCCS:
+                spec = cls.HIGH_RISK_MCCS[mcc]
+                detected_mccs.add(mcc)
+                amt = float(t.get("amount", 0.0) or 0.0)
+                high_risk_txns.append(t)
+                high_risk_exposure += amt
+                multipliers.append(spec["risk_multiplier"])
+
+                if spec["action"] not in mandatory_actions:
+                    mandatory_actions.append(spec["action"])
+
+                if amt >= spec["edd_threshold_usd"] or high_risk_exposure >= spec["edd_threshold_usd"]:
+                    edd_required = True
+                    if "ENHANCED_DUE_DILIGENCE" not in mandatory_actions:
+                        mandatory_actions.append("ENHANCED_DUE_DILIGENCE")
+
+                if amt >= spec["sar_threshold_usd"] or high_risk_exposure >= spec["sar_threshold_usd"]:
+                    if "FILE_SAR_HIGH_RISK_MCC" not in mandatory_actions:
+                        mandatory_actions.append("FILE_SAR_HIGH_RISK_MCC")
+
+        max_multiplier = max(multipliers) if multipliers else 1.0
+        # Adaptive velocity multiplier compounds if multiple high risk txns occur in the window
+        velocity_multiplier = max_multiplier
+        if len(high_risk_txns) >= 3:
+            velocity_multiplier = round(max_multiplier * 1.5, 2)
+        elif len(high_risk_txns) >= 2:
+            velocity_multiplier = round(max_multiplier * 1.25, 2)
+
+        if high_risk_txns:
+            desc = (
+                f"High-risk MCC activity detected: {len(high_risk_txns)} transaction(s) totaling "
+                f"${high_risk_exposure:,.2f} across MCCs: {sorted(list(detected_mccs))}. "
+                f"Velocity multiplier: {velocity_multiplier}x."
+            )
+        else:
+            desc = "Routine retail merchant activity. No high-risk MCC categories detected."
+
+        return {
+            "card_id": card_id,
+            "window_hours": window_hours,
+            "total_transactions_evaluated": len(window_txns),
+            "high_risk_mcc_count": len(high_risk_txns),
+            "high_risk_mccs_detected": sorted(list(detected_mccs)),
+            "high_risk_exposure_usd": round(high_risk_exposure, 2),
+            "max_risk_multiplier": max_multiplier,
+            "effective_velocity_multiplier": velocity_multiplier,
+            "enhanced_due_diligence_required": edd_required,
+            "mandatory_actions": mandatory_actions,
+            "description": desc,
+        }
+
+
 class JurisdictionComplianceRouter:
     """
     Evaluates cross-jurisdictional compliance rules, determines mandatory regulatory
@@ -667,12 +847,26 @@ class JurisdictionComplianceRouter:
                     obligations["must_file"] = True
                 obligations.setdefault("mandatory_actions", []).extend(cross_border_analysis["mandatory_actions"])
 
+        # High-Risk Merchant Category Code (MCC) Risk Analysis
+        mcc_analysis = None
+        if card_id:
+            mcc_analysis = HighRiskMCCRiskEngine.evaluate_mcc_risk(
+                card_id=card_id,
+                transactions=c_data.get("transactions"),
+                client=client,
+            )
+            if mcc_analysis.get("mandatory_actions"):
+                if "FILE_SAR_HIGH_RISK_MCC" in mcc_analysis["mandatory_actions"]:
+                    obligations["must_file"] = True
+                obligations.setdefault("mandatory_actions", []).extend(mcc_analysis["mandatory_actions"])
+
         dispatch_bundle = {
             "case_id": case_answer.get("case_id", "UNKNOWN"),
             "target_jurisdiction": jurisdiction,
             "obligations": obligations,
             "structuring_analysis": structuring_analysis,
             "cross_border_aml_analysis": cross_border_analysis,
+            "mcc_risk_analysis": mcc_analysis,
             "filing_package": {
                 "agency": obligations["agency"],
                 "statutory_authority": obligations["statute"],
