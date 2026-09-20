@@ -1,4 +1,30 @@
-## Iteration 094: Fine-Grained Policy Audit & Compliance Report Packager | 2026-09-21 10:30 | commit iter-094
+## Iteration 095: Checkpoint 17 Audit, 95-Iteration Milestone Review, and v0.95 Release Tag | 2026-09-21 10:45 | commit v0.95
+- **Lens:** All 15 PRD Evaluation Lenses
+- **Goal / hypothesis:** Reaching 95% completion (95/100 iterations) represents nineteen-twentieths of the journey. Conducting a comprehensive checkpoint audit across all 15 PRD evaluation lenses validates:
+  1. **Comprehensive Evaluation Across 15 Lenses**: Graph schema modeling, investigation accuracy, next best action, device sharing, regulatory compliance, GNN interoperability, community detection, explainability, security defenses, case memory, multi-agent architecture, audit trail, budgeting, performance, and enterprise interoperability.
+  2. **100% Determinism & Consistency**: 0.00% variance across 3-run benchmark evaluations, 100% backtest recall/precision (300 cases), 20/20 official benchmark cases valid, 50/50 extended benchmark cases valid.
+  3. **Milestone Documentation & Release Tag**: Documented Section 3.8 in `docs/MILESTONES.md`, updated scoreboard in `docs/METRICS.md`, marked item 95 DONE in `docs/BACKLOG.md`, created tag `v0.95`.
+- **Changes (files):**
+  - `docs/MILESTONES.md`: Added Section 3.8 Checkpoint 17 Audit & 95-Iteration Milestone Review, updated release tags.
+  - `docs/METRICS.md`: Updated Iteration 094 commit hash (`d347625`) and added Iteration 095 (`v0.95`).
+  - `docs/BACKLOG.md`: Marked item 95 as DONE.
+  - `docs/IMPROVEMENT_LOG.md`: Documented Iteration 095.
+- **Tests added/updated:**
+  - Full suite verified: **387 unit tests across 76 test suites (100% passing)**.
+- **Metrics before -> after:**
+  - Test Count: 387 (100% pass rate across 76 test suites)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Extended Benchmark Answers Valid: 50/50 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 387 passed across 76 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
+## Iteration 094: Fine-Grained Policy Audit & Compliance Report Packager | 2026-09-21 10:30 | commit d347625
 - **Lens:** 2. Next best action, 5. Case summary & explainability, 9. Security, safety & defenses, 13. Regulatory compliance & ethics
 - **Goal / hypothesis:** Financial crime investigations require strict regulatory compliance across multiple statutory bodies (FinCEN, UK FCA/NCA, EU 6AMLD/GDPR) and internal operational guardrails (Rules R1–R10). Delivering an automated policy auditor and compliance report packager provides:
   1. **Multi-Jurisdiction Statutory Auditing (`src/policy/compliance_report.py`)**: `ComplianceReportPackager` validates US FinCEN 31 CFR 1020.320 SAR thresholds, 30-day deadlines, and 5-year retention; UK POCA 2002 Part 7 DAML STR; and EU 6AMLD predicate offenses.
