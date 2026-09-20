@@ -69,6 +69,7 @@ Across 50 consecutive test-driven, production-grade iterations, the codebase has
 - **`v0.35` (Iteration 035)**: LPA Community Detection, PyG GNN Exporter, Velocity Burst Clustering, BSA Structuring Detection.
 - **`v0.4` (Iteration 040)**: Personalized PageRank Contagion, Graph Attention Pooling, Inductive Rule Induction, FATF Corridor Screening.
 - **`v0.45` (Iteration 050)**: Sybil Record Linkage, Streaming Edge Decay, Invariant Self-Refinement, GSQL/Cypher Knowledge Triplets, Active Learning Mining.
+- **`v0.5` (Iteration 055)**: Multi-Agent Federation (AML & Cyber Specialists), Deliberation Consensus Voting & Statutory Vetoes, Asynchronous Investigation Event Queue & Distributed Task Dispatcher (207 unit tests across 44 suites).
 
 ---
 
