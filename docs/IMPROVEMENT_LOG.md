@@ -1,4 +1,33 @@
-## Iteration 097: Cross-Platform Automated Smoke & Sanity Runner | 2026-09-21 11:15 | commit iter-097
+## Iteration 098: Comprehensive Technical Submission Whitepaper | 2026-09-21 11:30 | commit iter-098
+- **Lens:** 6. Case summary & explainability, 10. Demo quality & presentation, 11. Agent architecture & engineering
+- **Goal / hypothesis:** An official IEEE-CIS financial crime challenge submission requires an authoritative, academic-grade technical whitepaper detailing the mathematical formulations, system architecture, empirical benchmarks, and regulatory compliance standards:
+  1. **Comprehensive Technical Submission Whitepaper (`docs/SUBMISSION_WHITEPAPER.md`)**: Authored a complete, publication-grade whitepaper with 7 core academic sections: Abstract & Introduction, Problem Statement & Threat Landscape, 5-Layer Cognitive System Architecture, Q1–Q26 Graph Query Library Catalog with algorithmic complexities, Empirical Evaluation & Benchmark Results, Regulatory Compliance & Evidentiary Standards, SRE & Production Deployment Readiness, and Conclusion.
+  2. **Mathematical Formalisms**: Formulates temporal heterogeneous multigraph $G = (V, E, \tau)$, exponential recency decay kernel ($w_{\text{temporal}}$), Empirical Bayes Beta-Binomial conjugate update, and $O(\log N)$ binary search slicing.
+  3. **Empirical Benchmarks & Ablation**: Documents 100.0% precision, 100.0% recall, 0.00% variance across 3-run benchmark tests, 20/20 official cases, 50/50 extended cases, and full ablation study results.
+  4. **Automated Verification**: Built `tests/test_whitepaper_integrity.py` validating section coverage, Q1–Q26 query references, mathematical formulas, and statutory citations.
+- **Changes (files):**
+  - `docs/SUBMISSION_WHITEPAPER.md`: Authored official technical submission whitepaper.
+  - `tests/test_whitepaper_integrity.py`: Created 5 unit tests.
+  - `docs/METRICS.md`: Added Iteration 098 row.
+  - `docs/BACKLOG.md`: Marked item 98 as DONE.
+  - `docs/IMPROVEMENT_LOG.md`: Documented Iteration 098.
+- **Tests added/updated:**
+  - `tests/test_whitepaper_integrity.py` (5 unit tests, all pass).
+  - Total unit test suite expanded from 397 to **402** tests across 79 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 397 -> **402** (100% pass rate across 79 test suites)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Extended Benchmark Answers Valid: 50/50 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 402 passed across 79 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
+## Iteration 097: Cross-Platform Automated Smoke & Sanity Runner | 2026-09-21 11:15 | commit e2232f7
 - **Lens:** 14. Testing, evaluation & benchmarks, 15. Operational readiness & runbooks
 - **Goal / hypothesis:** Evaluation bots, hackathon judges, and DevOps engineers cloning the repository across Windows, Linux, and macOS require a lightweight, sub-5s smoke test script that verifies complete system health without external dependencies or long test runs:
   1. **Cross-Platform Smoke Runner (`scripts/smoke_test.py`)**: Executes 13 multi-category health checks spanning runtime environment (Python >= 3.10, core imports), data/GraphStore integrity (`cases/*.json`, `graph_cache.pkl`), and in-process FastAPI endpoints (`/api/cases`, `/api/cases/HHG-001`, `/api/compliance/report`, `/api/cases/HHG-001/briefing/html`, `/api/cases/HHG-001/graph-diff`, `/graphql`, `/api/security/ratelimit/stats`, `/api/webhooks/dlq/stats`, `/metrics`).
