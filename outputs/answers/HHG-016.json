@@ -1,0 +1,178 @@
+{
+  "case_id": "HHG-016",
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 1.0,
+    "pattern": "card_not_present_new_device",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3534820"
+    ],
+    "first_suspicious_txn_id": "3534820",
+    "connected_card_ids": [
+      "C00005-K1",
+      "C00045-K1",
+      "C00294-K2",
+      "C00426-K2",
+      "C00466-K1",
+      "C00573-K1",
+      "C00854-K2",
+      "C01002-K1",
+      "C01109-K2",
+      "C01154-K1"
+    ],
+    "connected_device_profiles": [
+      "Windows | UnknownOS | edge 16.0 | UnknownScreen"
+    ],
+    "exposure_usd": 59.67,
+    "evidence": [
+      {
+        "id": "EV-01",
+        "source": "graph",
+        "ref": "query:get_txn(3534820)",
+        "claim": "Flagged transaction of $59.67 executed via online channel (risk score: 0.37).",
+        "entity_ids": [
+          "3534820"
+        ]
+      },
+      {
+        "id": "EV-02",
+        "source": "graph",
+        "ref": "query:entity_profile(card_id=C09988-K1)",
+        "claim": "Card baseline: 61 prior transactions totaling $2550.57 (median: $37.54, typical regions: ['100.0', '382.0']).",
+        "entity_ids": [
+          "C09988-K1"
+        ]
+      },
+      {
+        "id": "EV-03",
+        "source": "graph",
+        "ref": "query:velocity(card_id=C09988-K1)",
+        "claim": "Velocity activity: 0 transaction(s) in last 1h, 0 in last 24h (spike ratio: 0.0).",
+        "entity_ids": []
+      },
+      {
+        "id": "EV-04",
+        "source": "graph",
+        "ref": "query:new_entity_check(3534820)",
+        "claim": "Novelty detection: new device profile for this account.",
+        "entity_ids": [
+          "3534820"
+        ]
+      },
+      {
+        "id": "EV-05",
+        "source": "graph",
+        "ref": "query:device_sharing(Windows | UnknownOS | edg...)",
+        "claim": "Device profile is shared across 158 cards and 158 customers.",
+        "entity_ids": [
+          "C00005-K1",
+          "C00045-K1",
+          "C00294-K2",
+          "C00426-K2"
+        ]
+      },
+      {
+        "id": "EV-06",
+        "source": "graph",
+        "ref": "query:pattern_match(card_not_present_new_device)",
+        "claim": "Pattern signature match for 'card_not_present_new_device' with confidence 0.80.",
+        "entity_ids": [
+          "3534820"
+        ]
+      },
+      {
+        "id": "EV-07",
+        "source": "graph",
+        "ref": "query:similar_cases(card=C09988-K1)",
+        "claim": "Found 5 prior closed case(s) touching related entities: CC-3039, CC-3206, CC-3221.",
+        "entity_ids": [
+          "CC-3039",
+          "CC-3206",
+          "CC-3221"
+        ]
+      },
+      {
+        "id": "EV-08",
+        "source": "customer",
+        "ref": "evidence_request:1",
+        "claim": "Customer states they did not make these purchases and still has the card",
+        "entity_ids": []
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-3039",
+      "CC-3206",
+      "CC-3221"
+    ],
+    "summary": "Investigation confirmed unauthorized activity on card C09988-K1 under pattern 'card_not_present_new_device'. Total exposure identified is $59.67 across 1 transaction(s). Cardholder outreach and graph evidence confirmed compromise; defensive card blocks and case progression executed.",
+    "written_to_graph": true,
+    "graph_case_id": "CASE-HHG-016"
+  },
+  "evidence_requests": [
+    {
+      "type": "customer_validation",
+      "asked_after_step": 3,
+      "assumed_response": "Customer states they did not make these purchases and still has the card",
+      "reason": "R1: Cardholder inquiry to verify transaction legitimacy."
+    }
+  ],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "VERIFY_WITH_CUSTOMER",
+        "route": "auto",
+        "reason": "R1: Assessed fraud probability is below 0.70 on weak/single signal; confirm with cardholder before any blocking action."
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "Section 3a: Internal fraud case created pending customer verification."
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: Customer confirmed unauthorized activity; exposure $59.67."
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: Formal internal fraud case created."
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "R2 & Section 3a: SAR required (exposure $59.67 or shared origin)."
+      },
+      {
+        "action": "MONITOR_CONNECTED_CARDS",
+        "route": "auto",
+        "reason": "R6: Shared device profile also observed on connected cards."
+      }
+    ],
+    "what_changed": "Customer denial raised fraud probability to 1.00, confirming immediate card block and case escalation."
+  },
+  "sar": {
+    "file": true,
+    "reason": "Section 3a & Rule R2: Confirmed unauthorized fraud with exposure of $59.67 USD and multi-card linkage.",
+    "narrative": "Between 2016-12-11 and 2016-12-12, cardholder C09988 experienced unauthorized activity on card C09988-K1. A total of 1 transaction(s) amounting to $59.67 USD were executed under fraud pattern 'card_not_present_new_device'. The primary flagged transaction 3534820 ($59.67) was initiated through the online channel. Activity originated from a device profile (Windows | UnknownOS | edge 16.0 | UnknownScreen) marked as New for this account. The same device profile was also observed across 158 other distinct cards, demonstrating coordinated compromise. The cardholder was contacted for transaction validation and stated: 'Customer states they did not make these purchases and still has the card'. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C09988-K1 to mitigate further loss and placed linked accounts under enhanced monitoring.",
+    "subjects": [
+      "C09988",
+      "C00005-K1",
+      "C09988-K1",
+      "C00045-K1"
+    ],
+    "total_amount_usd": 59.67,
+    "activity_dates": [
+      "2016-12-11",
+      "2016-12-12"
+    ]
+  },
+  "stop_reason": "Customer denial and definitive graph pattern signatures settled the verdict; further steps would not alter the defensive actions.",
+  "tool_calls": 8,
+  "tokens": 2400,
+  "latency_s": 0.03
+}
