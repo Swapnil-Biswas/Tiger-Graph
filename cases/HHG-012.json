@@ -1,0 +1,110 @@
+{
+  "case_id": "HHG-012",
+  "case": {
+    "status": "closed_legitimate",
+    "verdict": "legitimate",
+    "fraud_probability": 0.05,
+    "pattern": "none",
+    "pattern_description": "",
+    "affected_txn_ids": [],
+    "first_suspicious_txn_id": "",
+    "connected_card_ids": [],
+    "connected_device_profiles": [],
+    "exposure_usd": 0.0,
+    "evidence": [
+      {
+        "id": "EV-01",
+        "source": "graph",
+        "ref": "query:get_txn(3553342)",
+        "claim": "Flagged transaction of $30.91 executed via in_person channel (risk score: 0.55).",
+        "entity_ids": [
+          "3553342"
+        ]
+      },
+      {
+        "id": "EV-02",
+        "source": "graph",
+        "ref": "query:entity_profile(card_id=C05876-K2)",
+        "claim": "Card baseline: 991 prior transactions totaling $79341.74 (median: $49.05, typical regions: ['325.0', '272.0']).",
+        "entity_ids": [
+          "C05876-K2"
+        ]
+      },
+      {
+        "id": "EV-03",
+        "source": "graph",
+        "ref": "query:velocity(card_id=C05876-K2)",
+        "claim": "Velocity activity: 0 transaction(s) in last 1h, 0 in last 24h (spike ratio: 0.0).",
+        "entity_ids": []
+      },
+      {
+        "id": "EV-04",
+        "source": "graph",
+        "ref": "query:similar_cases(card=C05876-K2)",
+        "claim": "Found 5 prior closed case(s) touching related entities: CC-0003, CC-2370, CC-0222.",
+        "entity_ids": [
+          "CC-0003",
+          "CC-2370",
+          "CC-0222"
+        ]
+      },
+      {
+        "id": "EV-05",
+        "source": "customer",
+        "ref": "evidence_request:1",
+        "claim": "Customer confirms they made this purchase while traveling and still has possession of the card",
+        "entity_ids": []
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-0003",
+      "CC-2370",
+      "CC-0222"
+    ],
+    "summary": "Investigation cleared the alert for card C05876-K2 as legitimate activity. Transaction characteristics match cardholder baseline history; customer confirmation confirmed authorized use.",
+    "written_to_graph": true,
+    "graph_case_id": "CASE-HHG-012"
+  },
+  "evidence_requests": [
+    {
+      "type": "customer_validation",
+      "asked_after_step": 3,
+      "assumed_response": "Customer confirms they made this purchase while traveling and still has possession of the card",
+      "reason": "R1: Ambiguous risk score requires cardholder validation before permanent card block."
+    }
+  ],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "VERIFY_WITH_CUSTOMER",
+        "route": "auto",
+        "reason": "R1: Assessed fraud probability is below 0.70 on weak/single signal; confirm with cardholder before any blocking action."
+      }
+    ],
+    "final": [
+      {
+        "action": "ALLOW_TRANSACTION",
+        "route": "auto",
+        "reason": "R3: Customer confirmed transaction as authorized."
+      },
+      {
+        "action": "CLOSE_NO_FRAUD",
+        "route": "auto",
+        "reason": "R3: Verification confirmed false alarm; alert closed without fraud."
+      }
+    ],
+    "what_changed": "Customer confirmation reduced fraud probability to 0.05, resolving the alert as legitimate and clearing the case."
+  },
+  "sar": {
+    "file": false,
+    "reason": "Policy criteria for filing a Suspicious Activity Report were not met.",
+    "narrative": "",
+    "subjects": [],
+    "total_amount_usd": 0.0,
+    "activity_dates": []
+  },
+  "stop_reason": "Customer confirmation and baseline habit alignment verified legitimacy; alert cleared without fraud.",
+  "tool_calls": 7,
+  "tokens": 2250,
+  "latency_s": 0.01
+}

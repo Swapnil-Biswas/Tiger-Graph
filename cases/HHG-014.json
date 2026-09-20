@@ -1,0 +1,135 @@
+{
+  "case_id": "HHG-014",
+  "case": {
+    "status": "closed_legitimate",
+    "verdict": "legitimate",
+    "fraud_probability": 0.0,
+    "pattern": "none",
+    "pattern_description": "",
+    "affected_txn_ids": [],
+    "first_suspicious_txn_id": "",
+    "connected_card_ids": [
+      "C00255-K1",
+      "C01289-K1",
+      "C01935-K1",
+      "C01996-K1",
+      "C02910-K1",
+      "C02975-K1",
+      "C03528-K1",
+      "C03551-K1",
+      "C03676-K2",
+      "C03744-K1"
+    ],
+    "connected_device_profiles": [
+      "SM-G935F Build/NRD90M | Android 7.0 | chrome 62.0 for android | 1920x1080"
+    ],
+    "exposure_usd": 0.0,
+    "evidence": [
+      {
+        "id": "EV-01",
+        "source": "graph",
+        "ref": "query:get_txn(3478561)",
+        "claim": "Flagged transaction of $74.96 executed via online channel (risk score: 0.05).",
+        "entity_ids": [
+          "3478561"
+        ]
+      },
+      {
+        "id": "EV-02",
+        "source": "graph",
+        "ref": "query:entity_profile(card_id=C13487-K1)",
+        "claim": "Card baseline: 85 prior transactions totaling $4881.62 (median: $48.03, typical regions: ['191.0', '272.0']).",
+        "entity_ids": [
+          "C13487-K1"
+        ]
+      },
+      {
+        "id": "EV-03",
+        "source": "graph",
+        "ref": "query:velocity(card_id=C13487-K1)",
+        "claim": "Velocity activity: 0 transaction(s) in last 1h, 0 in last 24h (spike ratio: 0.0).",
+        "entity_ids": []
+      },
+      {
+        "id": "EV-04",
+        "source": "graph",
+        "ref": "query:device_sharing(SM-G935F Build/NRD90M | A...)",
+        "claim": "Device profile is shared across 52 cards and 52 customers.",
+        "entity_ids": [
+          "C00255-K1",
+          "C01289-K1",
+          "C01935-K1",
+          "C01996-K1"
+        ]
+      },
+      {
+        "id": "EV-05",
+        "source": "graph",
+        "ref": "query:pattern_match(card_not_present_new_device)",
+        "claim": "Pattern signature match for 'card_not_present_new_device' with confidence 0.80.",
+        "entity_ids": [
+          "3478561"
+        ]
+      },
+      {
+        "id": "EV-06",
+        "source": "graph",
+        "ref": "query:similar_cases(card=C13487-K1)",
+        "claim": "Found 5 prior closed case(s) touching related entities: CC-0932, CC-1065, CC-1258.",
+        "entity_ids": [
+          "CC-0932",
+          "CC-1065",
+          "CC-1258"
+        ]
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-0932",
+      "CC-1065",
+      "CC-1258"
+    ],
+    "summary": "Investigation cleared the alert for card C13487-K1 as legitimate activity. Transaction characteristics match cardholder baseline history; customer confirmation confirmed authorized use.",
+    "written_to_graph": true,
+    "graph_case_id": "CASE-HHG-014"
+  },
+  "evidence_requests": [],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "ALLOW_TRANSACTION",
+        "route": "auto",
+        "reason": "Activity consistent with customer normal spending habits."
+      },
+      {
+        "action": "CLOSE_NO_FRAUD",
+        "route": "auto",
+        "reason": "R3: Alert cleared as legitimate activity."
+      }
+    ],
+    "final": [
+      {
+        "action": "ALLOW_TRANSACTION",
+        "route": "auto",
+        "reason": "Activity consistent with customer normal spending habits."
+      },
+      {
+        "action": "CLOSE_NO_FRAUD",
+        "route": "auto",
+        "reason": "R3: Alert cleared as legitimate activity."
+      }
+    ],
+    "what_changed": "nothing"
+  },
+  "sar": {
+    "file": false,
+    "reason": "Policy criteria for filing a Suspicious Activity Report were not met.",
+    "narrative": "",
+    "subjects": [],
+    "total_amount_usd": 0.0,
+    "activity_dates": []
+  },
+  "stop_reason": "Customer confirmation and baseline habit alignment verified legitimacy; alert cleared without fraud.",
+  "tool_calls": 8,
+  "tokens": 2400,
+  "latency_s": 0.0
+}

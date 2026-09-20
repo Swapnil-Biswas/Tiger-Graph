@@ -1,0 +1,169 @@
+{
+  "case_id": "HHG-008",
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 1.0,
+    "pattern": "card_not_present_fraud",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3558054"
+    ],
+    "first_suspicious_txn_id": "3558054",
+    "connected_card_ids": [
+      "C00027-K1",
+      "C00036-K1",
+      "C00073-K1",
+      "C00259-K1",
+      "C00294-K2",
+      "C00426-K2",
+      "C00583-K1",
+      "C00606-K1",
+      "C00841-K1",
+      "C00854-K2"
+    ],
+    "connected_device_profiles": [
+      "UnknownDevice | UnknownOS | chrome 66.0 | UnknownScreen"
+    ],
+    "exposure_usd": 55.68,
+    "evidence": [
+      {
+        "id": "EV-01",
+        "source": "graph",
+        "ref": "query:get_txn(3558054)",
+        "claim": "Flagged transaction of $55.68 executed via online channel (risk score: 0.38).",
+        "entity_ids": [
+          "3558054"
+        ]
+      },
+      {
+        "id": "EV-02",
+        "source": "graph",
+        "ref": "query:entity_profile(card_id=C13171-K2)",
+        "claim": "Card baseline: 928 prior transactions totaling $50362.89 (median: $39.42, typical regions: ['284.0', '465.0']).",
+        "entity_ids": [
+          "C13171-K2"
+        ]
+      },
+      {
+        "id": "EV-03",
+        "source": "graph",
+        "ref": "query:velocity(card_id=C13171-K2)",
+        "claim": "Velocity activity: 0 transaction(s) in last 1h, 0 in last 24h (spike ratio: 0.0).",
+        "entity_ids": []
+      },
+      {
+        "id": "EV-04",
+        "source": "graph",
+        "ref": "query:device_sharing(UnknownDevice | UnknownOS...)",
+        "claim": "Device profile is shared across 171 cards and 171 customers.",
+        "entity_ids": [
+          "C00027-K1",
+          "C00036-K1",
+          "C00073-K1",
+          "C00259-K1"
+        ]
+      },
+      {
+        "id": "EV-05",
+        "source": "graph",
+        "ref": "query:pattern_match(card_not_present_fraud)",
+        "claim": "Pattern signature match for 'card_not_present_fraud' with confidence 0.70.",
+        "entity_ids": [
+          "3558054"
+        ]
+      },
+      {
+        "id": "EV-06",
+        "source": "graph",
+        "ref": "query:similar_cases(card=C13171-K2)",
+        "claim": "Found 5 prior closed case(s) touching related entities: CC-0056, CC-0467, CC-0772.",
+        "entity_ids": [
+          "CC-0056",
+          "CC-0467",
+          "CC-0772"
+        ]
+      },
+      {
+        "id": "EV-07",
+        "source": "customer",
+        "ref": "evidence_request:1",
+        "claim": "Customer states they did not make these purchases and still has the card",
+        "entity_ids": []
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-0056",
+      "CC-0467",
+      "CC-0772"
+    ],
+    "summary": "Investigation confirmed unauthorized activity on card C13171-K2 under pattern 'card_not_present_fraud'. Total exposure identified is $55.68 across 1 transaction(s). Cardholder outreach and graph evidence confirmed compromise; defensive card blocks and case progression executed.",
+    "written_to_graph": true,
+    "graph_case_id": "CASE-HHG-008"
+  },
+  "evidence_requests": [
+    {
+      "type": "customer_validation",
+      "asked_after_step": 3,
+      "assumed_response": "Customer states they did not make these purchases and still has the card",
+      "reason": "R1: Cardholder inquiry to verify transaction legitimacy."
+    }
+  ],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "VERIFY_WITH_CUSTOMER",
+        "route": "auto",
+        "reason": "R1: Assessed fraud probability is below 0.70 on weak/single signal; confirm with cardholder before any blocking action."
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "Section 3a: Internal fraud case created pending customer verification."
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: Customer confirmed unauthorized activity; exposure $55.68."
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: Formal internal fraud case created."
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "R2 & Section 3a: SAR required (exposure $55.68 or shared origin)."
+      },
+      {
+        "action": "MONITOR_CONNECTED_CARDS",
+        "route": "auto",
+        "reason": "R6: Shared device profile also observed on connected cards."
+      }
+    ],
+    "what_changed": "Customer denial raised fraud probability to 1.00, confirming immediate card block and case escalation."
+  },
+  "sar": {
+    "file": true,
+    "reason": "Section 3a & Rule R2: Confirmed unauthorized fraud with exposure of $55.68 USD and multi-card linkage.",
+    "narrative": "Between 2016-12-19 and 2016-12-20, cardholder C13171 experienced unauthorized activity on card C13171-K2. A total of 1 transaction(s) amounting to $55.68 USD were executed under fraud pattern 'card_not_present_fraud'. The primary flagged transaction 3558054 ($55.68) was initiated through the online channel. The same device profile was also observed across 171 other distinct cards, demonstrating coordinated compromise. The cardholder was contacted for transaction validation and stated: 'Customer states they did not make these purchases and still has the card'. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C13171-K2 to mitigate further loss and placed linked accounts under enhanced monitoring.",
+    "subjects": [
+      "C13171-K2",
+      "C00027-K1",
+      "C13171",
+      "C00036-K1"
+    ],
+    "total_amount_usd": 55.68,
+    "activity_dates": [
+      "2016-12-19",
+      "2016-12-20"
+    ]
+  },
+  "stop_reason": "Customer denial and definitive graph pattern signatures settled the verdict; further steps would not alter the defensive actions.",
+  "tool_calls": 8,
+  "tokens": 2400,
+  "latency_s": 0.05
+}

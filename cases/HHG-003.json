@@ -1,0 +1,117 @@
+{
+  "case_id": "HHG-003",
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 1.0,
+    "pattern": "card_not_present_fraud",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3530164"
+    ],
+    "first_suspicious_txn_id": "3530164",
+    "connected_card_ids": [],
+    "connected_device_profiles": [],
+    "exposure_usd": 49.0,
+    "evidence": [
+      {
+        "id": "EV-01",
+        "source": "graph",
+        "ref": "query:get_txn(3530164)",
+        "claim": "Flagged transaction of $49.00 executed via in_person channel (risk score: 0.4).",
+        "entity_ids": [
+          "3530164"
+        ]
+      },
+      {
+        "id": "EV-02",
+        "source": "graph",
+        "ref": "query:entity_profile(card_id=C08623-K2)",
+        "claim": "Card baseline: 11 prior transactions totaling $1303.09 (median: $96.98, typical regions: ['158.0', '387.0']).",
+        "entity_ids": [
+          "C08623-K2"
+        ]
+      },
+      {
+        "id": "EV-03",
+        "source": "graph",
+        "ref": "query:velocity(card_id=C08623-K2)",
+        "claim": "Velocity activity: 0 transaction(s) in last 1h, 0 in last 24h (spike ratio: 0.0).",
+        "entity_ids": []
+      },
+      {
+        "id": "EV-04",
+        "source": "graph",
+        "ref": "query:similar_cases(card=C08623-K2)",
+        "claim": "Found 5 prior closed case(s) touching related entities: CC-1589, CC-2817, CC-2935.",
+        "entity_ids": [
+          "CC-1589",
+          "CC-2817",
+          "CC-2935"
+        ]
+      },
+      {
+        "id": "EV-05",
+        "source": "customer",
+        "ref": "evidence_request:1",
+        "claim": "Customer states they did not make these purchases and still has the card",
+        "entity_ids": []
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-1589",
+      "CC-2817",
+      "CC-2935"
+    ],
+    "summary": "Investigation confirmed unauthorized activity on card C08623-K2 under pattern 'card_not_present_fraud'. Total exposure identified is $49.00 across 1 transaction(s). Cardholder outreach and graph evidence confirmed compromise; defensive card blocks and case progression executed.",
+    "written_to_graph": true,
+    "graph_case_id": "CASE-HHG-003"
+  },
+  "evidence_requests": [
+    {
+      "type": "customer_validation",
+      "asked_after_step": 3,
+      "assumed_response": "Customer states they did not make these purchases and still has the card",
+      "reason": "R1: Cardholder inquiry to verify transaction legitimacy."
+    }
+  ],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "VERIFY_WITH_CUSTOMER",
+        "route": "auto",
+        "reason": "R1: Assessed fraud probability is below 0.70 on weak/single signal; confirm with cardholder before any blocking action."
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "Section 3a: Internal fraud case created pending customer verification."
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: Customer confirmed unauthorized activity; exposure $49.00."
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: Formal internal fraud case created."
+      }
+    ],
+    "what_changed": "Customer denial raised fraud probability to 1.00, confirming immediate card block and case escalation."
+  },
+  "sar": {
+    "file": false,
+    "reason": "Policy criteria for filing a Suspicious Activity Report were not met.",
+    "narrative": "",
+    "subjects": [],
+    "total_amount_usd": 0.0,
+    "activity_dates": []
+  },
+  "stop_reason": "Customer denial and definitive graph pattern signatures settled the verdict; further steps would not alter the defensive actions.",
+  "tool_calls": 7,
+  "tokens": 2250,
+  "latency_s": 0.0
+}

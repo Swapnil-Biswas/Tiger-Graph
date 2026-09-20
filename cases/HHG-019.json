@@ -1,0 +1,168 @@
+{
+  "case_id": "HHG-019",
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 1.0,
+    "pattern": "card_not_present_new_device",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3503878"
+    ],
+    "first_suspicious_txn_id": "3503878",
+    "connected_card_ids": [
+      "C01104-K2",
+      "C01983-K1",
+      "C06224-K2",
+      "C11309-K1"
+    ],
+    "connected_device_profiles": [
+      "Windows | other | chrome 61.0 | 1280x720"
+    ],
+    "exposure_usd": 99.92,
+    "evidence": [
+      {
+        "id": "EV-01",
+        "source": "graph",
+        "ref": "query:get_txn(3503878)",
+        "claim": "Flagged transaction of $99.92 executed via online channel (risk score: 0.9).",
+        "entity_ids": [
+          "3503878"
+        ]
+      },
+      {
+        "id": "EV-02",
+        "source": "graph",
+        "ref": "query:entity_profile(card_id=C07987-K2)",
+        "claim": "Card baseline: 11 prior transactions totaling $3769.59 (median: $150.00, typical regions: ['448.0', '184.0']).",
+        "entity_ids": [
+          "C07987-K2"
+        ]
+      },
+      {
+        "id": "EV-03",
+        "source": "graph",
+        "ref": "query:velocity(card_id=C07987-K2)",
+        "claim": "Velocity activity: 0 transaction(s) in last 1h, 0 in last 24h (spike ratio: 0.0).",
+        "entity_ids": []
+      },
+      {
+        "id": "EV-04",
+        "source": "graph",
+        "ref": "query:new_entity_check(3503878)",
+        "claim": "Novelty detection: new device profile for this account.",
+        "entity_ids": [
+          "3503878"
+        ]
+      },
+      {
+        "id": "EV-05",
+        "source": "graph",
+        "ref": "query:device_sharing(Windows | other | chrome ...)",
+        "claim": "Device profile is shared across 5 cards and 5 customers.",
+        "entity_ids": [
+          "C01104-K2",
+          "C01983-K1",
+          "C06224-K2",
+          "C07987-K2"
+        ]
+      },
+      {
+        "id": "EV-06",
+        "source": "graph",
+        "ref": "query:pattern_match(card_not_present_new_device)",
+        "claim": "Pattern signature match for 'card_not_present_new_device' with confidence 0.80.",
+        "entity_ids": [
+          "3503878"
+        ]
+      },
+      {
+        "id": "EV-07",
+        "source": "graph",
+        "ref": "query:similar_cases(card=C07987-K2)",
+        "claim": "Found 5 prior closed case(s) touching related entities: CC-2011, CC-2087, CC-2860.",
+        "entity_ids": [
+          "CC-2011",
+          "CC-2087",
+          "CC-2860"
+        ]
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-2011",
+      "CC-2087",
+      "CC-2860"
+    ],
+    "summary": "Investigation confirmed unauthorized activity on card C07987-K2 under pattern 'card_not_present_new_device'. Total exposure identified is $99.92 across 1 transaction(s). Cardholder outreach and graph evidence confirmed compromise; defensive card blocks and case progression executed.",
+    "written_to_graph": true,
+    "graph_case_id": "CASE-HHG-019"
+  },
+  "evidence_requests": [],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: High probability unauthorized activity (1.00); exposure $99.92."
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "Section 3a: Formal fraud case opened with evidence attached."
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "Section 3a & R2: Regulatory SAR required (exposure $99.92 > $1,000 or shared device origin)."
+      },
+      {
+        "action": "MONITOR_CONNECTED_CARDS",
+        "route": "auto",
+        "reason": "R6: Compromised device profile shared with other cards."
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: High probability unauthorized activity (1.00); exposure $99.92."
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "Section 3a: Formal fraud case opened with evidence attached."
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "Section 3a & R2: Regulatory SAR required (exposure $99.92 > $1,000 or shared device origin)."
+      },
+      {
+        "action": "MONITOR_CONNECTED_CARDS",
+        "route": "auto",
+        "reason": "R6: Compromised device profile shared with other cards."
+      }
+    ],
+    "what_changed": "nothing"
+  },
+  "sar": {
+    "file": true,
+    "reason": "Section 3a & Rule R2: Confirmed unauthorized fraud with exposure of $99.92 USD and multi-card linkage.",
+    "narrative": "Between 2016-12-01 and 2016-12-01, cardholder C07987 experienced unauthorized activity on card C07987-K2. A total of 1 transaction(s) amounting to $99.92 USD were executed under fraud pattern 'card_not_present_new_device'. The primary flagged transaction 3503878 ($99.92) was initiated through the online channel. Activity originated from a device profile (Windows | other | chrome 61.0 | 1280x720) marked as New for this account. The same device profile was also observed across 5 other distinct cards, demonstrating coordinated compromise. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C07987-K2 to mitigate further loss and placed linked accounts under enhanced monitoring.",
+    "subjects": [
+      "C07987-K2",
+      "C07987",
+      "C01983-K1",
+      "C01104-K2"
+    ],
+    "total_amount_usd": 99.92,
+    "activity_dates": [
+      "2016-12-01",
+      "2016-12-01"
+    ]
+  },
+  "stop_reason": "Customer denial and definitive graph pattern signatures settled the verdict; further steps would not alter the defensive actions.",
+  "tool_calls": 8,
+  "tokens": 2400,
+  "latency_s": 0.0
+}

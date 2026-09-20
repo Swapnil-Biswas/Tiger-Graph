@@ -1,0 +1,169 @@
+{
+  "case_id": "HHG-006",
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 1.0,
+    "pattern": "card_not_present_new_device",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3476682"
+    ],
+    "first_suspicious_txn_id": "3476682",
+    "connected_card_ids": [
+      "C00094-K1",
+      "C00118-K1",
+      "C00134-K1",
+      "C00149-K1",
+      "C00180-K1",
+      "C00197-K1",
+      "C00230-K1",
+      "C00288-K1",
+      "C00329-K2",
+      "C00386-K1"
+    ],
+    "connected_device_profiles": [
+      "Trident/7.0 | Windows 7 | ie 11.0 for desktop | 1920x1080"
+    ],
+    "exposure_usd": 482.12,
+    "evidence": [
+      {
+        "id": "EV-01",
+        "source": "graph",
+        "ref": "query:get_txn(3476682)",
+        "claim": "Flagged transaction of $482.12 executed via online channel (risk score: 0.25).",
+        "entity_ids": [
+          "3476682"
+        ]
+      },
+      {
+        "id": "EV-02",
+        "source": "graph",
+        "ref": "query:entity_profile(card_id=C07297-K1)",
+        "claim": "Card baseline: 261 prior transactions totaling $29379.10 (median: $58.98, typical regions: ['264.0', '485.0']).",
+        "entity_ids": [
+          "C07297-K1"
+        ]
+      },
+      {
+        "id": "EV-03",
+        "source": "graph",
+        "ref": "query:velocity(card_id=C07297-K1)",
+        "claim": "Velocity activity: 0 transaction(s) in last 1h, 0 in last 24h (spike ratio: 0.0).",
+        "entity_ids": []
+      },
+      {
+        "id": "EV-04",
+        "source": "graph",
+        "ref": "query:device_sharing(Trident/7.0 | Windows 7 |...)",
+        "claim": "Device profile is shared across 544 cards and 543 customers.",
+        "entity_ids": [
+          "C00094-K1",
+          "C00118-K1",
+          "C00134-K1",
+          "C00149-K1"
+        ]
+      },
+      {
+        "id": "EV-05",
+        "source": "graph",
+        "ref": "query:pattern_match(card_not_present_new_device)",
+        "claim": "Pattern signature match for 'card_not_present_new_device' with confidence 0.80.",
+        "entity_ids": [
+          "3476682"
+        ]
+      },
+      {
+        "id": "EV-06",
+        "source": "graph",
+        "ref": "query:similar_cases(card=C07297-K1)",
+        "claim": "Found 5 prior closed case(s) touching related entities: CC-0026, CC-0781, CC-0796.",
+        "entity_ids": [
+          "CC-0026",
+          "CC-0781",
+          "CC-0796"
+        ]
+      },
+      {
+        "id": "EV-07",
+        "source": "customer",
+        "ref": "evidence_request:1",
+        "claim": "Customer states they did not make these purchases and still has the card",
+        "entity_ids": []
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-0026",
+      "CC-0781",
+      "CC-0796"
+    ],
+    "summary": "Investigation confirmed unauthorized activity on card C07297-K1 under pattern 'card_not_present_new_device'. Total exposure identified is $482.12 across 1 transaction(s). Cardholder outreach and graph evidence confirmed compromise; defensive card blocks and case progression executed.",
+    "written_to_graph": true,
+    "graph_case_id": "CASE-HHG-006"
+  },
+  "evidence_requests": [
+    {
+      "type": "customer_validation",
+      "asked_after_step": 3,
+      "assumed_response": "Customer states they did not make these purchases and still has the card",
+      "reason": "R1: Cardholder inquiry to verify transaction legitimacy."
+    }
+  ],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "VERIFY_WITH_CUSTOMER",
+        "route": "auto",
+        "reason": "R1: Assessed fraud probability is below 0.70 on weak/single signal; confirm with cardholder before any blocking action."
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "Section 3a: Internal fraud case created pending customer verification."
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: Customer confirmed unauthorized activity; exposure $482.12."
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: Formal internal fraud case created."
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "R2 & Section 3a: SAR required (exposure $482.12 or shared origin)."
+      },
+      {
+        "action": "MONITOR_CONNECTED_CARDS",
+        "route": "auto",
+        "reason": "R6: Shared device profile also observed on connected cards."
+      }
+    ],
+    "what_changed": "Customer denial raised fraud probability to 1.00, confirming immediate card block and case escalation."
+  },
+  "sar": {
+    "file": true,
+    "reason": "Section 3a & Rule R2: Confirmed unauthorized fraud with exposure of $482.12 USD and multi-card linkage.",
+    "narrative": "Between 2016-11-21 and 2016-11-22, cardholder C07297 experienced unauthorized activity on card C07297-K1. A total of 1 transaction(s) amounting to $482.12 USD were executed under fraud pattern 'card_not_present_new_device'. The primary flagged transaction 3476682 ($482.12) was initiated through the online channel. The same device profile was also observed across 544 other distinct cards, demonstrating coordinated compromise. The cardholder was contacted for transaction validation and stated: 'Customer states they did not make these purchases and still has the card'. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C07297-K1 to mitigate further loss and placed linked accounts under enhanced monitoring.",
+    "subjects": [
+      "C07297",
+      "C07297-K1",
+      "C00118-K1",
+      "C00094-K1"
+    ],
+    "total_amount_usd": 482.12,
+    "activity_dates": [
+      "2016-11-21",
+      "2016-11-22"
+    ]
+  },
+  "stop_reason": "Customer denial and definitive graph pattern signatures settled the verdict; further steps would not alter the defensive actions.",
+  "tool_calls": 8,
+  "tokens": 2400,
+  "latency_s": 0.0
+}
