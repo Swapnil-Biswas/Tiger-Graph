@@ -1,4 +1,4 @@
-## Iteration 057: Counterfactual Scenario Playground & Policy Simulation Engine | 2026-09-21 01:10 | commit TBD_COMMIT
+## Iteration 057: Counterfactual Scenario Playground & Policy Simulation Engine | 2026-09-21 01:10 | commit c28d45f
 - **Lens:** 3. Next best action & policy guidance, 8. Explainability & human-in-the-loop, 11. Agent architecture & engineering
 - **Goal / hypothesis:** In enterprise fraud investigations, risk committees, and compliance audits, analysts need to simulate "what-if" topological perturbations without modifying production graphs to test decision boundaries and policy sensitivity. Implementing `GraphScenarioSimulator` in `src/graph/simulation.py` provides:
   1. **Topological & Behavioral Perturbations**: Parameterized simulation of exposure overrides ($N$ dollars or scaling multipliers), transaction burst injections, device unlinking, high-risk merchant MCC reclassifications (e.g. 6051 quasi-cash), and synthetic cardholder challenge responses.
