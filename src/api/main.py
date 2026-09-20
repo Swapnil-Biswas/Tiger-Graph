@@ -152,6 +152,11 @@ class StreamingPruneRequest(BaseModel):
     max_degree: int = 50
 
 
+class RefineInvestigationRequest(BaseModel):
+    answer: Dict[str, Any]
+    max_refinements: int = 3
+
+
 StructuringCheckRequest.model_rebuild()
 ContagionCheckRequest.model_rebuild()
 PoolEmbeddingRequest.model_rebuild()
@@ -164,6 +169,7 @@ EntityLinkageRequest.model_rebuild()
 SybilCheckRequest.model_rebuild()
 EdgeDecayRequest.model_rebuild()
 StreamingPruneRequest.model_rebuild()
+RefineInvestigationRequest.model_rebuild()
 
 
 @app.get("/api/health")
@@ -645,6 +651,14 @@ def get_card_pruned_edges(card_id: str, as_of: Optional[str] = None, half_life_d
         half_life_days=half_life_days,
         max_degree=max_degree,
     )
+
+
+@app.post("/api/agent/self-refine")
+def run_self_refine(req: RefineInvestigationRequest):
+    """Executes graph-augmented self-refinement and counterfactual verification loop on an investigation answer."""
+    from src.agent.refiner import GraphAugmentedSelfRefiner
+    refiner = GraphAugmentedSelfRefiner(max_refinements=req.max_refinements)
+    return refiner.refine_investigation(req.answer)
 
 
 @app.get("/api/rules/mined")

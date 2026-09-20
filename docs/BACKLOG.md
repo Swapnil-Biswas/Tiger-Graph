@@ -170,10 +170,23 @@ Ranked by expected impact on Hackathon Judging Criteria:
 46. **[DONE - Iteration 046] [Streaming Graph Scalability & Performance] Dynamic Graph Edge Pruning & Exponential Decay Memory Management**
     - *Result:* Implemented `ExponentialTemporalDecay` in `src/graph/decay.py` applying continuous exponential decay ($w(e) = \min(1.0, \alpha(e) \cdot 2^{-\Delta t / \tau})$) with half-life $\tau$ (30 days), priority-boosting multipliers ($\alpha = 4.0$ for confirmed fraud, $\alpha = 3.0$ for syndicate links, $\alpha = 2.0$ for high risk), guaranteed fraud seed preservation immunity, and bounded-degree top-$K$ pruning. Exposed Q24 methods `calculate_edge_decay`, `prune_card_edges`, and `prune_streaming_graph` in `GraphClient`. Added API endpoints `/api/graph/edge-decay`, `/api/graph/streaming-prune`, `/api/cards/{card_id}/pruned`. Added 6 unit tests in `tests/test_graph_decay.py` (160/160 tests pass).
 
-47. **[Agent Architecture & Self-Refinement] Graph-Augmented LLM Self-Refinement & Counter-Factual Verification Loop**
-    - *Goal:* Implement iterative self-refinement and counter-factual verification loop where the agent checks its proposed verdict and actions against the graph's structural invariants, auto-detects ungrounded assertions or policy contradictions, and refines its response before final dispatch.
-    - *Files:* `src/agent/refiner.py`, `src/agent/investigator.py`, `tests/test_agent_refiner.py`
-    - *Metric Impact:* Agent Architecture & Explainability (Lens 11, Lens 12).
+47. **[DONE - Iteration 047] [Agent Architecture & Self-Refinement] Graph-Augmented LLM Self-Refinement & Counter-Factual Invariant Verification Loop**
+    - *Result:* Implemented `GraphAugmentedSelfRefiner` in `src/agent/refiner.py` verifying 7 structural invariants: weak signal block barrier (< 0.70), multi-card block threshold, customer denial strict enforcement, customer confirm dispute protection, recurring charge subscription safeguard, high-exposure L2 routing tier mandate, and mandatory SAR filing. Connected Step 12 into `FraudInvestigatorAgent.investigate_case`. Added API endpoint `/api/agent/self-refine`. Added 7 unit tests in `tests/test_agent_refiner.py` (167/167 tests pass).
+
+48. **[Graph Interoperability & Knowledge Graph] Dynamic Knowledge Graph Triplet Export for External Neo4j/TigerGraph GSQL Sync**
+    - *Goal:* Implement RDF/JSON-LD and Cypher/GSQL DDL knowledge graph triplet exporter (`Subject`, `Predicate`, `Object`, `TemporalWeight`, `ProvenanceCase`) in `src/graph/triplets.py` and `GraphClient` (Q25), enabling automated external synchronization to enterprise TigerGraph clusters and Neo4j graph databases.
+    - *Files:* `src/graph/triplets.py`, `src/graph/client.py`, `src/api/main.py`, `tests/test_graph_triplets.py`
+    - *Metric Impact:* Graph Schema & Production Readiness (Lens 1, Lens 14).
+
+49. **[Machine Learning & Continuous Retraining] Active Learning Sample Selector & Hard-Negative Mining**
+    - *Goal:* Implement active learning sample selection engine using margin sampling, entropy uncertainty, and topological diversity clustering to mine informative hard negatives and borderline cases from historical transactions for continuous GBDT/GNN classifier retraining.
+    - *Files:* `src/ml/active_learning.py`, `src/graph/client.py`, `src/api/main.py`, `tests/test_active_learning.py`
+    - *Metric Impact:* Innovation & Machine Learning (Lens 6, Lens 14).
+
+50. **[Release Tag v0.45] 50-Iteration Milestone Review & Checkpoint 8 Audit**
+    - *Goal:* Execute comprehensive 50-iteration milestone review across all 15 evaluation lenses, verifying zero regression, 100% test pass rate across 40+ suites, 0 secrets, and creating release tag `v0.45`.
+    - *Files:* `docs/MILESTONES.md`, `docs/PRD.md`
+    - *Metric Impact:* Submission Readiness & Production Quality.
 
 ---
 

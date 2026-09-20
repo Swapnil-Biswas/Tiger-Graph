@@ -512,4 +512,9 @@ class FraudInvestigatorAgent:
         dispatch = JurisdictionComplianceRouter.generate_dispatch_bundle(answer, client=self.client)
         answer["regulatory_dispatch"] = dispatch
 
+        # 12. GRAPH-AUGMENTED LLM SELF-REFINEMENT & COUNTER-FACTUAL VERIFICATION LOOP
+        from src.agent.refiner import GraphAugmentedSelfRefiner
+        refiner = GraphAugmentedSelfRefiner()
+        answer = refiner.refine_investigation(answer)
+
         return answer
