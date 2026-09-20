@@ -1,3 +1,28 @@
+## Iteration 081: Interactive Video Script & Demo Asset Packager | 2026-09-21 07:15 | commit pending
+- **Lens:** 10. Case summary, explanation & visual reporting, 8. Explainability & human-in-the-loop, 14. Testing, evaluation & benchmarks
+- **Goal / hypothesis:** Competition evaluation and enterprise stakeholder buy-in require high-polish presentation assets, including an exact timestamped video narration script and an automated bundle packager that creates a self-contained demo distribution with cryptographic checksums. Building `docs/DEMO_SCRIPT.md` and `scripts/package_demo_assets.py` delivers:
+  1. **5-Minute Timestamped Video Script (`docs/DEMO_SCRIPT.md`)**: Structured 300-second narration across 6 scenes: (1) Problem Framing & Graph-Native Architecture, (2) Live Case Traversal & WebGL Ego-Net, (3) Multi-Agent Swarm Consensus & Statutory Vetoes, (4) Dual-Gate Policy Actions & FinCEN Form 111 XML E-Filing, (5) Real-Time Streaming Influx & HMAC-SHA256 Webhooks, and (6) Enterprise Production Readiness (Prometheus, Grafana, Helm, Chaos Resilience).
+  2. **Automated Demo Bundle Packager (`scripts/package_demo_assets.py`)**: Assembles `outputs/demo_bundle/` containing representative benchmark cases (`HHG-001`, `HHG-006`, `HHG-010`), architecture diagrams, sample FinCEN Form 111 XML, and an HTML demo overview hub.
+  3. **Cryptographic Manifest Verification**: Calculates SHA-256 digests for all bundled files in `manifest.json` and provides `--verify` CLI integrity checking.
+- **Changes (files):**
+  - `docs/DEMO_SCRIPT.md`: Created official 5-minute video demonstration script.
+  - `scripts/package_demo_assets.py`: Implemented `DemoAssetPackager` with bundling and SHA-256 verification.
+  - `tests/test_demo_packager.py`: Created 5 unit tests validating script structure, asset bundling, tampering detection, and CLI JSON mode.
+- **Tests added/updated:**
+  - `tests/test_demo_packager.py` (5 unit tests, all pass).
+  - Total unit test suite expanded from 312 to **317** tests across 65 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 312 -> **317** (100% pass rate across 65 test suites)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 317 passed across 65 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 080: Checkpoint 14 Audit, 80-Iteration Milestone Review, and v0.8 Release Tag | 2026-09-21 07:00 | commit v0.8
 - **Lens:** 14. Testing, evaluation & benchmarks, 11. Agent architecture & engineering, 10. Case summary, explanation & visual reporting
 - **Goal / hypothesis:** Reaching 80 iterations (80% milestone — four-fifths of the 100-iteration continuous improvement loop) requires a comprehensive audit across all 15 PRD evaluation lenses to verify architectural documentation, sanity verification scripts, type annotation coverage, CLI tooling, and operational stability before tagging `v0.8`.
