@@ -135,6 +135,28 @@ class TestPhase3GraphRAG(unittest.TestCase):
         self.assertIn("Temporal Isolation: Graph expansion strictly bounded as_of", brief)
         print("PASS: Graph topology successfully integrated into Context Brief.")
 
+    def test_05_policy_retrieval_mrr_benchmark(self):
+        """Benchmark Mean Reciprocal Rank (MRR) and Top-k accuracy across comprehensive policy test set."""
+        benchmark_queries = [
+            ("Three small authorizations followed by a larger purchase", "POLICY-R5"),
+            ("Customer denies making the transaction", "POLICY-R2"),
+            ("Single risk score signal under 0.70 verify customer", "POLICY-R1"),
+            ("Customer confirms they made the purchase during travel", "POLICY-R3"),
+            ("Multiple cards compromised from same device profile and region", "POLICY-R6"),
+            ("Monthly recurring charge disputed by cardholder", "POLICY-R7"),
+            ("Uncertain fraud evaluation with high financial loss", "POLICY-R8"),
+            ("Restrictions on BLOCK_ALL_CARDS requires at least two cards", "POLICY-R10"),
+            ("Card not present online purchase from new device proxy", "TYP-CNP-NEW-DEV"),
+            ("Multi-card proxy rotation coordinated undocumented pattern", "TYP-DISCOVERED-PROXY-ROT"),
+            ("Device pooling nexus shared by multiple unrelated cards", "TYP-DISCOVERED-DEVICE-POOL"),
+            ("Rapid geographical dispersion impossible travel velocity", "TYP-RAPID-DISPERSION"),
+        ]
+
+        metrics = self.retriever.evaluate_policy_retrieval_mrr(benchmark_queries, top_k=3)
+        self.assertGreaterEqual(metrics["mrr"], 0.90, f"MRR too low: {metrics['mrr']}")
+        self.assertEqual(metrics["topk_accuracy"], 1.0, f"Top-k accuracy must be 100%: {metrics['topk_accuracy']}")
+        print(f"PASS: Policy Retrieval MRR: {metrics['mrr']:.4f}, Top-1 Acc: {metrics['top1_accuracy']*100:.1f}%, Top-3 Acc: {metrics['topk_accuracy']*100:.1f}%")
+
 
 if __name__ == "__main__":
     unittest.main()

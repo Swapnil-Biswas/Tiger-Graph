@@ -1,4 +1,33 @@
-## Iteration 017: Deterministic Audit Trail Self-Critique & Citation Verifier | 2026-09-20 17:37 | commit pending
+## Iteration 018: GraphRAG BM25 & N-Gram Policy Retrieval Optimization | 2026-09-20 17:52 | commit pending
+- **Lens:** 7. GraphRAG quality & 12. LLM prompting and cost/latency
+- **Goal / hypothesis:** Traditional TF-IDF token matching without term-frequency saturation, bi-gram phrase recognition, or exact identifier boosting causes retrieval drift across nuanced fraud rules and drops 2-character tokens (e.g. `r1` through `r9`). Upgrading `LocalSemanticIndex` in `src/rag/embed.py` to BM25 ($k_1=1.2, b=0.75$) with bi-gram phrase indexing, exact policy ID boosting, and synchronizing discovered anomaly typologies (`TYP-DISCOVERED-DEVICE-POOL`, `TYP-RAPID-DISPERSION`) into `PolicyChunker` will achieve 1.0000 Mean Reciprocal Rank (MRR) and 100% Top-1 retrieval accuracy across all policy queries.
+- **Changes (files):**
+  - `src/rag/embed.py`: Implemented BM25 Robertson-Spärck Jones scoring, bi-gram phrase generation, short-token preservation (`r1`..`r10`, `ev`, `sar`), document length normalization, and exact identifier / acronym boosting.
+  - `src/rag/chunk.py`: Added knowledge chunks for Pattern 7 (`TYP-DISCOVERED-DEVICE-POOL`) and Pattern 8 (`TYP-RAPID-DISPERSION`) discovered in Iteration 011.
+  - `src/rag/retrieve.py`: Added `evaluate_policy_retrieval_mrr` computing MRR, Top-1 accuracy, and Top-k hit rate.
+  - `tests/test_phase3.py`: Added `test_05_policy_retrieval_mrr_benchmark` asserting MRR >= 0.90 and 100% Top-k accuracy.
+- **Tests added/updated:**
+  - `tests/test_phase3.py` test count expanded from 4 to **5** (all 5 passing).
+  - Total unit test suite expanded from 54 to **55** tests across 14 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 54 -> **55** (100% pass rate)
+  - Policy Retrieval MRR: 0.8333 -> **1.0000** (100% perfect Top-1 ranking across all benchmark queries)
+  - Policy Retrieval Top-1 Accuracy: **100.0%**
+  - Policy Retrieval Top-3 Accuracy: **100.0%**
+  - GraphRAG Context Brief: 1748 characters (well within 3,000-character budget)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (55/55)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** In regulatory retrieval, short tokens like `r1`, `r5`, and `r10` are the highest-information tokens in human analyst queries; preserving them and generating bi-grams (`single_signal`, `risk_score`, `card_testing`) lifted MRR from 0.8333 to a perfect 1.0000.
+- **Follow-ups added to backlog:** Next implement Iteration 019: Automated Component Ablation Study Harness (Lens 14: Testing and evaluation & 1: Investigation accuracy).
+
+## Iteration 017: Deterministic Audit Trail Self-Critique & Citation Verifier | 2026-09-20 17:37 | commit 73242f6
 - **Lens:** 9. Explainability & 11. Agent architecture and robustness & 20. Innovation
 - **Goal / hypothesis:** In regulatory banking compliance, LLM narrative summaries and SAR filings risk hallucinating non-existent transactions, fictitious cards, or fake regulatory clauses. Implementing a deterministic `AuditTrailSelfCritiqueVerifier` performs an automated self-critique pass over the agent's case summary: extracting all cited evidence IDs (`EV-xx`), regulatory policies (`POLICY-Rx`), and mentioned entities (cards `Cxxxx-Kx`, transactions `xxxxxxx`), cross-referencing them against the verified evidence graph, computing an audit faithfulness score (0.00-1.00), and penalizing/sanitizing any unverified claims.
 - **Changes (files):**

@@ -6,7 +6,7 @@ with graph structural traversals (connected devices, shared customers, cluster r
 
 import os
 import sys
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 
 # Ensure project root is in sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
@@ -100,3 +100,47 @@ class GraphRAGRetriever:
                     }
 
         return list(hits.values())[:top_k]
+
+    def evaluate_policy_retrieval_mrr(
+        self,
+        test_queries: List[Tuple[str, str]],
+        top_k: int = 3,
+    ) -> Dict[str, float]:
+        """
+        Evaluates retrieval quality across test query/expected-chunk-ID pairs.
+        Returns:
+            mrr: Mean Reciprocal Rank (1.0 = perfect top-1 ranking)
+            top1_accuracy: Fraction of queries where expected chunk is rank 1
+            topk_accuracy: Fraction of queries where expected chunk is in top-k
+        """
+        total = len(test_queries)
+        if total == 0:
+            return {"mrr": 0.0, "top1_accuracy": 0.0, "topk_accuracy": 0.0}
+
+        reciprocal_ranks = []
+        top1_hits = 0
+        topk_hits = 0
+
+        for query, expected_id in test_queries:
+            hits = self.retrieve_policy(query, top_k=top_k)
+            hit_ids = [h.get("id") for h in hits]
+
+            if expected_id in hit_ids:
+                rank = hit_ids.index(expected_id) + 1
+                reciprocal_ranks.append(1.0 / rank)
+                topk_hits += 1
+                if rank == 1:
+                    top1_hits += 1
+            else:
+                reciprocal_ranks.append(0.0)
+
+        mrr = sum(reciprocal_ranks) / total
+        top1_acc = top1_hits / total
+        topk_acc = topk_hits / total
+
+        return {
+            "mrr": round(mrr, 4),
+            "top1_accuracy": round(top1_acc, 4),
+            "topk_accuracy": round(topk_acc, 4),
+        }
+

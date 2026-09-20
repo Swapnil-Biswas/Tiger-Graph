@@ -155,5 +155,21 @@ class PolicyChunker:
                 "text": "Multiple distinct cards compromised from the identical device build behind rotating anonymous proxies within a 30-day window. Fits Rule R6 and R9 for cross-customer coordination.",
                 "keywords": ["multi_card_proxy_rotation", "undocumented", "discovered", "cross-customer coordination", "proxy rotation"],
             },
+            {
+                "id": "TYP-DISCOVERED-DEVICE-POOL",
+                "doc": "DiscoveredTypologies",
+                "section": "Discovered",
+                "title": "Pattern 7: Discovered Device Pooling Nexus",
+                "text": "Hardware fingerprint or device profile linked to multiple independent card accounts across three or more cardholders. Indicates device pooling nexus used by fraud operations for testing and liquidation. Governed by Policy R6 and R9.",
+                "keywords": ["device_pooling_nexus", "device pooling", "device nexus", "multiple cards", "unrelated cards", "hardware fingerprint", "shared device pool"],
+            },
+            {
+                "id": "TYP-RAPID-DISPERSION",
+                "doc": "DiscoveredTypologies",
+                "section": "Discovered",
+                "title": "Pattern 8: Discovered Rapid Geographical Dispersion",
+                "text": "Rapid multi-regional dispersion with impossible travel velocity hops across non-contiguous billing regions within tight time windows, indicating distributed counterfeit card relay or skimming ring. Governed by Policy R2, R6, and R9.",
+                "keywords": ["rapid_geo_dispersion", "rapid geographical dispersion", "impossible travel velocity", "geo dispersion", "multi regional hops", "counterfeit relay"],
+            },
         ]
         return chunks

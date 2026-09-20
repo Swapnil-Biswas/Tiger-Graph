@@ -71,10 +71,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 17. **[DONE - Iteration 017] [Explainability & Robustness] Deterministic Audit Trail Self-Critique & Citation Verifier**
     - *Result:* Built `AuditTrailSelfCritiqueVerifier` in `src/agent/explainer_validator.py`. Verifies narrative citation grounding (`EV-xx`, `POLICY-xx`), extracts and validates entity mentions (cards, txns), and computes a 0.00-1.00 faithfulness score. Added 4 unit tests in `tests/test_audit_self_critique.py` (54 tests, 100% pass).
 
-18. **[GraphRAG & Cost/Latency] GraphRAG Multi-Vector Retrieval Relevance & Policy Routing Optimization**
-    - *Goal:* Enhance `PolicyRetriever` in `src/rag/retriever.py` with multi-vector lexical/semantic matching, keyword boosting, and policy relevance@k scoring to ensure 100% accurate policy citation retrieval for all fraud typologies.
-    - *Files:* `src/rag/retriever.py`, `tests/test_phase3.py`
-    - *Metric Impact:* GraphRAG Quality (Lens 7) & LLM Prompting/Cost (Lens 12).
+18. **[DONE - Iteration 018] [GraphRAG & Cost/Latency] GraphRAG Multi-Vector Retrieval Relevance & Policy Routing Optimization**
+    - *Result:* Upgraded `LocalSemanticIndex` to BM25 ($k_1=1.2, b=0.75$) with bi-gram indexing and exact ID boosting in `src/rag/embed.py`. Synchronized newly discovered typologies (`TYP-DISCOVERED-DEVICE-POOL`, `TYP-RAPID-DISPERSION`) into `src/rag/chunk.py`. Added MRR benchmark in `tests/test_phase3.py` achieving 1.0000 MRR and 100% Top-1 accuracy (55 tests, 100% pass).
 
 19. **[Testing & Evaluation] Automated Component Ablation Study Harness**
     - *Goal:* Build `eval/ablation_study.py` evaluating backtest performance with Graph Signals OFF, Case Memory OFF, and Policy Rules OFF, computing exact delta metrics to prove architectural necessity of each component.

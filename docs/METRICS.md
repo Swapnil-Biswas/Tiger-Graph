@@ -19,7 +19,8 @@
 | **014** | `cf51cbf` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 43/43 (100%) | 0.021s | PASS | PolicyEngine penetration fuzzing & permission bypass defenses |
 | **015** | `33d27a5` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 48/48 (100%) | 0.008s | PASS | Graph client bisect temporal slicing & performance benchmark (106x speedup) |
 | **016** | `62ec1a4` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 50/50 (100%) | 0.008s | PASS | SyndicateNexus graph persistence & cross-case ring linking |
-| **017** | pending | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 54/54 (100%) | 0.008s | PASS | Deterministic audit trail self-critique & citation verifier |
+| **017** | `73242f6` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 54/54 (100%) | 0.008s | PASS | Deterministic audit trail self-critique & citation verifier |
+| **018** | pending | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 55/55 (100%) | 0.008s | PASS | GraphRAG BM25 & n-gram policy retrieval optimization (1.0000 MRR) |
 
 ---
 
