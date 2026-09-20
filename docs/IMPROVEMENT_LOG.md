@@ -1,3 +1,34 @@
+## Iteration 093: Graph Temporal Motif & Topology Diff Comparator | 2026-09-21 10:15 | commit iter-093
+- **Lens:** 1. Investigation accuracy & graph algorithms, 11. Agent architecture & engineering, 4. Explainability & trust
+- **Goal / hypothesis:** Fraud networks are dynamic and non-stationary; financial crime syndicates rapidly evolve their topology (e.g. pivoting from star-hub card testing to closed triangular laundering rings or forming new bridges across merchant clusters). Comparing temporal snapshots $G_{t_1}$ and $G_{t_2}$ allows automated detection of structural surges and motif emergence:
+  1. **Graph Topology Diff Comparator (`src/graph/motif_diff.py`)**: `GraphTopologyDiffComparator` calculates exact delta sets for nodes and edges (added, removed, persistent) between two graph states.
+  2. **Higher-Order Motif Mining**: Analyzes changes in stars (degree $\ge 3$), triangles ($K_3$), cycles ($C_4$), and bridges (critical cut-edges).
+  3. **Automated Risk Classification**: Classifies structural shift severity into deterministic categories: `STRUCTURAL_EXPLOSION`, `RING_FORMATION`, `BRIDGE_CREATION`, or `STABLE`.
+  4. **GraphClient Integration & REST Endpoints**: Added `compare_topology_snapshots` to `GraphClient` and exposed `GET /api/graph/diff` and `GET /api/cases/{case_id}/graph-diff` in `src/api/main.py`.
+- **Changes (files):**
+  - `src/graph/motif_diff.py`: Implemented GraphTopologyDiffComparator, snapshot diffing, motif counting, and risk classification.
+  - `src/graph/client.py`: Added compare_topology_snapshots.
+  - `src/api/main.py`: Added graph diff endpoints.
+  - `tests/test_motif_diff.py`: Created 7 unit tests covering identity diff, expansion detection, ring formation, bridge creation, GraphClient integration, and API endpoints.
+  - `docs/METRICS.md`: Added Iteration 093 row.
+  - `docs/BACKLOG.md`: Marked item 93 as DONE.
+  - `docs/IMPROVEMENT_LOG.md`: Documented Iteration 093.
+- **Tests added/updated:**
+  - `tests/test_motif_diff.py` (7 unit tests, all pass).
+  - Total unit test suite expanded from 373 to **380** tests across 75 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 373 -> **380** (100% pass rate across 75 test suites)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Extended Benchmark Answers Valid: 50/50 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 380 passed across 75 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 092: Webhook Dead-Letter Queue & Exponential Backoff Retry Engine | 2026-09-21 10:00 | commit c2d9fd4
 - **Lens:** 15. Operational readiness & runbooks, 11. Agent architecture & engineering, 9. Security, safety & defenses
 - **Goal / hypothesis:** In mission-critical financial crime systems, downstream incident receivers (PagerDuty, SIEMs, Slack) can experience network blips, HTTP 500/503 errors, or rate limiting. Without an asynchronous Dead-Letter Queue (DLQ), critical notifications are permanently dropped. Implementing a DLQ engine delivers:

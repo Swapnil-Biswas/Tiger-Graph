@@ -1596,6 +1596,38 @@ def purge_webhook_dlq(status: Optional[str] = Query(default=None)):
     return {"status": "purged", "count": purged_count}
 
 
+# Graph Temporal Topology Diff & Motif Comparator
+@app.get("/api/graph/diff")
+def get_graph_diff(
+    entity_id: str = Query(...),
+    t1: float = Query(...),
+    t2: float = Query(...),
+    hops: int = Query(default=2, ge=1, le=4),
+):
+    """Compare temporal snapshots of an entity's ego-network between t1 and t2."""
+    diff_data = agent.client.compare_topology_snapshots(entity_id=entity_id, t1=t1, t2=t2, hops=hops)
+    return diff_data
+
+
+@app.get("/api/cases/{case_id}/graph-diff")
+def get_case_graph_diff(case_id: str):
+    """Compares the case subject's ego-network topology before and after the incident alert."""
+    case_file = os.path.join("cases", f"{case_id}.json")
+    if case_id in active_cases:
+        raw = active_cases[case_id]
+    elif os.path.exists(case_file):
+        with open(case_file, "r", encoding="utf-8") as f:
+            raw = json.load(f)
+    else:
+        raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
+    cid = raw.get("case", {}).get("first_suspicious_txn_id") or case_id
+    t_alert = time.time()
+    t_base = t_alert - 30 * 86400
+    diff_data = agent.client.compare_topology_snapshots(entity_id=cid, t1=t_base, t2=t_alert, hops=2)
+    return diff_data
+
+
+
 
 # Mount UI static directory
 ui_dir = os.path.join(os.path.dirname(__file__), "../../ui")

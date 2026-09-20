@@ -95,6 +95,7 @@
 | **090** | `v0.9` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 361/361 (100%) | 0.008s | PASS | Checkpoint 16 Audit, 90-Iteration Milestone Review, and v0.9 Release Tag |
 | **091** | `50891e8` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 366/366 (100%) | 0.008s | PASS | Automated concurrent load & stress testing harness (RPS, P50-P99 percentiles) |
 | **092** | `c2d9fd4` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 373/373 (100%) | 0.008s | PASS | Webhook dead-letter queue, exponential backoff retries, and DLQ management endpoints |
+| **093** | `iter-093` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 380/380 (100%) | 0.008s | PASS | Graph temporal motif and topology diff comparator (node/edge deltas, motif shifts, risk classification) |
 
 ---
 

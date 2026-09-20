@@ -1231,6 +1231,30 @@ class GraphClient:
             max_per_merchant=max_per_merchant,
         )
 
+    # =========================================================================
+    # Temporal Topology Diff & Motif Comparator
+    # =========================================================================
+    def compare_topology_snapshots(
+        self,
+        entity_id: str,
+        t1: Union[str, int, float],
+        t2: Union[str, int, float],
+        hops: int = 2,
+    ) -> dict:
+        """
+        Compares temporal snapshots of an entity's ego-network between t1 and t2.
+        Identifies added/removed nodes/edges, motif shifts (stars, triangles, cycles),
+        and classifies risk shift (STABLE, RING_FORMATION, BRIDGE_CREATION, STRUCTURAL_EXPLOSION).
+        """
+        from src.graph.motif_diff import motif_comparator
+        t1_epoch = parse_as_of_epoch(t1) if isinstance(t1, str) else float(t1)
+        t2_epoch = parse_as_of_epoch(t2) if isinstance(t2, str) else float(t2)
+        res = motif_comparator.compare_temporal_snapshots(
+            self.store, entity_id=entity_id, t1=t1_epoch, t2=t2_epoch, hops=hops
+        )
+        return res.to_dict()
+
+
 
 
 
