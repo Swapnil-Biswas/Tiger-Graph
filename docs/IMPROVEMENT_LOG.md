@@ -1,4 +1,4 @@
-## Iteration 049: Active Learning Sample Selector & Hard-Negative Mining Engine | 2026-09-20 23:05 | commit TBD_COMMIT
+## Iteration 049: Active Learning Sample Selector & Hard-Negative Mining Engine | 2026-09-20 23:05 | commit ff5f3c0
 - **Lens:** 6. Machine learning, fraud classification & GNNs & 14. Performance, scale & production readiness & 11. Agent architecture & engineering
 - **Goal / hypothesis:** Highly imbalanced financial crime transaction streams (> 98% benign) cause standard GBDT and GNN classifiers to suffer from low decision margins and high false alarm rates on complex edge cases. Implementing `ActiveLearningSampleSelector` in `src/ml/active_learning.py` enables continuous active learning and automated hard-negative mining across 4 distinct sampling strategies:
   1. `margin_uncertainty`: Identifies samples nearest to the critical decision boundary ($1.0 - 2 \cdot |P - 0.50|$).
