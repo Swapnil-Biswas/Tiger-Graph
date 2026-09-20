@@ -1,3 +1,32 @@
+## Iteration 057: Counterfactual Scenario Playground & Policy Simulation Engine | 2026-09-21 01:10 | commit TBD_COMMIT
+- **Lens:** 3. Next best action & policy guidance, 8. Explainability & human-in-the-loop, 11. Agent architecture & engineering
+- **Goal / hypothesis:** In enterprise fraud investigations, risk committees, and compliance audits, analysts need to simulate "what-if" topological perturbations without modifying production graphs to test decision boundaries and policy sensitivity. Implementing `GraphScenarioSimulator` in `src/graph/simulation.py` provides:
+  1. **Topological & Behavioral Perturbations**: Parameterized simulation of exposure overrides ($N$ dollars or scaling multipliers), transaction burst injections, device unlinking, high-risk merchant MCC reclassifications (e.g. 6051 quasi-cash), and synthetic cardholder challenge responses.
+  2. **Non-Destructive Execution**: Evaluates counterfactuals in-memory across the multi-agent pipeline (Fraud, AML, Cyber, Consensus, Policies) without mutating underlying graph stores.
+  3. **Diff & Causal Driver Auditing**: Computes exact delta metrics ($\Delta P_{\text{fraud}}$, $\Delta S_{\text{aml}}$, $\Delta S_{\text{cyber}}$, verdict flips, SAR status changes, actions added/removed) with human-readable causal driver narratives.
+  4. **Catalog of Pre-Configured Presets**: 6 production templates (`BELOW_BSA_THRESHOLD`, `DEVICE_UNLINKING`, `VELOCITY_SURGE`, `HIGH_RISK_MCC_6051`, `CUSTOMER_CONFIRMED_LEGITIMATE`, `CUSTOMER_CONFIRMED_FRAUD`).
+  5. **Enterprise REST API**: Three endpoints (`POST /api/simulation/run`, `GET /api/simulation/templates`, `POST /api/simulation/templates/{template_id}/apply`).
+- **Changes (files):**
+  - `src/graph/simulation.py`: Implemented `GraphScenarioSimulator`, `ScenarioPerturbation`, `ScenarioSimulationReport`, and `SIMULATION_TEMPLATES`.
+  - `src/api/main.py`: Initialized global `simulator`, registered `RunSimulationRequest` model, and exposed 3 simulation endpoints.
+  - `tests/test_graph_simulation.py`: Created 7 unit tests covering template cataloging, customer confirmation flips, cardholder dispute escalations, device unlinking, velocity burst injections, high-risk MCC pivots, and REST API endpoints.
+- **Tests added/updated:**
+  - `tests/test_graph_simulation.py` (7 unit tests, all pass).
+  - Total unit test suite expanded from 214 to **221** tests across 46 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 214 -> **221** (100% pass rate across 46 test suites)
+  - What-If Simulation: Interactive topological & policy perturbation engine with 6 presets
+  - Causal Sensitivity: Numerical delta tracking across Fraud, AML, Cyber, and action plans
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 221 passed, 0 failed across 46 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 056: Cross-Agent Distributed Episodic & Semantic Memory Bus | 2026-09-21 00:45 | commit c11978b
 - **Lens:** 10. Case memory & knowledge graphs, 11. Agent architecture & engineering, 8. Explainability & human-in-the-loop
 - **Goal / hypothesis:** In multi-agent federated architectures, specialized domain sub-agents (Fraud, AML, Cyber) need a shared, persistent cognitive memory space to cross-reference historical findings, query cross-domain precedents, and share real-time working observations during live case investigations. Implementing `FederatedMemoryBus` in `src/cases/federated_memory.py` provides:

@@ -45,6 +45,10 @@ case_manager = CaseManager(client=agent.client)
 from src.agent.queue import InvestigationTaskQueue
 task_queue = InvestigationTaskQueue(max_workers=2, agent=agent)
 
+# Graph Scenario Simulator
+from src.graph.simulation import GraphScenarioSimulator
+simulator = GraphScenarioSimulator(agent=agent)
+
 # In-memory store for active cases & approvals
 active_cases: Dict[str, Dict[str, Any]] = {}
 pending_approvals: Dict[str, Dict[str, Any]] = {}
@@ -212,6 +216,18 @@ class MemorySearchRequest(BaseModel):
     query_vector: Optional[List[float]] = None
 
 
+class RunSimulationRequest(BaseModel):
+    case_id: str
+    amount_multiplier: float = 1.0
+    override_amount: Optional[float] = None
+    inject_transactions: List[Dict[str, Any]] = []
+    unlink_devices: List[str] = []
+    unlink_ip_addresses: List[str] = []
+    override_mcc: Optional[str] = None
+    simulated_customer_response: Optional[str] = None
+    notes: Optional[str] = ""
+
+
 StructuringCheckRequest.model_rebuild()
 ContagionCheckRequest.model_rebuild()
 PoolEmbeddingRequest.model_rebuild()
@@ -232,6 +248,7 @@ CyberAssessmentRequest.model_rebuild()
 ConsensusDeliberateRequest.model_rebuild()
 EnqueueTaskRequest.model_rebuild()
 MemorySearchRequest.model_rebuild()
+RunSimulationRequest.model_rebuild()
 
 
 @app.get("/api/health")
@@ -1005,6 +1022,41 @@ def get_cross_domain_prior(
         device_profile=device_profile,
         as_of=as_of,
     )
+
+
+@app.post("/api/simulation/run")
+def run_scenario_simulation(req: RunSimulationRequest):
+    """Executes counterfactual what-if simulation comparing baseline vs perturbed graph state."""
+    from src.graph.simulation import ScenarioPerturbation
+    perturbation = ScenarioPerturbation(
+        case_id=req.case_id,
+        amount_multiplier=req.amount_multiplier,
+        override_amount=req.override_amount,
+        inject_transactions=req.inject_transactions,
+        unlink_devices=req.unlink_devices,
+        unlink_ip_addresses=req.unlink_ip_addresses,
+        override_mcc=req.override_mcc,
+        simulated_customer_response=req.simulated_customer_response,
+        notes=req.notes or "",
+    )
+    report = simulator.simulate_scenario(perturbation)
+    return report.to_dict()
+
+
+@app.get("/api/simulation/templates")
+def get_simulation_templates():
+    """Retrieves pre-configured counterfactual scenario templates."""
+    return simulator.list_templates()
+
+
+@app.post("/api/simulation/templates/{template_id}/apply")
+def apply_simulation_template(template_id: str, case_id: str = Query(...)):
+    """Applies a preset scenario template to a case and returns delta report."""
+    try:
+        report = simulator.apply_template(case_id=case_id, template_id=template_id)
+        return report.to_dict()
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.post("/api/benchmark/run")

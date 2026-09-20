@@ -204,10 +204,23 @@ Ranked by expected impact on Hackathon Judging Criteria:
 56. **[DONE - Iteration 056] [Federated Memory Sync] Cross-Agent Distributed Episodic & Semantic Memory Bus**
     - *Result:* Implemented `FederatedMemoryBus`, `FederatedEpisode`, and `AgentObservation` in `src/cases/federated_memory.py`. Features multi-agent 8D vector embedding store bootstrapped from closed historical cases, real-time shared working memory blackboard, cosine precedent search with half-life recency decay ($w = e^{-\lambda \cdot \Delta t}$) and entity bonuses, and multi-domain empirical risk priors. Integrated as Step 16 in `FraudInvestigatorAgent.investigate_case`. Added 4 API endpoints (`POST /api/memory/episodes/search`, `GET /api/memory/episodes/{case_id}`, `GET /api/memory/blackboard/{case_id}`, `GET /api/memory/cross-domain-prior`). Added 7 unit tests in `tests/test_federated_memory.py` (214/214 tests pass across 45 suites).
 
-57. **[Graph Scenario Sandbox] Counterfactual Scenario Playground & Policy Simulation Engine**
-    - *Goal:* Allow investigators to simulate "what-if" topological perturbations (edge injection, velocity scaling, device unlinking) and re-score case outcomes dynamically.
-    - *Files:* `src/graph/simulation.py`, `src/api/main.py`, `tests/test_graph_simulation.py`
-    - *Metric Impact:* Innovation & Human-in-the-Loop (Lens 3, Lens 8).
+57. **[DONE - Iteration 057] [Graph Scenario Sandbox] Counterfactual Scenario Playground & Policy Simulation Engine**
+    - *Result:* Implemented `GraphScenarioSimulator`, `ScenarioPerturbation`, `ScenarioSimulationReport`, and `SIMULATION_TEMPLATES` in `src/graph/simulation.py`. Supports non-destructive in-memory "what-if" simulations over amounts, transaction injections, device unlinking, high-risk MCC 6051 pivots, and customer challenge responses. Computes exact causal delta metrics ($\Delta P_{\text{fraud}}$, $\Delta S_{\text{aml}}$, $\Delta S_{\text{cyber}}$, SAR flips, action diffs) with causal driver narratives. Added 3 API endpoints (`POST /api/simulation/run`, `GET /api/simulation/templates`, `POST /api/simulation/templates/{template_id}/apply`). Added 7 unit tests in `tests/test_graph_simulation.py` (221/221 tests pass across 46 suites).
+
+58. **[Visual Graph Timeline] Interactive Temporal Graph Playback & Syndicate Cascade Visualizer**
+    - *Goal:* Implement interactive chronological step-by-step transaction playback and subgraph cascade visualizer for dynamic web investigation.
+    - *Files:* `src/graph/playback.py`, `src/api/main.py`, `tests/test_graph_playback.py`
+    - *Metric Impact:* Visuals & UI Experience (Lens 8, Lens 12).
+
+59. **[Compliance Evidence Packager] Automated Audit Dossier & Cryptographic Chain-of-Custody**
+    - *Goal:* Bundle investigation steps, model decisions, GSQL query execution proofs, and SHA-256 HMAC digital signatures into an immutable regulatory evidence archive.
+    - *Files:* `src/cases/evidence_bundle.py`, `src/api/main.py`, `tests/test_evidence_bundle.py`
+    - *Metric Impact:* Regulatory Compliance & Auditability (Lens 5, Lens 9).
+
+60. **[Release Tag v0.55] Checkpoint 10 Audit & 60-Iteration Milestone Review**
+    - *Goal:* Comprehensive verification across simulation sandbox, temporal playback, cryptographic evidence packaging, 50+ test suites, 0 secrets, and release tag `v0.55`.
+    - *Files:* `docs/MILESTONES.md`, `docs/METRICS.md`
+    - *Metric Impact:* Submission Readiness & Production Quality.
 
 ---
 
