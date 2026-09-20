@@ -1,4 +1,25 @@
-## Iteration 008: Structured 5-Part FinCEN SAR Narrative Generator | 2026-09-20 16:57 | commit pending
+## Iteration 009: Cytoscape Visual Glyphs, Neighborhood Highlighting & HUD Inspector | 2026-09-20 17:01 | commit pending
+- **Lens:** 15. UI/UX & 16. Demo and storytelling
+- **Goal / hypothesis:** Reviewers and fraud analysts inspecting multi-entity fraud rings require instant visual distinction between entity vertices (Cards vs Customers vs Devices vs Transactions vs Cases) and dynamic neighborhood focus. Upgrading the Cytoscape canvas with entity-specific geometric glyphs, interactive 1-hop neighborhood highlighting with background dimming, multi-layout controls (Concentric, Breadthfirst, CoSE), and an active HUD topology inspector significantly raises Demo Quality and Explainability.
+- **Changes (files):**
+  - `ui/index.html`: Added layout switcher buttons (`⭕ Concentric`, `🌲 Breadthfirst`, `⚛️ Force-Directed`, `🔍 Fit`) and `#cy-node-hud` real-time topology inspector bar.
+  - `ui/app.js`: Configured distinctive geometric glyph styles (`round-rectangle` for Card, `diamond` for DeviceProfile, `hexagon` for Transaction, `octagon` for Case, `tag` for BillingRegion), tap neighborhood highlighting with `faded` unselected nodes, and HUD details rendering.
+  - `ui/style.css`: Styled `.graph-actions`, `.graph-ctrl-btn`, and `.cy-node-hud` with glassmorphic accents.
+- **Tests added/updated:**
+  - Web UI asset verification test verified HTML, controls, and HUD elements serve 200 OK.
+  - Full unit test suite passed (25/25 tests, 100%).
+  - Answer validation passed (20/20 cases).
+- **Metrics before -> after:**
+  - Test Count: 25 (100% pass rate)
+  - Visual Topology Glyphs: 6 distinct geometric shapes and color codes (Card, Customer, Device, Txn, Case, Region)
+  - Interactive Graph Features: Neighborhood focus, background fade, dynamic HUD inspector, 3 layout algorithms
+  - Valid Benchmark Answers: 20/20 (100%)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **What I learned / what surprised me:** Dimming unrelated nodes to 0.15 opacity while boosting connected edges to neon cyan creates an immediate "aha!" moment when clicking a shared device profile, instantly isolating the fraud ring from benign background accounts.
+- **Follow-ups added to backlog:** Next implement Iteration 010: Checkpoint 2 Review & Submission-Ready Release Tag `v0.1`.
+
+## Iteration 008: Structured 5-Part FinCEN SAR Narrative Generator | 2026-09-20 16:57 | commit 1013f37
 - **Lens:** 10. Case management & 9. Explainability
 - **Goal / hypothesis:** Financial Crimes Enforcement Network (FinCEN) and Bank Secrecy Act (BSA) regulatory compliance guidelines mandate that SAR filings clearly address the Five Essential Questions (Who, What, When, Where, Why) with structured sections. Replacing ad-hoc narrative strings with a formal `SARNarrativeGenerator` creates audit-ready narratives partitioned into 5 standardized sections: Subject Demographics, Suspicious Activity Summary, Chronology & Typology Mechanics, Investigative Findings & Policies Cited, and Law Enforcement Referral.
 - **Changes (files):**

@@ -228,9 +228,18 @@
           <div class="glass-card mb-4">
             <div class="card-header">
               <h3>Case Subgraph Explorer</h3>
-              <span class="badge-graph">Cytoscape.js</span>
+              <div class="graph-actions">
+                <button class="graph-ctrl-btn" id="btn-layout-concentric" title="Concentric Layout">⭕</button>
+                <button class="graph-ctrl-btn" id="btn-layout-breadthfirst" title="Hierarchy Layout">🌲</button>
+                <button class="graph-ctrl-btn" id="btn-layout-cose" title="Force Directed">⚛️</button>
+                <button class="graph-ctrl-btn" id="btn-cy-fit" title="Fit to View">🔍</button>
+                <span class="badge-graph">Cytoscape.js</span>
+              </div>
             </div>
             <div id="cy-container" class="graph-canvas"></div>
+            <div id="cy-node-hud" class="cy-node-hud">
+              <span class="hud-label">Topology Inspector:</span> <span id="hud-text" class="hud-text">Click any node to inspect incident relationships and neighborhood.</span>
+            </div>
           </div>
 
           <!-- Evidence Citations -->

@@ -40,10 +40,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 8. **[DONE - Iteration 008] [Case Management] Structured 5-Part FinCEN SAR Narrative Generator**
    - *Result:* Built `src/cases/sar_generator.py` generating standard 5-part BSA/FinCEN regulatory narratives (Subject, Exposure Summary, Chronology, Findings & Policies, Disposition). Added 2 unit tests in `tests/test_sar_generator.py` (25 tests, 100% pass).
 
-9. **[UI/UX] Cytoscape Custom Node Glyphs & Interactive Subgraph Expansion**
-   - *Goal:* Add distinct SVG icon glyphs for Card, Customer, Device, Transaction, and Case vertices with on-click node expansion.
-   - *Files:* `ui/app.js`, `ui/style.css`
-   - *Metric Impact:* Demo Quality (10%).
+9. **[DONE - Iteration 009] [UI/UX] Cytoscape Custom Node Glyphs & Interactive Subgraph Expansion**
+   - *Result:* Configured 6 distinct geometric vertex glyphs, interactive 1-hop neighborhood tap highlighting with background fade, multi-algorithm layout switchers, and real-time topology HUD inspector.
 
 10. **[Release Tag v0.1] Submission-Ready Checkpoint at Iteration 10**
     - *Goal:* Verify all gates, tag repository with `v0.1`, write state-of-project summary, and confirm zero regression.

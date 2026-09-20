@@ -569,13 +569,57 @@ body {
   font-size: 0.86rem;
 }
 
-/* Graph Explorer Canvas */
+/* Graph Explorer Canvas & Controls */
+.graph-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.graph-ctrl-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-main);
+  font-size: 0.78rem;
+  padding: 0.2rem 0.45rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.graph-ctrl-btn:hover {
+  background: rgba(0, 240, 255, 0.15);
+  border-color: var(--accent-cyan);
+}
+
 .graph-canvas {
   width: 100%;
   height: 280px;
   background: rgba(8, 11, 18, 0.95);
-  border-radius: 10px;
+  border-radius: 10px 10px 0 0;
   border: 1px solid var(--border-subtle);
+}
+
+.cy-node-hud {
+  background: rgba(13, 19, 33, 0.9);
+  border: 1px solid var(--border-subtle);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.hud-label {
+  color: var(--accent-cyan);
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+.hud-text {
+  color: #e2e8f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Evidence Scroll Container */

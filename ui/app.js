@@ -45,69 +45,173 @@ function initCytoscape() {
         style: {
           'label': 'data(label)',
           'color': '#f0f4fc',
-          'font-size': '11px',
+          'font-size': '10px',
+          'font-family': 'JetBrains Mono, monospace',
           'text-valign': 'bottom',
-          'text-margin-y': 4,
+          'text-margin-y': 5,
           'background-color': '#00f0ff',
           'width': 28,
           'height': 28,
           'border-width': 2,
-          'border-color': 'rgba(255, 255, 255, 0.4)'
+          'border-color': 'rgba(255, 255, 255, 0.4)',
+          'transition-property': 'background-color, border-color, width, height, opacity',
+          'transition-duration': '0.2s'
         }
       },
       {
         selector: 'node[type = "Case"]',
         style: {
-          'background-color': '#ff3366',
-          'width': 34,
-          'height': 34
+          'shape': 'octagon',
+          'background-color': '#ec4899',
+          'border-color': '#f472b6',
+          'border-width': 3,
+          'width': 36,
+          'height': 36
         }
       },
       {
         selector: 'node[type = "Customer"]',
         style: {
+          'shape': 'ellipse',
           'background-color': '#8b5cf6',
+          'border-color': '#c084fc',
+          'border-width': 2,
           'width': 32,
           'height': 32
         }
       },
       {
+        selector: 'node[type = "Card"]',
+        style: {
+          'shape': 'round-rectangle',
+          'background-color': '#0ea5e9',
+          'border-color': '#38bdf8',
+          'border-width': 2,
+          'width': 42,
+          'height': 24
+        }
+      },
+      {
+        selector: 'node[type = "Transaction"]',
+        style: {
+          'shape': 'hexagon',
+          'background-color': '#ef4444',
+          'border-color': '#f87171',
+          'border-width': 2,
+          'width': 34,
+          'height': 34
+        }
+      },
+      {
         selector: 'node[type = "DeviceProfile"]',
         style: {
-          'background-color': '#ffb300',
           'shape': 'diamond',
-          'width': 26,
-          'height': 26
+          'background-color': '#f59e0b',
+          'border-color': '#fbbf24',
+          'border-width': 2,
+          'width': 30,
+          'height': 30
         }
       },
       {
         selector: 'node[type = "BillingRegion"]',
         style: {
-          'background-color': '#00e676',
-          'shape': 'hexagon',
-          'width': 26,
-          'height': 26
+          'shape': 'tag',
+          'background-color': '#10b981',
+          'border-color': '#34d399',
+          'border-width': 2,
+          'width': 30,
+          'height': 24
         }
       },
       {
         selector: 'edge',
         style: {
           'width': 2,
-          'line-color': 'rgba(255, 255, 255, 0.15)',
-          'target-arrow-color': 'rgba(255, 255, 255, 0.25)',
+          'line-color': 'rgba(255, 255, 255, 0.18)',
+          'target-arrow-color': 'rgba(255, 255, 255, 0.35)',
           'target-arrow-shape': 'triangle',
           'curve-style': 'bezier',
           'label': 'data(label)',
-          'font-size': '9px',
-          'color': '#8a99b5'
+          'font-size': '8px',
+          'color': '#8a99b5',
+          'transition-property': 'line-color, width, opacity',
+          'transition-duration': '0.2s'
+        }
+      },
+      {
+        selector: 'node.highlighted',
+        style: {
+          'border-color': '#00f0ff',
+          'border-width': 4,
+          'opacity': 1.0,
+          'z-index': 99
+        }
+      },
+      {
+        selector: 'edge.highlighted',
+        style: {
+          'line-color': '#00f0ff',
+          'target-arrow-color': '#00f0ff',
+          'width': 3,
+          'opacity': 1.0,
+          'z-index': 99
+        }
+      },
+      {
+        selector: '.faded',
+        style: {
+          'opacity': 0.15
         }
       }
     ],
     layout: {
-      name: 'circle',
-      padding: 20
+      name: 'concentric',
+      padding: 25
     }
   });
+
+  // Interactive Node Tap (Highlight Neighborhood & Update HUD)
+  cyInstance.on('tap', 'node', function(evt) {
+    const node = evt.target;
+    const neighborhood = node.neighborhood().add(node);
+    
+    cyInstance.elements().removeClass('highlighted').addClass('faded');
+    neighborhood.removeClass('faded').addClass('highlighted');
+    
+    // Update HUD Inspector
+    const hud = document.getElementById("hud-text");
+    if (hud) {
+      const d = node.data();
+      const connectedEdges = node.connectedEdges().length;
+      const neighbors = node.neighborhood('node').map(n => n.data('label')).join(', ');
+      hud.innerHTML = `<strong>[${d.type || 'Entity'}]</strong> ID: <code>${d.id}</code> | Degree: ${connectedEdges} connection(s)${neighbors ? ` -> Connected to: ${neighbors}` : ''}`;
+    }
+  });
+
+  // Tap Canvas Background to Reset Highlighting
+  cyInstance.on('tap', function(evt) {
+    if (evt.target === cyInstance) {
+      cyInstance.elements().removeClass('highlighted faded');
+      const hud = document.getElementById("hud-text");
+      if (hud) {
+        hud.textContent = "Click any node to inspect incident relationships and neighborhood.";
+      }
+    }
+  });
+
+  // Graph Controls Event Listeners
+  const btnConcentric = document.getElementById("btn-layout-concentric");
+  if (btnConcentric) btnConcentric.addEventListener("click", () => cyInstance.layout({ name: 'concentric', padding: 25, animate: true }).run());
+  
+  const btnBreadth = document.getElementById("btn-layout-breadthfirst");
+  if (btnBreadth) btnBreadth.addEventListener("click", () => cyInstance.layout({ name: 'breadthfirst', directed: true, padding: 25, animate: true }).run());
+
+  const btnCose = document.getElementById("btn-layout-cose");
+  if (btnCose) btnCose.addEventListener("click", () => cyInstance.layout({ name: 'cose', animate: true, padding: 25 }).run());
+
+  const btnFit = document.getElementById("btn-cy-fit");
+  if (btnFit) btnFit.addEventListener("click", () => cyInstance.animate({ fit: { padding: 30 }, duration: 400 }));
 }
 
 // Load List of Cases from Backend API

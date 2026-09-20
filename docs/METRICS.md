@@ -10,7 +10,8 @@
 | **005** | `8577f68` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 21/21 (100%) | 0.063s | PASS | 1-Click Interactive Demo Presets in web UI |
 | **006** | `d621ef7` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 22/22 (100%) | 0.063s | PASS | Benchmark 3-run self-consistency (0.00% variance, 100% determinism) |
 | **007** | `a3b95f6` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 23/23 (100%) | 0.023s | PASS | Enhanced topological graph context brief in GraphRAG |
-| **008** | `pending` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 25/25 (100%) | 0.022s | PASS | Structured 5-part FinCEN SAR narrative generator |
+| **008** | `1013f37` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 25/25 (100%) | 0.022s | PASS | Structured 5-part FinCEN SAR narrative generator |
+| **009** | `pending` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 25/25 (100%) | 0.022s | PASS | Cytoscape visual glyphs, neighborhood highlight, and HUD inspector |
 
 ---
 
