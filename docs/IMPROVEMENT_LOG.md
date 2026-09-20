@@ -1,4 +1,36 @@
-## Iteration 093: Graph Temporal Motif & Topology Diff Comparator | 2026-09-21 10:15 | commit iter-093
+## Iteration 094: Fine-Grained Policy Audit & Compliance Report Packager | 2026-09-21 10:30 | commit iter-094
+- **Lens:** 2. Next best action, 5. Case summary & explainability, 9. Security, safety & defenses, 13. Regulatory compliance & ethics
+- **Goal / hypothesis:** Financial crime investigations require strict regulatory compliance across multiple statutory bodies (FinCEN, UK FCA/NCA, EU 6AMLD/GDPR) and internal operational guardrails (Rules R1–R10). Delivering an automated policy auditor and compliance report packager provides:
+  1. **Multi-Jurisdiction Statutory Auditing (`src/policy/compliance_report.py`)**: `ComplianceReportPackager` validates US FinCEN 31 CFR 1020.320 SAR thresholds, 30-day deadlines, and 5-year retention; UK POCA 2002 Part 7 DAML STR; and EU 6AMLD predicate offenses.
+  2. **GDPR Article 5(1)(c) Data Minimization Auditing**: Detects unmasked Primary Account Numbers (PANs) and unmasked personal emails within evidence claims.
+  3. **Internal Policy Guardrails (R1–R10) & Evidence Gates**: Verifies weak-signal pre-block safeguards (R1), unreachable customer routing (R4), recurring dispute protections (R7), premature closure gates (R8), and multi-card compromise requirements (R10).
+  4. **FRE 902(13)/(14) Cryptographic Verification**: Verifies cryptographic hash chain integrity and stamps deterministic SHA-256 digital certificate digests.
+  5. **Markdown & HTML Certificate Exporters & API Endpoints**: Generates publication-grade Markdown and printable HTML compliance certificates. Exposed `GET /api/compliance/report/{case_id}` and `POST /api/compliance/audit-batch` in `src/api/main.py`.
+- **Changes (files):**
+  - `src/policy/compliance_report.py`: Implemented ComplianceReportPackager, ComplianceAuditReport, FrameworkAssessment, and export formatters.
+  - `src/policy/audit_ledger.py`: Exposed audit_ledger singleton alias.
+  - `src/api/main.py`: Added compliance report and batch audit endpoints.
+  - `tests/test_compliance_report.py`: Created 7 unit tests covering compliant cases, SAR enforcement, GDPR data minimization, policy guardrails, Markdown/HTML exports, batch audits, and REST endpoints.
+  - `docs/METRICS.md`: Added Iteration 094 row.
+  - `docs/BACKLOG.md`: Marked item 94 as DONE.
+  - `docs/IMPROVEMENT_LOG.md`: Documented Iteration 094.
+- **Tests added/updated:**
+  - `tests/test_compliance_report.py` (7 unit tests, all pass).
+  - Total unit test suite expanded from 380 to **387** tests across 76 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 380 -> **387** (100% pass rate across 76 test suites)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Extended Benchmark Answers Valid: 50/50 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 387 passed across 76 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
+## Iteration 093: Graph Temporal Motif & Topology Diff Comparator | 2026-09-21 10:15 | commit 62d744a
 - **Lens:** 1. Investigation accuracy & graph algorithms, 11. Agent architecture & engineering, 4. Explainability & trust
 - **Goal / hypothesis:** Fraud networks are dynamic and non-stationary; financial crime syndicates rapidly evolve their topology (e.g. pivoting from star-hub card testing to closed triangular laundering rings or forming new bridges across merchant clusters). Comparing temporal snapshots $G_{t_1}$ and $G_{t_2}$ allows automated detection of structural surges and motif emergence:
   1. **Graph Topology Diff Comparator (`src/graph/motif_diff.py`)**: `GraphTopologyDiffComparator` calculates exact delta sets for nodes and edges (added, removed, persistent) between two graph states.

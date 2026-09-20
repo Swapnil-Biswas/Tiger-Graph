@@ -161,6 +161,7 @@ class CryptographicAuditLedger:
 
 
 _GLOBAL_LEDGER = CryptographicAuditLedger()
+audit_ledger = _GLOBAL_LEDGER
 
 
 def get_audit_ledger() -> CryptographicAuditLedger:

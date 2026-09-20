@@ -11,7 +11,7 @@ import time
 import uuid
 from typing import Dict, Any, Optional, List, Union
 from fastapi import FastAPI, HTTPException, Query, Body, Response, Depends
-from fastapi.responses import StreamingResponse, JSONResponse, FileResponse
+from fastapi.responses import StreamingResponse, JSONResponse, FileResponse, HTMLResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -1622,11 +1622,69 @@ def get_case_graph_diff(case_id: str):
         raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
     cid = raw.get("case", {}).get("first_suspicious_txn_id") or case_id
     t_alert = time.time()
-    t_base = t_alert - 30 * 86400
-    diff_data = agent.client.compare_topology_snapshots(entity_id=cid, t1=t_base, t2=t_alert, hops=2)
-    return diff_data
+# Statutory & Policy Compliance Audit Packager
+from src.policy.compliance_report import compliance_packager
+
+@app.get("/api/compliance/report/{case_id}")
+def get_case_compliance_report(
+    case_id: str,
+    jurisdiction: str = Query(default="US"),
+    format: str = Query(default="json"),
+):
+    """
+    Generates a fine-grained compliance and policy audit report for a case.
+    Supports 'json', 'markdown', and 'html' format outputs.
+    """
+    case_file = os.path.join("cases", f"{case_id}.json")
+    if case_id in active_cases:
+        case_data = active_cases[case_id]
+    elif os.path.exists(case_file):
+        with open(case_file, "r", encoding="utf-8") as f:
+            case_data = json.load(f)
+    else:
+        raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
+
+    report = compliance_packager.evaluate_case(case_data, jurisdiction=jurisdiction)
+    fmt = format.lower().strip()
+    if fmt == "markdown":
+        md = compliance_packager.export_markdown_certificate(report)
+        return PlainTextResponse(content=md, media_type="text/markdown")
+    elif fmt == "html":
+        html = compliance_packager.export_html_certificate(report)
+        return HTMLResponse(content=html)
+    return report.to_dict()
 
 
+@app.post("/api/compliance/audit-batch")
+def audit_compliance_batch(
+    payload: Dict[str, Any] = Body(...),
+):
+    """
+    Audits a batch of cases against statutory and internal policy standards.
+    Accepts explicit 'cases' list or 'case_ids' list.
+    """
+    jurisdiction = payload.get("jurisdiction", "US")
+    cases_to_audit = []
+    if "cases" in payload and isinstance(payload["cases"], list):
+        cases_to_audit = payload["cases"]
+    elif "case_ids" in payload and isinstance(payload["case_ids"], list):
+        for cid in payload["case_ids"]:
+            cfile = os.path.join("cases", f"{cid}.json")
+            if cid in active_cases:
+                cases_to_audit.append(active_cases[cid])
+            elif os.path.exists(cfile):
+                with open(cfile, "r", encoding="utf-8") as f:
+                    cases_to_audit.append(json.load(f))
+    else:
+        cases_dir = "cases"
+        if os.path.exists(cases_dir):
+            for fn in sorted(os.listdir(cases_dir)):
+                if fn.endswith(".json"):
+                    with open(os.path.join(cases_dir, fn), "r", encoding="utf-8") as f:
+                        cases_to_audit.append(json.load(f))
+
+    res = compliance_packager.audit_batch(cases_to_audit, jurisdiction=jurisdiction)
+    return res
 
 
 # Mount UI static directory
