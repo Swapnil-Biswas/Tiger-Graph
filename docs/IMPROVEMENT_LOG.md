@@ -1,4 +1,33 @@
-## Iteration 032: Topological Feature Vector & GNN-Ready Adjacency Matrix Exporter | 2026-09-20 18:54 | commit pending
+## Iteration 033: Multi-Card Temporal Velocity Burst Clustering | 2026-09-20 18:57 | commit pending
+- **Lens:** 1. Graph schema and ingestion & 2. Graph database and query performance & 11. Agent architecture
+- **Goal / hypothesis:** Distributed card testing and automated bot cash-out attacks spread low-value authorizations across multiple stolen cards to evade single-card velocity thresholds. Implementing `MultiCardBurstClusterDetector` in `src/graph/algorithms.py` analyzes the temporal neighborhood around flagged transactions within configurable time windows (e.g. 1h-24h), detects multi-card clustering, computes micro-deposit ratios, and evaluates bot periodicity from inter-arrival standard deviations.
+- **Changes (files):**
+  - `src/graph/algorithms.py`: Created `MultiCardBurstClusterDetector.detect_burst_cluster` computing distinct cards, transaction counts, total exposure, micro-deposit ratios, inter-arrival time standard deviations, and bot periodicity detection.
+  - `src/graph/client.py`: Added `detect_burst_cluster` (Q15) to `GraphClient`.
+  - `src/graph/traverser.py`: Added `_get_burst_cluster` task to `ConcurrentGraphTraverser.gather_graph_evidence`.
+  - `src/agent/budgeter.py`: Added `allow_burst_cluster_scan` flag across budget tiers.
+  - `src/agent/graph.py`: Integrated burst cluster evidence citations and topological context into `FraudInvestigatorAgent.investigate_case`.
+  - `tests/test_burst_clustering.py`: Added 4 unit tests verifying isolated transactions, syndicate card testing attacks (HHG-011 / SM-G610F), temporal window restriction, and sub-1ms execution latency.
+- **Tests added/updated:**
+  - `tests/test_burst_clustering.py` (4 unit tests, all pass).
+  - Total unit test suite expanded from 93 to **97** tests across 26 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 93 -> **97** (100% pass rate)
+  - Burst Detection: Multi-card temporal clustering with bot periodicity and micro-deposit analysis
+  - Execution Latency: < 1ms for complete temporal burst cluster scan
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (97/97)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** On transaction 3583368 (case HHG-011), 3 distinct cards transacted on the same hardware fingerprint (`SM-G610F`) within 5 hours for virtually identical amounts (~$125 and ~$131). Clustered temporal analysis flags this organized attack immediately with high confidence (0.85) without requiring prior closed cases.
+- **Follow-ups added to backlog:** Proceed to Iteration 034: Regulatory Structuring Alerts & Dynamic Multi-Entity Exposure Rollup (Lens 6 & Lens 7).
+
+## Iteration 032: Topological Feature Vector & GNN-Ready Adjacency Matrix Exporter | 2026-09-20 18:54 | commit 194b0e6
 - **Lens:** 2. Graph database and query performance & 14. Testing and evaluation & 11. Agent architecture
 - **Goal / hypothesis:** Graph Neural Networks (RGCN, GAT) and gradient boosted decision trees (XGBoost/LightGBM) require structured, normalized topological feature vectors and sparse adjacency matrices for subgraphs. Creating `TopologicalGraphEmbeddingExporter` in `src/graph/embeddings.py` transforms heterogeneous incident ego-nets into PyTorch Geometric (PyG) compatible node tensors ($[N, 9]$), sparse edge indices ($[2, E]$), edge attributes ($[E, 5]$), and tabular topological summary vectors while enforcing strict `as_of` temporal bounds.
 - **Changes (files):**

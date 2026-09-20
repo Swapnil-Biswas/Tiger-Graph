@@ -5,6 +5,7 @@ proxy rotation syndicate detection, and cross-card device nexus expansion)
 to uncover organized financial crime patterns beyond the 5 documented typologies.
 """
 
+import math
 from typing import Dict, Any, List, Optional, Set, Union, Tuple
 from collections import defaultdict, Counter
 
@@ -351,4 +352,138 @@ class UndocumentedPatternDetector:
             "confidence": 0.0,
             "description": "",
             "details": {}
+        }
+
+
+class MultiCardBurstClusterDetector:
+    """
+    Multi-Card Temporal Velocity Burst & Coordinated Testing Detector.
+    Identifies distributed card testing, bot attacks, and synchronized cash-outs
+    across distinct payment cards sharing hardware fingerprints or merchant channels
+    within narrow temporal windows (e.g. 1h to 24h).
+    """
+
+    def __init__(self, client):
+        self.client = client
+
+    def detect_burst_cluster(
+        self,
+        txn_id: str,
+        window_hours: float = 24.0,
+        as_of: Optional[Union[str, int]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Analyzes the temporal neighborhood around txn_id for coordinated multi-card bursts.
+        """
+        from src.graph.client import parse_as_of_epoch
+        txn = self.client.store.transactions.get(str(txn_id))
+        if not txn:
+            return {
+                "txn_id": str(txn_id),
+                "is_coordinated_burst": False,
+                "burst_card_count": 0,
+                "burst_txn_count": 0,
+                "confidence": 0.0,
+                "threat_level": "low",
+                "description": f"Transaction {txn_id} not found.",
+            }
+
+        t_epoch = txn["epoch_s"]
+        card_id = txn["card_id"]
+        dev_profile = txn.get("device_profile", "")
+
+        as_of_epoch = parse_as_of_epoch(as_of) if as_of is not None else t_epoch
+        cutoff_epoch = min(t_epoch, as_of_epoch)
+        window_kilosec = max(1, int(window_hours * 3.6))
+
+        # Collect candidate transactions within window
+        candidates = []
+        if dev_profile and dev_profile != "None | None | None | None" and not dev_profile.startswith("UnknownDevice"):
+            all_dev_txns = self.client.store.txns_by_device.get(dev_profile, [])
+            for t in all_dev_txns:
+                if (cutoff_epoch - window_kilosec) <= t["epoch_s"] <= cutoff_epoch:
+                    candidates.append(t)
+        else:
+            # Fallback to card transactions in window
+            all_card_txns = self.client.store.txns_by_card.get(card_id, [])
+            for t in all_card_txns:
+                if (cutoff_epoch - window_kilosec) <= t["epoch_s"] <= cutoff_epoch:
+                    candidates.append(t)
+
+        # Deduplicate
+        seen_tids = set()
+        cluster_txns = []
+        for t in candidates:
+            tid = str(t["TransactionID"])
+            if tid not in seen_tids:
+                seen_tids.add(tid)
+                cluster_txns.append(t)
+
+        cluster_txns.sort(key=lambda x: x["epoch_s"])
+
+        distinct_cards = sorted(list(set(t["card_id"] for t in cluster_txns)))
+        distinct_customers = sorted(list(set(t["customer_id"] for t in cluster_txns)))
+        txn_count = len(cluster_txns)
+        card_count = len(distinct_cards)
+        customer_count = len(distinct_customers)
+        total_exposure = round(sum(t.get("amount", 0.0) for t in cluster_txns), 2)
+
+        micro_deposits = [t for t in cluster_txns if float(t.get("amount", 0.0)) <= 5.0]
+        micro_deposit_ratio = round(len(micro_deposits) / txn_count, 3) if txn_count > 0 else 0.0
+
+        # Calculate inter-arrival intervals
+        inter_arrivals_sec = []
+        for i in range(1, len(cluster_txns)):
+            diff_sec = (cluster_txns[i]["epoch_s"] - cluster_txns[i - 1]["epoch_s"]) * 1000
+            inter_arrivals_sec.append(diff_sec)
+
+        if len(inter_arrivals_sec) >= 2:
+            mean_interval = sum(inter_arrivals_sec) / len(inter_arrivals_sec)
+            variance = sum((x - mean_interval) ** 2 for x in inter_arrivals_sec) / len(inter_arrivals_sec)
+            std_interval = round(math.sqrt(variance), 1)
+        else:
+            mean_interval = 0.0
+            std_interval = 0.0
+
+        is_bot_pattern = (txn_count >= 3 and 0.0 < std_interval <= 120.0)
+
+        is_coordinated_burst = (
+            (card_count >= 2 and txn_count >= 3 and window_hours <= 24.0)
+            or (card_count >= 3 and txn_count >= 3)
+            or (txn_count >= 4 and micro_deposit_ratio >= 0.50)
+        )
+
+        if is_coordinated_burst:
+            confidence = min(0.98, 0.70 + (0.05 * card_count) + (0.10 * micro_deposit_ratio))
+            threat = "critical" if card_count >= 3 else ("high" if card_count >= 2 else "medium")
+        else:
+            confidence = 0.0
+            threat = "low"
+
+        description = (
+            f"Coordinated multi-card velocity burst detected: {card_count} distinct cards executed {txn_count} transactions "
+            f"within {window_hours}h window (exposure: ${total_exposure:.2f}, micro-deposit ratio: {micro_deposit_ratio:.2f}, "
+            f"bot interval std: {std_interval}s)."
+            if is_coordinated_burst else
+            f"Routine activity: {txn_count} transaction(s) across {card_count} card(s) in {window_hours}h window."
+        )
+
+        return {
+            "txn_id": str(txn_id),
+            "seed_card_id": card_id,
+            "window_hours": window_hours,
+            "is_coordinated_burst": is_coordinated_burst,
+            "burst_card_count": card_count,
+            "burst_customer_count": customer_count,
+            "burst_txn_count": txn_count,
+            "total_exposure_usd": total_exposure,
+            "micro_deposit_ratio": micro_deposit_ratio,
+            "is_bot_periodicity": is_bot_pattern,
+            "inter_arrival_mean_sec": round(mean_interval, 1),
+            "inter_arrival_std_sec": std_interval,
+            "threat_level": threat,
+            "confidence": round(confidence, 2),
+            "cards_involved": distinct_cards[:10],
+            "txn_ids": [t["TransactionID"] for t in cluster_txns][:15],
+            "description": description,
         }

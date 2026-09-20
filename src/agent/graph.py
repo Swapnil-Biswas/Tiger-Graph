@@ -228,6 +228,15 @@ class FraudInvestigatorAgent:
                 comm_res.get("cards", [])[:4],
             )
 
+        burst_res = graph_evidence.get("burst_cluster", {})
+        if burst_res.get("is_coordinated_burst"):
+            add_evidence(
+                "graph",
+                f"query:burst_cluster({flagged_txn})",
+                f"Coordinated multi-card velocity burst: {burst_res.get('burst_card_count')} distinct cards executed {burst_res.get('burst_txn_count')} txns in {burst_res.get('window_hours')}h window (exposure: ${burst_res.get('total_exposure_usd'):.2f}, micro-deposit ratio: {burst_res.get('micro_deposit_ratio'):.2f}, bot periodicity std: {burst_res.get('inter_arrival_std_sec')}s).",
+                burst_res.get("cards_involved", [])[:4],
+            )
+
         # Apply Architectural Ablation Overrides
         if ablate_graph:
             graph_evidence["context"] = {}
@@ -239,6 +248,7 @@ class FraudInvestigatorAgent:
             graph_evidence["pattern_match"] = {"best_pattern": "none", "patterns": {}}
             graph_evidence["undocumented_anomaly"] = {}
             graph_evidence["community"] = {"is_dense_fraud_cluster": False, "community_size": 1, "card_count": 1, "fraud_contagion_score": 0.0}
+            graph_evidence["burst_cluster"] = {"is_coordinated_burst": False, "burst_card_count": 0}
 
         if ablate_memory:
             graph_evidence["similar_cases"] = {"case_ids": [], "cases": []}
@@ -270,6 +280,7 @@ class FraudInvestigatorAgent:
                 "geo": graph_evidence.get("geo"),
                 "ring": graph_evidence.get("ring"),
                 "community": comm_res,
+                "burst_cluster": burst_res,
                 "as_of": as_of,
             },
             max_chars=3000,

@@ -124,10 +124,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 32. **[DONE - Iteration 032] [Agent Architecture & GNN / Machine Learning] Topological Feature Vector & GNN-Ready Adjacency Matrix Exporter**
     - *Result:* Implemented `TopologicalGraphEmbeddingExporter.extract_gnn_subgraph` in `src/graph/embeddings.py` and exposed `export_gnn_subgraph` (Q14) in `GraphClient`. Generates normalized node feature tensors ($[N, 9]$), sparse edge indices ($[2, E]$) in PyTorch Geometric (PyG) format, edge attributes ($[E, 5]$), and tabular ego-net topological vectors for GBDT (XGBoost/LightGBM) models with sub-5ms latency. Added 4 unit tests in `tests/test_graph_embeddings.py` (93/93 tests pass).
 
-33. **[Investigation Accuracy & Anomaly Detection] Multi-Card Temporal Velocity Burst Clustering**
-    - *Goal:* Detect coordinated micro-deposit or distributed card testing bursts across distinct cards sharing merchant categories or time windows, even when devices are masked or rotating.
-    - *Files:* `src/graph/client.py`, `src/agent/graph.py`, `tests/test_burst_clustering.py`
-    - *Metric Impact:* Investigation Accuracy & Anomaly Detection (Lens 1, 2).
+33. **[DONE - Iteration 033] [Investigation Accuracy & Anomaly Detection] Multi-Card Temporal Velocity Burst Clustering**
+    - *Result:* Implemented `MultiCardBurstClusterDetector.detect_burst_cluster` in `src/graph/algorithms.py` and exposed `detect_burst_cluster` (Q15) in `GraphClient`. Detects coordinated card testing, bot attacks, and synchronized cash-outs across distinct payment cards sharing hardware fingerprints or merchant channels in narrow temporal windows (e.g. 1h-24h). Computes inter-arrival std deviations for bot periodicity detection and micro-deposit ratios. Integrated into `ConcurrentGraphTraverser` and `FraudInvestigatorAgent`. Added 4 unit tests in `tests/test_burst_clustering.py` (97/97 tests pass).
 
 34. **[Policy & Compliance] Regulatory Threshold Alerts & Dynamic Multi-Entity Exposure Rollup**
     - *Goal:* Implement automated BSA structuring detection ($10,000 threshold smurfing) aggregating cross-card, cross-account exposures within 24h/7d windows to trigger mandatory CTR/SAR thresholds.

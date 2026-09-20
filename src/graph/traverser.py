@@ -86,6 +86,11 @@ class ConcurrentGraphTraverser:
                 return "community", client.detect_community(card_id, as_of=as_of)
             return "community", {"is_dense_fraud_cluster": False, "community_size": 1}
 
+        def _get_burst_cluster():
+            if flagged_txn and budget_plan.get("allow_burst_cluster_scan", True):
+                return "burst_cluster", client.detect_burst_cluster(flagged_txn, as_of=as_of)
+            return "burst_cluster", {"is_coordinated_burst": False, "burst_card_count": 0}
+
         tasks = [
             _get_profile,
             _get_context,
@@ -99,6 +104,7 @@ class ConcurrentGraphTraverser:
             _get_geo,
             _get_undocumented,
             _get_community,
+            _get_burst_cluster,
         ]
 
         results = {}

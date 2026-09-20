@@ -412,6 +412,24 @@ class GraphClient:
         return exporter.extract_gnn_subgraph(seed_id, entity_type=entity_type, as_of=as_of, k_hops=k_hops, max_nodes=max_nodes)
 
     # =========================================================================
+    # Q15: detect_burst_cluster
+    # Multi-Card Temporal Velocity Burst & Coordinated Testing Detector
+    # =========================================================================
+    def detect_burst_cluster(
+        self,
+        txn_id: str,
+        window_hours: float = 24.0,
+        as_of: Optional[Union[str, int]] = None,
+    ) -> dict:
+        """
+        Q15: Identifies coordinated multi-card velocity bursts, bot attacks,
+        and synchronized testing clusters in narrow temporal windows.
+        """
+        from src.graph.algorithms import MultiCardBurstClusterDetector
+        detector = MultiCardBurstClusterDetector(self)
+        return detector.detect_burst_cluster(txn_id, window_hours=window_hours, as_of=as_of)
+
+    # =========================================================================
     # Q7: new_entity_check
     # First-time device, billing region, or email domain for customer
     # =========================================================================
