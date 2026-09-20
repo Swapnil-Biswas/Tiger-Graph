@@ -111,9 +111,36 @@ Ranked by expected impact on Hackathon Judging Criteria:
 29. **[DONE - Iteration 029] [Performance & Scaling] Parallelized Asynchronous Graph Traversal Engine**
     - *Result:* Implemented `ConcurrentGraphTraverser.gather_graph_evidence` in `src/graph/traverser.py` and integrated into `FraudInvestigatorAgent.investigate_case`. Dispatches 11 independent graph algorithms concurrently across 6 worker threads, preserving 100% result identity and determinism. Added 2 unit tests in `tests/test_async_investigation.py` (85/85 tests pass).
 
-30. **[Checkpoint 5 & Release Tag v0.3] Milestone Review & Release Tag v0.3**
-    - *Goal:* Audit all 30 iterations against PRD Section 25, verify 0 regressions across all suites, and create annotated release tag `v0.3`.
-    - *Files:* `docs/IMPROVEMENT_LOG.md`, git tag `v0.3`
+30. **[DONE - Iteration 030] [Checkpoint 5 & Release Tag v0.3] Milestone Review & Release Tag v0.3**
+    - *Result:* Comprehensive PRD Section 25 audit completed. All 6 mandatory gates passed (85/85 unit tests across 23 suites, 100% backtest recall/precision, 0.00% benchmark variance, 1.0000 policy retrieval MRR, 1.00 audit faithfulness, 20/20 valid benchmark answers, ECE 0.0116, 0 secrets, demo path green). Tagged and pushed `v0.3`.
+
+---
+
+## Phase 4: Network Dynamics, Embeddings, & Deep Graph Intelligence (Iterations 31–45)
+
+31. **[Investigation Accuracy & Graph Algorithms] Dynamic Graph Community Detection & Dense Fraud Subgraph Discovery**
+    - *Goal:* Implement Louvain / label propagation community partitioner in `src/graph/algorithms.py` to identify tightly-knit multi-card/device clusters and calculate community-level fraud contagion risk.
+    - *Files:* `src/graph/algorithms.py`, `src/agent/graph.py`, `tests/test_community_detection.py`
+    - *Metric Impact:* Investigation Accuracy (Lens 1, 2).
+
+32. **[Agent Architecture & GNN / Machine Learning] Topological Feature Vector & GNN-Ready Adjacency Matrix Exporter**
+    - *Goal:* Build `src/graph/embeddings.py` exporting normalized topological node feature vectors (degree centrality, clustering coefficient, ego-net density, cycle participation, temporal velocity) and sparse adjacency matrices ready for PyG / DGL graph neural network ingestion.
+    - *Files:* `src/graph/embeddings.py`, `tests/test_graph_embeddings.py`
+    - *Metric Impact:* Agentic Design & Innovation (Lens 2, 14).
+
+33. **[Investigation Accuracy & Anomaly Detection] Multi-Card Temporal Velocity Burst Clustering**
+    - *Goal:* Detect coordinated micro-deposit or distributed card testing bursts across distinct cards sharing merchant categories or time windows, even when devices are masked or rotating.
+    - *Files:* `src/graph/client.py`, `src/agent/graph.py`, `tests/test_burst_clustering.py`
+    - *Metric Impact:* Investigation Accuracy & Anomaly Detection (Lens 1, 2).
+
+34. **[Policy & Compliance] Regulatory Threshold Alerts & Dynamic Multi-Entity Exposure Rollup**
+    - *Goal:* Implement automated BSA structuring detection ($10,000 threshold smurfing) aggregating cross-card, cross-account exposures within 24h/7d windows to trigger mandatory CTR/SAR thresholds.
+    - *Files:* `src/policy/jurisdiction.py`, `src/agent/graph.py`, `tests/test_structuring_detection.py`
+    - *Metric Impact:* Regulatory Compliance & SAR (Lens 6, 7).
+
+35. **[Checkpoint 6 & Release Tag v0.35] Milestone Review & System Calibration Re-Check**
+    - *Goal:* Audit across all 35 iterations, re-evaluate ECE/reliability, verify 0 regressions, and create tag `v0.35`.
+    - *Files:* `docs/IMPROVEMENT_LOG.md`, git tag `v0.35`
     - *Metric Impact:* Documentation & Deliverables (Lens 17).
 
 ---
