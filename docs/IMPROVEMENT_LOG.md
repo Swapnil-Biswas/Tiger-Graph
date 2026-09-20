@@ -1,4 +1,4 @@
-## Iteration 039: Cross-Border AML Transaction Bundling & Correspondent Banking Risk | 2026-09-20 20:00 | commit pending
+## Iteration 039: Cross-Border AML Transaction Bundling & Correspondent Banking Risk | 2026-09-20 20:00 | commit c235572
 - **Lens:** 6. Fraud detection accuracy & 7. Multi-jurisdiction policy compliance & 14. Testing and evaluation
 - **Goal / hypothesis:** Transnational fraud syndicates exploit correspondent banking channels and fragmented cross-border jurisdictions to launder illicit proceeds. Standard domestic fraud checks overlook FATF high-risk corridors (Iran, North Korea, Myanmar, Russia, etc.), FATF grey lists (UAE, Panama, Cayman Islands, etc.), and multi-region transaction layering/bundling. Implementing `CrossBorderAMLRiskDetector` in `src/policy/jurisdiction.py` flags correspondent banking thresholds ($5,000 EDD, $2,500 SAR-AML), mandates Enhanced Due Diligence (EDD), triggers automated SAR cross-border filings, and integrates into `JurisdictionComplianceRouter.generate_dispatch_bundle` and `GraphClient` query library (Q20).
 - **Changes (files):**
