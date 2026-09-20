@@ -1,4 +1,4 @@
-## Iteration 061: Interactive UI Investigation Dossier & Audit Bundle Viewer | 2026-09-21 02:15 | commit pending
+## Iteration 061: Interactive UI Investigation Dossier & Audit Bundle Viewer | 2026-09-21 02:15 | commit e36c66b
 - **Lens:** 12. Visuals & UI experience, 8. Explainability & human-in-the-loop, 9. Auditability & evidentiary reproducibility
 - **Goal / hypothesis:** Enterprise fraud investigators and compliance officers need intuitive, visual web interfaces to examine cryptographic evidence bundles, audit Merkle trees, and scrub through chronological syndicate attack animations without writing Python scripts. Integrating full frontend UI support across `ui/index.html`, `ui/app.js`, and `ui/style.css` provides:
   1. **Compliance Evidence Vault (FRE 902 Tab)**:
