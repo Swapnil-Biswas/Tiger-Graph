@@ -278,5 +278,7 @@ Ranked by expected impact on Hackathon Judging Criteria:
 78. **[DONE - Iteration 078] [Code Quality & Type Integrity] Strict Type Annotations & Dead Code Audit**
     - *Result:* Built `CodeQualityAuditor` in `eval/code_quality_auditor.py` performing static AST analysis across 63 Python modules (15,664 LOC). Verified 88.92% type annotation coverage (345/388 functions annotated), 61.33% docstring coverage, exactly 0 naked `except:` statements, and exactly 0 wildcard imports (`from x import *`). Added 5 unit tests in `tests/test_type_integrity.py` (304/304 tests pass across 63 suites).
 
-79. **[Interactive CLI] Terminal Fraud Investigator & Real-Time Dashboard**
+79. **[DONE - Iteration 079] [Developer & Operations Tooling] Interactive Terminal Fraud Investigator & Real-Time Dashboard**
+    - *Result:* Implemented `FraudInvestigationCLI` in `src/cli/investigate_cli.py` providing a terminal-first operational interface. Supports formatted case listings (`--list`), in-depth case dossier visualization (`--case HHG-001`) with graph evidence, next best actions (auto/L1/L2), SAR status, and counterfactual decision boundaries, aggregate benchmark analytics (`--benchmark`), real-time streaming transaction feed (`--stream`), and machine-readable output (`--json`). Added 8 unit tests in `tests/test_cli_investigator.py` (312/312 tests pass across 64 suites).
+
 80. **[Release Tag v0.8] Checkpoint 14 Audit & 80-Iteration Milestone Review**

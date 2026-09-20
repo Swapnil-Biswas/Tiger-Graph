@@ -1,3 +1,29 @@
+## Iteration 079: Interactive CLI Fraud Investigator & Terminal Dashboard | 2026-09-21 06:45 | commit pending
+- **Lens:** 8. Explainability & human-in-the-loop, 10. Case summary, explanation & visual reporting, 11. Agent architecture & engineering, 7. Graph query design & efficiency
+- **Goal / hypothesis:** Security Operations Center (SOC) fraud investigators, compliance officers, and command-line power users require rapid terminal access to inspect cases, view multi-hop graph evidence, evaluate multi-agent consensus verdicts, and monitor streaming transactions without launching a full browser. Building `src/cli/investigate_cli.py` delivers:
+  1. **Comprehensive Case Dossiers (`--case HHG-001`)**: Renders full investigation briefs directly in the terminal including verdict, pattern, exposure, graph/sensor evidence, dual-gate next best actions with auto/L1/L2 routing badges, FinCEN SAR requirements, and counterfactual decision boundaries.
+  2. **Benchmark Analytics View (`--benchmark`)**: Displays aggregate metrics across all 20 cases (17 fraud / 3 legitimate, $3,224.98 total exposure, 65% SAR filing rate, average fraud probability 0.8555).
+  3. **Real-Time Streaming Ticker (`--stream`)**: Visual terminal monitor displaying live transaction influx, MCC classifications, and anomaly detection alerts.
+  4. **CP1252/Unicode Terminal Resilience**: Includes `_safe_str` sanitization ensuring robust rendering across Windows PowerShell/CMD and Linux/macOS.
+- **Changes (files):**
+  - `src/cli/__init__.py`: Initialized CLI package.
+  - `src/cli/investigate_cli.py`: Implemented `FraudInvestigationCLI` with case listing, dossier viewing, benchmark analytics, and streaming monitor.
+  - `tests/test_cli_investigator.py`: Created 8 unit tests covering all CLI methods, argument parsing, case normalization, and JSON output.
+- **Tests added/updated:**
+  - `tests/test_cli_investigator.py` (8 unit tests, all pass).
+  - Total unit test suite expanded from 304 to **312** tests across 64 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 304 -> **312** (100% pass rate across 64 test suites)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 312 passed across 64 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 078: Strict Static Type Annotations & Dead Code Quality Audit | 2026-09-21 06:30 | commit 396f3a6
 - **Lens:** 11. Agent architecture & engineering, 14. Testing, evaluation & benchmarks, 9. Security, safety & defenses
 - **Goal / hypothesis:** Mission-critical financial infrastructure demands rigorous code health, static type safety, and zero latent defects. Building an automated AST static analysis auditor in `eval/code_quality_auditor.py` delivers:
