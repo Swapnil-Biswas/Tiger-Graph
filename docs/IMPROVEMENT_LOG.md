@@ -1,4 +1,4 @@
-## Iteration 081: Interactive Video Script & Demo Asset Packager | 2026-09-21 07:15 | commit pending
+## Iteration 081: Interactive Video Script & Demo Asset Packager | 2026-09-21 07:15 | commit f8e199b
 - **Lens:** 10. Case summary, explanation & visual reporting, 8. Explainability & human-in-the-loop, 14. Testing, evaluation & benchmarks
 - **Goal / hypothesis:** Competition evaluation and enterprise stakeholder buy-in require high-polish presentation assets, including an exact timestamped video narration script and an automated bundle packager that creates a self-contained demo distribution with cryptographic checksums. Building `docs/DEMO_SCRIPT.md` and `scripts/package_demo_assets.py` delivers:
   1. **5-Minute Timestamped Video Script (`docs/DEMO_SCRIPT.md`)**: Structured 300-second narration across 6 scenes: (1) Problem Framing & Graph-Native Architecture, (2) Live Case Traversal & WebGL Ego-Net, (3) Multi-Agent Swarm Consensus & Statutory Vetoes, (4) Dual-Gate Policy Actions & FinCEN Form 111 XML E-Filing, (5) Real-Time Streaming Influx & HMAC-SHA256 Webhooks, and (6) Enterprise Production Readiness (Prometheus, Grafana, Helm, Chaos Resilience).

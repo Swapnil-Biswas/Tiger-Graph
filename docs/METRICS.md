@@ -83,7 +83,7 @@
 | **078** | `396f3a6` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 304/304 (100%) | 0.008s | PASS | Static AST code quality auditor, type annotation integrity (88.92%), zero naked excepts |
 | **079** | `6a530d1` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 312/312 (100%) | 0.008s | PASS | Interactive CLI terminal fraud investigator, case dossier viewer, benchmark summary |
 | **080** | `v0.8` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 312/312 (100%) | 0.008s | PASS | Checkpoint 14 Audit, 80-Iteration Milestone Review, and v0.8 Release Tag |
-| **081** | pending | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 317/317 (100%) | 0.008s | PASS | 5-minute video walkthrough script, demo asset packager with SHA-256 manifest verification |
+| **081** | `f8e199b` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 317/317 (100%) | 0.008s | PASS | 5-minute video walkthrough script, demo asset packager with SHA-256 manifest verification |
 
 ---
 
