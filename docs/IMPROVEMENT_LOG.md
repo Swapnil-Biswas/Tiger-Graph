@@ -1,4 +1,31 @@
-## Iteration 037: Temporal Graph Attention Subgraph Pooling | 2026-09-20 19:40 | commit pending
+## Iteration 038: Inductive Fraud Rule Discovery from Closed Cases | 2026-09-20 19:45 | commit pending
+- **Lens:** 2. Undocumented pattern discovery & 20. Innovation & 7. GraphRAG quality
+- **Goal / hypothesis:** Hand-crafted policy rules become brittle as cybercrime syndicates adapt to evade exact thresholds. Implementing `InductiveFraudRuleMiner` in `src/cases/rule_miner.py` automatically learns high-precision, interpretable association rules ($\text{IF } \text{antecedent} \implies \text{consequent}$) from 5,565 closed historical cases, evaluating support, confidence ($\ge 80\%$), and lift ($> 1.0\times$), supporting entity evaluation, and exporting inductive rules as dynamic GraphRAG knowledge chunks.
+- **Changes (files):**
+  - `src/cases/rule_miner.py`: Created `InductiveFraudRuleMiner` with 1-item and 2-item frequent itemset mining, confidence/lift ranking, entity evaluation, and GraphRAG knowledge chunk export.
+  - `src/graph/client.py`: Added `mine_inductive_rules` and `evaluate_inductive_rules` (Q19) to `GraphClient`.
+  - `src/api/main.py`: Added `GET /api/rules/mined` and `POST /api/rules/evaluate` endpoints; added `MineRulesRequest` and `EvaluateRulesRequest` with `model_rebuild()`.
+  - `tests/test_rule_discovery.py`: Created 6 unit tests covering rule mining over 5,565 cases, confidence/lift thresholds, temporal isolation, card evaluation, GraphRAG chunk formatting, and API endpoints.
+- **Tests added/updated:**
+  - `tests/test_rule_discovery.py` (6 unit tests, all pass).
+  - Total unit test suite expanded from 116 to **122** tests across 31 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 116 -> **122** (100% pass rate across 31 test suites)
+  - Inductive Rule Mining: Frequent itemset association rules mined from 5,565 closed cases
+  - Rule Mining Latency: ~220ms for exhaustive 5,565 case evaluation
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (122/122)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** In 5,565 historical closed cases, combinations like `device_cards >= 3 AND online_merchant == True` yielded a 100.0% empirical fraud rate across 1,829 cases. Exporting these as dynamic GraphRAG chunks gives the agent empirical backing for novel fraud typologies without manual policy authoring.
+- **Follow-ups added to backlog:** Proceed to Iteration 039: Cross-Border AML Transaction Bundling & Correspondent Banking Risk (Lens 6 & Lens 7).
+
+## Iteration 037: Temporal Graph Attention Subgraph Pooling | 2026-09-20 19:40 | commit 4872be5
 - **Lens:** 2. Graph database and query performance & 11. Agent architecture & 14. Testing and evaluation
 - **Goal / hypothesis:** Downstream gradient boosted decision tree (XGBoost/LightGBM) models and neural network classifiers require fixed-dimensional vector representations rather than variable-sized multi-hop node tensors $[N, D]$. Standard mean or max pooling drops critical temporal recency and topological hierarchy. Implementing `TemporalGraphAttentionPooler` in `src/graph/embeddings.py` computes softmax time-decayed attention scores $\alpha_i = \text{softmax}(w^T x_i - \lambda \cdot \Delta t_i)$ to aggregate node features into fixed-dimensional vectors: 9D attention-pooled, 9D mean-pooled, 9D max-pooled, and 27D concatenated representations.
 - **Changes (files):**

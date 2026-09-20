@@ -857,5 +857,45 @@ class GraphClient:
             decay_lambda=decay_lambda,
         )
 
+    # =========================================================================
+    # Q19: mine_inductive_rules & evaluate_inductive_rules
+    # Inductive Fraud Rule Discovery from Historical Cases
+    # =========================================================================
+    def mine_inductive_rules(
+        self,
+        min_support: int = 10,
+        min_confidence: float = 0.80,
+        as_of: Optional[Union[str, int]] = None,
+        target_consequent: str = "confirmed_fraud",
+        max_rules: int = 20,
+    ) -> dict:
+        """
+        Q19: Mines high-confidence association rules and emergent fraud typologies
+        from historical closed cases prior to as_of.
+        """
+        from src.cases.rule_miner import InductiveFraudRuleMiner
+        miner = InductiveFraudRuleMiner(self)
+        return miner.mine_rules(
+            min_support=min_support,
+            min_confidence=min_confidence,
+            as_of=as_of,
+            target_consequent=target_consequent,
+            max_rules=max_rules,
+        )
+
+    def evaluate_inductive_rules(
+        self,
+        card_id: str,
+        rules: Optional[List[Dict[str, Any]]] = None,
+        as_of: Optional[Union[str, int]] = None,
+    ) -> dict:
+        """
+        Evaluates an active card against discovered inductive fraud rules.
+        """
+        from src.cases.rule_miner import InductiveFraudRuleMiner
+        miner = InductiveFraudRuleMiner(self)
+        return miner.evaluate_entity(card_id=card_id, rules=rules, as_of=as_of)
+
+
 
 

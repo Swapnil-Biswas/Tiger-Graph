@@ -39,7 +39,8 @@
 | **034** | `d8e969d` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 103/103 (100%) | 0.008s | PASS | Regulatory structuring alerts & dynamic multi-entity exposure rollup (BSA/POCA/6AMLD) |
 | **035** | `e06e23a` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 103/103 (100%) | 0.008s | PASS | Checkpoint 6 Audit, Milestone Review, and v0.35 Release Tag |
 | **036** | `9f2868f` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 110/110 (100%) | 0.008s | PASS | Personalized PageRank fraud contagion (RWR) & continuous diffusion scoring |
-| **037** | pending | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 116/116 (100%) | 0.008s | PASS | Temporal graph attention subgraph pooling (9D/27D embeddings) |
+| **037** | `4872be5` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 116/116 (100%) | 0.008s | PASS | Temporal graph attention subgraph pooling (9D/27D embeddings) |
+| **038** | pending | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 122/122 (100%) | 0.008s | PASS | Inductive fraud rule discovery from 5,565 closed cases (Q19) |
 
 ---
 

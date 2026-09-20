@@ -92,9 +92,24 @@ class PoolEmbeddingRequest(BaseModel):
     decay_lambda: float = 0.05
 
 
+class MineRulesRequest(BaseModel):
+    min_support: int = 10
+    min_confidence: float = 0.80
+    as_of: Optional[str] = None
+    target_consequent: str = "confirmed_fraud"
+    max_rules: int = 20
+
+
+class EvaluateRulesRequest(BaseModel):
+    card_id: str
+    as_of: Optional[str] = None
+
+
 StructuringCheckRequest.model_rebuild()
 ContagionCheckRequest.model_rebuild()
 PoolEmbeddingRequest.model_rebuild()
+MineRulesRequest.model_rebuild()
+EvaluateRulesRequest.model_rebuild()
 
 
 @app.get("/api/health")
@@ -390,6 +405,33 @@ def run_pool_embedding(req: PoolEmbeddingRequest):
         k_hops=req.k_hops,
         max_nodes=req.max_nodes,
         decay_lambda=req.decay_lambda,
+    )
+
+
+@app.get("/api/rules/mined")
+def get_mined_rules(
+    min_support: int = 10,
+    min_confidence: float = 0.80,
+    as_of: Optional[str] = None,
+    target_consequent: str = "confirmed_fraud",
+    max_rules: int = 20,
+):
+    """Mines inductive association rules from historical closed cases."""
+    return agent.client.mine_inductive_rules(
+        min_support=min_support,
+        min_confidence=min_confidence,
+        as_of=as_of,
+        target_consequent=target_consequent,
+        max_rules=max_rules,
+    )
+
+
+@app.post("/api/rules/evaluate")
+def run_evaluate_rules(req: EvaluateRulesRequest):
+    """Evaluates an active card against mined inductive rules."""
+    return agent.client.evaluate_inductive_rules(
+        card_id=req.card_id,
+        as_of=req.as_of,
     )
 
 

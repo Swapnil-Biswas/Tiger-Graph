@@ -139,10 +139,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 37. **[DONE - Iteration 037] [Graph Analytics & Machine Learning] Temporal Graph Attention Subgraph Pooling**
     - *Result:* Implemented `TemporalGraphAttentionPooler` in `src/graph/embeddings.py` and exposed `pool_graph_embedding` (Q18) in `GraphClient`. Computes time-decayed softmax attention scores ($\alpha_i = \text{softmax}(w^T x_i - \lambda \cdot \Delta t_i)$) over heterogeneous multi-hop node feature tensors ($[N, 9]$) to aggregate variable-sized subgraphs into fixed-dimensional vectors: 9D attention-pooled, 9D mean-pooled, 9D max-pooled, and 27D concatenated embeddings for GBDT (XGBoost/LightGBM) and neural network ingestion. Added API endpoints `/api/cases/{case_id}/embedding` and `/api/graph/pool-embedding`. Added 6 unit tests in `tests/test_graph_pooling.py` (116/116 tests pass).
 
-38. **[Case Management & Automated Knowledge Discovery] Inductive Fraud Rule Discovery from Closed Cases**
-    - *Goal:* Implement inductive rule induction mining frequent subgraphs and attribute correlations from 5,565 closed historical cases to discover new emergent fraud typologies.
-    - *Files:* `src/cases/rule_miner.py`, `src/rag/chunk.py`, `tests/test_rule_discovery.py`
-    - *Metric Impact:* Innovation & Undocumented Pattern Discovery (Lens 2, 20).
+38. **[DONE - Iteration 038] [Case Management & Automated Knowledge Discovery] Inductive Fraud Rule Discovery from Closed Cases**
+    - *Result:* Implemented `InductiveFraudRuleMiner` in `src/cases/rule_miner.py` and exposed `mine_inductive_rules` and `evaluate_inductive_rules` (Q19) in `GraphClient`. Automatically learns high-confidence association rules ($\text{IF } \text{antecedent} \implies \text{consequent}$) from 5,565 closed historical cases, evaluating support, confidence ($\ge 80\%$), and lift ($> 1.0\times$), supporting entity evaluation, and exporting inductive rules as dynamic GraphRAG knowledge chunks. Added API endpoints `/api/rules/mined` and `/api/rules/evaluate`. Added 6 unit tests in `tests/test_rule_discovery.py` (122/122 tests pass).
 
 39. **[Policy & Compliance] Cross-Border AML Transaction Bundling & Correspondent Banking Risk**
     - *Goal:* Implement cross-border wire and transaction bundling detection evaluating correspondent banking intermediary paths and high-risk FATF jurisdictions.
