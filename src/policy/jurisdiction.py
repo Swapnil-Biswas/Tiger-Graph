@@ -269,6 +269,207 @@ class RegulatoryStructuringDetector:
         }
 
 
+class CrossBorderAMLRiskDetector:
+    """
+    Detects cross-border AML transaction bundling, correspondent banking risks,
+    and high-risk FATF jurisdictional corridors under FinCEN 31 CFR 1010.610/620,
+    EU 6AMLD Article 3, and UK Money Laundering Regulations 2017.
+    """
+
+    FATF_HIGH_RISK_JURISDICTIONS = {"IR", "KP", "MM", "SY", "YE", "RU", "999", "OFFSHORE", "HAVEN"}
+    FATF_GREY_LIST_JURISDICTIONS = {"AE", "PA", "KY", "VG", "BS", "CY", "MT", "888"}
+    DOMESTIC_COUNTRY_CODES = {"87", "87.0", "US", "USA"}
+
+    CORRESPONDENT_THRESHOLDS = {
+        "edd_threshold_usd": 5000.0,
+        "sar_aml_threshold_usd": 2500.0,
+        "max_corridor_velocity_hours": 48.0,
+    }
+
+    @classmethod
+    def evaluate_cross_border_risk(
+        cls,
+        card_id: str,
+        transactions: Optional[List[Dict[str, Any]]] = None,
+        as_of: Optional[Any] = None,
+        client: Optional[Any] = None,
+        window_hours: float = 48.0,
+    ) -> Dict[str, Any]:
+        """
+        Evaluates cross-border flow, correspondent banking risk, and FATF corridor exposure.
+        """
+        from src.graph.client import parse_as_of_epoch
+        as_of_epoch = parse_as_of_epoch(as_of)
+
+        gathered_txns: List[Dict[str, Any]] = []
+        if transactions is not None:
+            gathered_txns = list(transactions)
+        elif client is not None and hasattr(client, "store"):
+            all_card_txns = client.store.txns_by_card.get(card_id, [])
+            gathered_txns = list(all_card_txns)
+
+        # Normalize and filter strictly by as_of_epoch
+        valid_txns = []
+        for t in gathered_txns:
+            ep = t.get("epoch_s")
+            if ep is None:
+                ep = t.get("ts")
+            try:
+                ep = float(ep) if ep is not None else 0.0
+            except (ValueError, TypeError):
+                ep = 0.0
+            t_copy = dict(t)
+            t_copy["_epoch"] = ep
+            valid_txns.append(t_copy)
+
+        if as_of_epoch is not None:
+            valid_txns = [t for t in valid_txns if t["_epoch"] <= as_of_epoch]
+
+        if not valid_txns:
+            return {
+                "card_id": card_id,
+                "window_hours": window_hours,
+                "total_transactions_evaluated": 0,
+                "cross_border_txns_count": 0,
+                "distinct_regions_count": 0,
+                "distinct_countries_count": 0,
+                "cross_border_exposure_usd": 0.0,
+                "has_fatf_high_risk_corridor": False,
+                "has_fatf_grey_list_corridor": False,
+                "is_layering_bundling_detected": False,
+                "enhanced_due_diligence_required": False,
+                "aml_risk_score": 0.0,
+                "aml_threat_level": "low",
+                "mandatory_actions": [],
+                "statutory_authority": "31 CFR 1010.610/620 (Correspondent Banking EDD) / EU 6AMLD Art 3",
+                "description": "No transactions found within evaluated scope.",
+            }
+
+        ref_epoch = as_of_epoch if as_of_epoch is not None and as_of_epoch < 9000000000 else max(t["_epoch"] for t in valid_txns)
+        window_seconds = int(window_hours * 3600)
+        window_start = ref_epoch - window_seconds
+
+        window_txns = [t for t in valid_txns if t["_epoch"] >= window_start]
+        if not window_txns and valid_txns:
+            window_txns = valid_txns
+
+        distinct_regions = set()
+        distinct_countries = set()
+        cross_border_txns = []
+        has_fatf_high_risk = False
+        has_fatf_grey_list = False
+        cross_border_exposure = 0.0
+
+        for t in window_txns:
+            addr1 = str(t.get("addr1") or t.get("region") or "")
+            addr2 = str(t.get("addr2") or t.get("country") or "87.0")
+            amt = float(t.get("amount", 0.0) or 0.0)
+            custom_jur = str(t.get("jurisdiction") or "").upper()
+
+            if addr1:
+                distinct_regions.add(addr1)
+            if addr2:
+                distinct_countries.add(addr2)
+
+            is_cb = (addr2 not in cls.DOMESTIC_COUNTRY_CODES) or (t.get("is_cross_border") is True) or (custom_jur and custom_jur != "US")
+            is_fatf_high = (addr2 in cls.FATF_HIGH_RISK_JURISDICTIONS) or (custom_jur in cls.FATF_HIGH_RISK_JURISDICTIONS) or (addr1 == "999")
+            is_fatf_grey = (addr2 in cls.FATF_GREY_LIST_JURISDICTIONS) or (custom_jur in cls.FATF_GREY_LIST_JURISDICTIONS) or (addr1 == "888")
+
+            if is_cb or is_fatf_high or is_fatf_grey:
+                cross_border_txns.append(t)
+                cross_border_exposure += amt
+
+            if is_fatf_high:
+                has_fatf_high_risk = True
+            if is_fatf_grey:
+                has_fatf_grey_list = True
+
+        # Layering / bundling detection: 3+ distinct regions or 2+ distinct international countries within window
+        is_layering = (len(distinct_regions) >= 3 and len(cross_border_txns) >= 2) or (len(distinct_countries) >= 2 and cross_border_exposure >= 1000.0)
+
+        mandatory_actions = []
+        edd_required = False
+
+        if has_fatf_high_risk:
+            edd_required = True
+            mandatory_actions.append("ENHANCED_DUE_DILIGENCE")
+            if cross_border_exposure >= cls.CORRESPONDENT_THRESHOLDS["sar_aml_threshold_usd"]:
+                mandatory_actions.append("FILE_SAR_CROSS_BORDER_AML")
+
+        if has_fatf_grey_list and cross_border_exposure >= cls.CORRESPONDENT_THRESHOLDS["sar_aml_threshold_usd"]:
+            edd_required = True
+            mandatory_actions.append("ENHANCED_DUE_DILIGENCE")
+
+        if cross_border_exposure >= cls.CORRESPONDENT_THRESHOLDS["edd_threshold_usd"]:
+            edd_required = True
+            if "ENHANCED_DUE_DILIGENCE" not in mandatory_actions:
+                mandatory_actions.append("ENHANCED_DUE_DILIGENCE")
+
+        if is_layering:
+            mandatory_actions.append("BLOCK_CORRESPONDENT_PATH")
+            mandatory_actions.append("RESTRICT_OUTBOUND_WIRES")
+            if cross_border_exposure >= cls.CORRESPONDENT_THRESHOLDS["sar_aml_threshold_usd"]:
+                if "FILE_SAR_CROSS_BORDER_AML" not in mandatory_actions:
+                    mandatory_actions.append("FILE_SAR_CROSS_BORDER_AML")
+
+        # Composite AML risk score
+        aml_risk = 0.0
+        if has_fatf_high_risk:
+            aml_risk += 0.50
+        elif has_fatf_grey_list:
+            aml_risk += 0.30
+
+        if cross_border_exposure >= cls.CORRESPONDENT_THRESHOLDS["edd_threshold_usd"]:
+            aml_risk += 0.30
+        elif cross_border_exposure >= cls.CORRESPONDENT_THRESHOLDS["sar_aml_threshold_usd"]:
+            aml_risk += 0.20
+
+        if is_layering:
+            aml_risk += 0.25
+
+        aml_risk = min(0.99, round(aml_risk, 2))
+
+        if aml_risk >= 0.70:
+            threat = "critical"
+        elif aml_risk >= 0.40:
+            threat = "high"
+        elif aml_risk >= 0.15:
+            threat = "moderate"
+        else:
+            threat = "low"
+
+        if mandatory_actions:
+            desc = (
+                f"Cross-border AML risk detected: {len(cross_border_txns)} international transaction(s) "
+                f"totaling ${cross_border_exposure:,.2f} across {len(distinct_countries)} jurisdiction(s). "
+                f"FATF high-risk corridor: {has_fatf_high_risk}, layering detected: {is_layering} (threat: {threat})."
+            )
+        else:
+            desc = (
+                f"Domestic routine activity: {len(window_txns)} transaction(s) within domestic jurisdiction. "
+                f"No cross-border AML or correspondent banking anomalies detected."
+            )
+
+        return {
+            "card_id": card_id,
+            "window_hours": window_hours,
+            "total_transactions_evaluated": len(window_txns),
+            "cross_border_txns_count": len(cross_border_txns),
+            "distinct_regions_count": len(distinct_regions),
+            "distinct_countries_count": len(distinct_countries),
+            "cross_border_exposure_usd": round(cross_border_exposure, 2),
+            "has_fatf_high_risk_corridor": has_fatf_high_risk,
+            "has_fatf_grey_list_corridor": has_fatf_grey_list,
+            "is_layering_bundling_detected": is_layering,
+            "enhanced_due_diligence_required": edd_required,
+            "aml_risk_score": aml_risk,
+            "aml_threat_level": threat,
+            "mandatory_actions": mandatory_actions,
+            "statutory_authority": "31 CFR 1010.610/620 (Correspondent Banking EDD) / EU 6AMLD Art 3",
+            "description": desc,
+        }
+
+
 class JurisdictionComplianceRouter:
     """
     Evaluates cross-jurisdictional compliance rules, determines mandatory regulatory
@@ -452,11 +653,26 @@ class JurisdictionComplianceRouter:
                 obligations["must_file"] = True
                 obligations.setdefault("mandatory_filings", []).extend(structuring_analysis["mandatory_filings"])
 
+        # Cross-Border AML & Correspondent Banking Risk Analysis
+        cross_border_analysis = None
+        card_id = c_data.get("card_id") or (connected_cards[0] if connected_cards else None)
+        if card_id:
+            cross_border_analysis = CrossBorderAMLRiskDetector.evaluate_cross_border_risk(
+                card_id=card_id,
+                transactions=c_data.get("transactions"),
+                client=client,
+            )
+            if cross_border_analysis.get("mandatory_actions"):
+                if "FILE_SAR_CROSS_BORDER_AML" in cross_border_analysis["mandatory_actions"]:
+                    obligations["must_file"] = True
+                obligations.setdefault("mandatory_actions", []).extend(cross_border_analysis["mandatory_actions"])
+
         dispatch_bundle = {
             "case_id": case_answer.get("case_id", "UNKNOWN"),
             "target_jurisdiction": jurisdiction,
             "obligations": obligations,
             "structuring_analysis": structuring_analysis,
+            "cross_border_aml_analysis": cross_border_analysis,
             "filing_package": {
                 "agency": obligations["agency"],
                 "statutory_authority": obligations["statute"],

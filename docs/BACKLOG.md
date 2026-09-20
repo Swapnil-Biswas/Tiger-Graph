@@ -142,10 +142,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 38. **[DONE - Iteration 038] [Case Management & Automated Knowledge Discovery] Inductive Fraud Rule Discovery from Closed Cases**
     - *Result:* Implemented `InductiveFraudRuleMiner` in `src/cases/rule_miner.py` and exposed `mine_inductive_rules` and `evaluate_inductive_rules` (Q19) in `GraphClient`. Automatically learns high-confidence association rules ($\text{IF } \text{antecedent} \implies \text{consequent}$) from 5,565 closed historical cases, evaluating support, confidence ($\ge 80\%$), and lift ($> 1.0\times$), supporting entity evaluation, and exporting inductive rules as dynamic GraphRAG knowledge chunks. Added API endpoints `/api/rules/mined` and `/api/rules/evaluate`. Added 6 unit tests in `tests/test_rule_discovery.py` (122/122 tests pass).
 
-39. **[Policy & Compliance] Cross-Border AML Transaction Bundling & Correspondent Banking Risk**
-    - *Goal:* Implement cross-border wire and transaction bundling detection evaluating correspondent banking intermediary paths and high-risk FATF jurisdictions.
-    - *Files:* `src/policy/jurisdiction.py`, `src/graph/client.py`, `tests/test_cross_border_aml.py`
-    - *Metric Impact:* Policy Engine & Regulatory Compliance (Lens 6, 7).
+39. **[DONE - Iteration 039] [Policy & Compliance] Cross-Border AML Transaction Bundling & Correspondent Banking Risk**
+    - *Result:* Implemented `CrossBorderAMLRiskDetector` in `src/policy/jurisdiction.py` and exposed `detect_cross_border_aml` (Q20) in `GraphClient`. Evaluates FATF high-risk corridors (Iran, North Korea, Myanmar, Russia, etc.), FATF grey lists (UAE, Panama, Cayman Islands, etc.), rapid layering across 3+ regions, and correspondent banking thresholds ($5,000 EDD, $2,500 SAR-AML). Integrated into `JurisdictionComplianceRouter.generate_dispatch_bundle`, automatically escalating filing requirements. Added API endpoints `/api/cases/{case_id}/cross-border-aml` and `/api/regulatory/cross-border-check`. Added 6 unit tests in `tests/test_cross_border_aml.py` (128/128 tests pass).
 
 40. **[Checkpoint 7 & Release Tag v0.4] Mid-Point Major Milestone Review**
     - *Goal:* Conduct 40% milestone audit, re-verify all 100+ tests, evaluate graph analytics scalability, verify 20/20 benchmark stability, and create tag `v0.4`.

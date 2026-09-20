@@ -173,7 +173,8 @@ Decision Sensitivity (Counterfactual Boundaries):
 <tr><td><span class='badge-id'>EV-03</span></td><td>graph</td><td><code>query:velocity(card_id=C12382-K1)</code></td><td>Velocity activity: 1 transaction(s) in last 1h, 4 in last 24h (spike ratio: 6.36).</td></tr>
 <tr><td><span class='badge-id'>EV-04</span></td><td>graph</td><td><code>query:similar_cases(card=C12382-K1)</code></td><td>Found 5 prior closed case(s) touching related entities: CC-1066, CC-1673, CC-2964.</td></tr>
 <tr><td><span class='badge-id'>EV-05</span></td><td>graph</td><td><code>query:empirical_bayes_prior(card=C12382-K1)</code></td><td>Historical memory prior: 4 precedent case(s) (4 confirmed fraud, 0 cleared) yielding posterior fraud risk rate of 0.333.</td></tr>
-<tr><td><span class='badge-id'>EV-06</span></td><td>customer</td><td><code>evidence_request:1</code></td><td>Customer states they did not make these purchases and still has the card</td></tr>
+<tr><td><span class='badge-id'>EV-06</span></td><td>graph</td><td><code>query:fraud_contagion(C12382-K1)</code></td><td>Personalized PageRank fraud contagion score 0.4736 (critical risk) propagating from 5 confirmed fraud seed(s) in local subgraph.</td></tr>
+<tr><td><span class='badge-id'>EV-07</span></td><td>customer</td><td><code>evidence_request:1</code></td><td>Customer states they did not make these purchases and still has the card</td></tr>
         </tbody>
       </table>
     </div>
@@ -227,14 +228,14 @@ Decision Sensitivity (Counterfactual Boundaries):
         <strong>Deterministic Audit Trail Certified</strong> — 0 Hallucinations, Faithfulness: 1.00/1.00
       </div>
       <div style="color: var(--text-muted);">
-        Generated: 2026-09-20 13:46:31 UTC
+        Generated: 2026-09-20 14:12:53 UTC
       </div>
     </div>
   </div>
 
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-      const elements = {"nodes": [{"data": {"id": "CASE-HHG-001", "label": "Case: HHG-001", "type": "Case", "color": "#8b5cf6"}}, {"data": {"id": "CARD-HHG-001", "label": "Card", "type": "Card", "color": "#00f0ff"}}, {"data": {"id": "TXN-3514030", "label": "Txn 3514030", "type": "Transaction", "color": "#ef4444"}}, {"data": {"id": "TXN-3513814", "label": "Txn 3513814", "type": "Transaction", "color": "#ef4444"}}, {"data": {"id": "TXN-3511596", "label": "Txn 3511596", "type": "Transaction", "color": "#ef4444"}}, {"data": {"id": "TXN-3512936", "label": "Txn 3512936", "type": "Transaction", "color": "#ef4444"}}], "edges": [{"data": {"source": "CASE-HHG-001", "target": "CARD-HHG-001", "label": "SUBJECT_CARD"}}, {"data": {"source": "CARD-HHG-001", "target": "TXN-3514030", "label": "EXPOSURE"}}, {"data": {"source": "CARD-HHG-001", "target": "TXN-3513814", "label": "EXPOSURE"}}, {"data": {"source": "CARD-HHG-001", "target": "TXN-3511596", "label": "EXPOSURE"}}, {"data": {"source": "CARD-HHG-001", "target": "TXN-3512936", "label": "EXPOSURE"}}]};
+      const elements = {"nodes": [{"data": {"id": "CASE-HHG-001", "label": "Case: HHG-001", "type": "Case", "color": "#8b5cf6"}}, {"data": {"id": "CARD-HHG-001", "label": "Card", "type": "Card", "color": "#00f0ff"}}, {"data": {"id": "TXN-3511596", "label": "Txn 3511596", "type": "Transaction", "color": "#ef4444"}}, {"data": {"id": "TXN-3514030", "label": "Txn 3514030", "type": "Transaction", "color": "#ef4444"}}, {"data": {"id": "TXN-3512936", "label": "Txn 3512936", "type": "Transaction", "color": "#ef4444"}}, {"data": {"id": "TXN-3513814", "label": "Txn 3513814", "type": "Transaction", "color": "#ef4444"}}], "edges": [{"data": {"source": "CASE-HHG-001", "target": "CARD-HHG-001", "label": "SUBJECT_CARD"}}, {"data": {"source": "CARD-HHG-001", "target": "TXN-3511596", "label": "EXPOSURE"}}, {"data": {"source": "CARD-HHG-001", "target": "TXN-3514030", "label": "EXPOSURE"}}, {"data": {"source": "CARD-HHG-001", "target": "TXN-3512936", "label": "EXPOSURE"}}, {"data": {"source": "CARD-HHG-001", "target": "TXN-3513814", "label": "EXPOSURE"}}]};
       cytoscape({
         container: document.getElementById('cy-container'),
         elements: elements,

@@ -105,11 +105,19 @@ class EvaluateRulesRequest(BaseModel):
     as_of: Optional[str] = None
 
 
+class CrossBorderCheckRequest(BaseModel):
+    card_id: str
+    transactions: Optional[List[Dict[str, Any]]] = None
+    as_of: Optional[str] = None
+    window_hours: float = 48.0
+
+
 StructuringCheckRequest.model_rebuild()
 ContagionCheckRequest.model_rebuild()
 PoolEmbeddingRequest.model_rebuild()
 MineRulesRequest.model_rebuild()
 EvaluateRulesRequest.model_rebuild()
+CrossBorderCheckRequest.model_rebuild()
 
 
 @app.get("/api/health")
@@ -333,6 +341,40 @@ def run_structuring_check(req: StructuringCheckRequest):
         as_of=req.as_of,
         jurisdiction=req.jurisdiction,
         client=agent.client,
+    )
+
+
+@app.get("/api/cases/{case_id}/cross-border-aml")
+def get_case_cross_border_aml(case_id: str, window_hours: float = 48.0):
+    """Evaluates cross-border AML transaction bundling, correspondent banking risk, and FATF corridor exposure."""
+    if case_id not in active_cases:
+        if case_id in agent.client.store.case_pack:
+            res = agent.investigate_case(case_id)
+            active_cases[case_id] = res
+            case_manager.write_case_to_graph(res)
+        else:
+            raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
+
+    case_data = active_cases[case_id]
+    card_id = case_data.get("case", {}).get("card_id")
+    as_of = case_data.get("case", {}).get("as_of")
+    analysis = agent.client.detect_cross_border_aml(
+        card_id=card_id,
+        transactions=case_data.get("case", {}).get("transactions"),
+        as_of=as_of,
+        window_hours=window_hours,
+    )
+    return {"case_id": case_id, "cross_border_aml_analysis": analysis}
+
+
+@app.post("/api/regulatory/cross-border-check")
+def run_cross_border_check(req: CrossBorderCheckRequest):
+    """On-demand cross-border AML and correspondent banking risk evaluation."""
+    return agent.client.detect_cross_border_aml(
+        card_id=req.card_id,
+        transactions=req.transactions,
+        as_of=req.as_of,
+        window_hours=req.window_hours,
     )
 
 

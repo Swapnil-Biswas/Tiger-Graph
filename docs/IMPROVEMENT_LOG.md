@@ -1,4 +1,31 @@
-## Iteration 038: Inductive Fraud Rule Discovery from Closed Cases | 2026-09-20 19:45 | commit pending
+## Iteration 039: Cross-Border AML Transaction Bundling & Correspondent Banking Risk | 2026-09-20 20:00 | commit pending
+- **Lens:** 6. Fraud detection accuracy & 7. Multi-jurisdiction policy compliance & 14. Testing and evaluation
+- **Goal / hypothesis:** Transnational fraud syndicates exploit correspondent banking channels and fragmented cross-border jurisdictions to launder illicit proceeds. Standard domestic fraud checks overlook FATF high-risk corridors (Iran, North Korea, Myanmar, Russia, etc.), FATF grey lists (UAE, Panama, Cayman Islands, etc.), and multi-region transaction layering/bundling. Implementing `CrossBorderAMLRiskDetector` in `src/policy/jurisdiction.py` flags correspondent banking thresholds ($5,000 EDD, $2,500 SAR-AML), mandates Enhanced Due Diligence (EDD), triggers automated SAR cross-border filings, and integrates into `JurisdictionComplianceRouter.generate_dispatch_bundle` and `GraphClient` query library (Q20).
+- **Changes (files):**
+  - `src/policy/jurisdiction.py`: Created `CrossBorderAMLRiskDetector` evaluating FATF high-risk and grey-list corridors, rapid layering across 3+ regions, correspondent banking EDD/SAR thresholds, and connected it directly into `JurisdictionComplianceRouter.generate_dispatch_bundle`.
+  - `src/graph/client.py`: Added `detect_cross_border_aml` (Q20) to `GraphClient`.
+  - `src/api/main.py`: Added `GET /api/cases/{case_id}/cross-border-aml` and `POST /api/regulatory/cross-border-check` endpoints; added `CrossBorderCheckRequest` with `model_rebuild()`.
+  - `tests/test_cross_border_aml.py`: Created 6 unit tests covering domestic baseline, FATF high-risk corridor EDD/SAR triggers, multi-region rapid layering/bundling, dispatch bundle integration, temporal isolation, and API endpoints.
+- **Tests added/updated:**
+  - `tests/test_cross_border_aml.py` (6 unit tests, all pass).
+  - Total unit test suite expanded from 122 to **128** tests across 32 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 122 -> **128** (100% pass rate across 32 test suites)
+  - Cross-Border AML Screening: FATF high-risk and grey-list corridor screening with correspondent banking EDD/SAR automation
+  - Dispatch Bundle Integration: Automatic escalation of `must_file = True` upon AML risk detection
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (128/128)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Normalizing `epoch_s` and strictly isolating transactions by `as_of` ensures that cross-border layering bursts occurring after case creation are not leaked into historical backtests, while allowing real-time correspondent banking monitoring for active accounts.
+- **Follow-ups added to backlog:** Proceed to Iteration 040: Checkpoint 7 Milestone Review & Release Tag v0.4.
+
+## Iteration 038: Inductive Fraud Rule Discovery from Closed Cases | 2026-09-20 19:45 | commit b265531
 - **Lens:** 2. Undocumented pattern discovery & 20. Innovation & 7. GraphRAG quality
 - **Goal / hypothesis:** Hand-crafted policy rules become brittle as cybercrime syndicates adapt to evade exact thresholds. Implementing `InductiveFraudRuleMiner` in `src/cases/rule_miner.py` automatically learns high-precision, interpretable association rules ($\text{IF } \text{antecedent} \implies \text{consequent}$) from 5,565 closed historical cases, evaluating support, confidence ($\ge 80\%$), and lift ($> 1.0\times$), supporting entity evaluation, and exporting inductive rules as dynamic GraphRAG knowledge chunks.
 - **Changes (files):**

@@ -896,6 +896,31 @@ class GraphClient:
         miner = InductiveFraudRuleMiner(self)
         return miner.evaluate_entity(card_id=card_id, rules=rules, as_of=as_of)
 
+    # =========================================================================
+    # Q20: detect_cross_border_aml
+    # Cross-Border AML Bundling & Correspondent Banking Risk
+    # =========================================================================
+    def detect_cross_border_aml(
+        self,
+        card_id: str,
+        transactions: Optional[List[Dict[str, Any]]] = None,
+        as_of: Optional[Union[str, int]] = None,
+        window_hours: float = 48.0,
+    ) -> Dict[str, Any]:
+        """
+        Q20: Evaluates cross-border flow, correspondent banking risk, and FATF corridor
+        exposure under FinCEN 31 CFR 1010.610/620, EU 6AMLD, and UK MLR 2017.
+        """
+        from src.policy.jurisdiction import CrossBorderAMLRiskDetector
+        return CrossBorderAMLRiskDetector.evaluate_cross_border_risk(
+            card_id=card_id,
+            transactions=transactions,
+            as_of=as_of,
+            client=self,
+            window_hours=window_hours,
+        )
+
+
 
 
 
