@@ -1,4 +1,34 @@
-## Iteration 088: Dynamic Rate Limiting & DoS Interception Filter | 2026-09-21 09:00 | commit d960266
+## Iteration 089: Executive Case Summary PDF/Markdown Briefing Exporter | 2026-09-21 09:15 | commit 4763854
+- **Lens:** 8. Explainability & human-in-the-loop, 10. Visualization & UI/UX, 5. Regulatory compliance & SAR narrative
+- **Goal / hypothesis:** Compliance officers, risk committees, legal counsel, and banking regulators require publication-grade executive summaries of complex fraud investigations without manual compilation. Implementing an executive briefing exporter delivers:
+  1. **Executive Markdown Briefings (`export_markdown_briefing`)**: Formats high-level incident summaries, financial exposure metrics, multi-hop graph evidence tables, next-best-action timelines, counterfactual decision boundaries, FinCEN SAR determinations, and official cryptographic certifications.
+  2. **Printable HTML/PDF Executive Dossiers (`export_html_briefing`)**: High-contrast, publication-grade document styling with `@media print` rules, responsive key-value KPI cards, formal classification stamps (`RESTRICTED // BSA-AML`), and a one-click `window.print()` button.
+  3. **Robust Data & Encoding Compatibility**: Dynamically parses both dictionary and string action lists, handles list/dict counterfactuals, and sanitizes CP1252-incompatible unicode symbols (`<=`, `>=`, `--`).
+  4. **FastAPI Endpoints**: Exposed `GET /api/cases/{case_id}/briefing/markdown` and `GET /api/cases/{case_id}/briefing/html`.
+- **Changes (files):**
+  - `src/cases/briefing_exporter.py`: Implemented ExecutiveBriefingExporter for Markdown and HTML briefings.
+  - `src/api/main.py`: Added briefing endpoints for Markdown and HTML formats.
+  - `tests/test_briefing_exporter.py`: Created 6 unit tests covering fraud cases, legitimate cases, HTML DOM structure, 404 handling, and FastAPI client integration.
+  - `docs/METRICS.md`: Added Iteration 089 row.
+  - `docs/BACKLOG.md`: Marked item 89 as DONE.
+  - `docs/IMPROVEMENT_LOG.md`: Documented Iteration 089.
+- **Tests added/updated:**
+  - `tests/test_briefing_exporter.py` (6 unit tests, all pass).
+  - Total unit test suite expanded from 355 to **361** tests across 72 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 355 -> **361** (100% pass rate across 72 test suites)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Extended Benchmark Answers Valid: 50/50 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 361 passed across 72 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
+## Iteration 088: Dynamic Rate Limiting & DoS Interception Filter | 2026-09-21 09:00 | commit eb4ccdd
 - **Lens:** 9. Security, safety & defenses, 15. Operational readiness & runbooks, 11. Agent architecture & engineering
 - **Goal / hypothesis:** Mission-critical fraud investigation APIs require robust denial-of-service (DoS) interception and resource protection against abusive traffic spikes, rogue scraper loops, and brute-force mutations. Implementing a dynamic rate limiter delivers:
   1. **Thread-Safe Token Bucket Algorithm (`TokenBucket`)**: High-performance $O(1)$ token consumption with sub-millisecond overhead, continuous fractional refill math, and dynamic capacity tracking.

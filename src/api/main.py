@@ -1469,6 +1469,31 @@ def export_case(case_id: str):
     raise HTTPException(status_code=404, detail="Answer file not found.")
 
 
+# Executive Case Summary Briefing Exporter
+from src.cases.briefing_exporter import ExecutiveBriefingExporter
+briefing_exporter = ExecutiveBriefingExporter()
+
+@app.get("/api/cases/{case_id}/briefing/markdown")
+def get_case_briefing_markdown(case_id: str):
+    """Generate and return publication-ready Markdown executive briefing."""
+    try:
+        md = briefing_exporter.export_markdown_briefing(case_id, active_cases.get(case_id))
+        return Response(content=md, media_type="text/markdown")
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
+
+
+@app.get("/api/cases/{case_id}/briefing/html")
+def get_case_briefing_html(case_id: str):
+    """Generate and return publication-ready printable HTML executive briefing."""
+    try:
+        html = briefing_exporter.export_html_briefing(case_id, active_cases.get(case_id))
+        return HTMLResponse(content=html)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
+
+
+
 # Cryptographic Audit Ledger
 from src.policy.audit_ledger import get_audit_ledger
 audit_ledger = get_audit_ledger()
