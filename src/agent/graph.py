@@ -59,10 +59,21 @@ class FraudInvestigatorAgent:
         if flagged_txn.endswith(".0"):
             flagged_txn = flagged_txn[:-2]
 
+        # Determine trigger type accurately from metadata or case record
+        notes = str(case_info.get("analyst_notes", "")).lower()
+        if case_info.get("trigger_type"):
+            t_type = case_info["trigger_type"]
+        elif "reported unrecognized" in notes:
+            t_type = "customer_report"
+        elif "model scored" in notes:
+            t_type = "risk_score"
+        else:
+            t_type = "risk_score"
+
         trigger_data = {
             "case_id": case_id,
             "opened_at": opened_at,
-            "trigger_type": case_info.get("trigger_type", "score"),
+            "trigger_type": t_type,
             "trigger_text": case_info.get("trigger_text", f"Alert triggered on card {card_id}"),
             "card_id": card_id,
             "customer_id": cust_id,

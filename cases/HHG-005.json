@@ -3,7 +3,7 @@
   "case": {
     "status": "closed_fraud",
     "verdict": "fraud",
-    "fraud_probability": 0.98,
+    "fraud_probability": 1.0,
     "pattern": "card_not_present_new_device",
     "pattern_description": "",
     "affected_txn_ids": [
@@ -109,7 +109,7 @@
       {
         "action": "BLOCK_CARD",
         "route": "L1",
-        "reason": "R2: High probability unauthorized activity (0.98); exposure $100.07."
+        "reason": "R2: High probability unauthorized activity (1.00); exposure $100.07."
       },
       {
         "action": "CREATE_CASE",
@@ -131,7 +131,7 @@
       {
         "action": "BLOCK_CARD",
         "route": "L1",
-        "reason": "R2: High probability unauthorized activity (0.98); exposure $100.07."
+        "reason": "R2: High probability unauthorized activity (1.00); exposure $100.07."
       },
       {
         "action": "CREATE_CASE",
@@ -157,9 +157,9 @@
     "narrative": "Between 2016-12-07 and 2016-12-08, cardholder C02923 experienced unauthorized activity on card C02923-K1. A total of 1 transaction(s) amounting to $100.07 USD were executed under fraud pattern 'card_not_present_new_device'. The primary flagged transaction 3523199 ($100.07) was initiated through the online channel. Activity originated from a device profile (iOS Device | iOS 9.3.5 | mobile safari 9.0 | 1024x768) marked as New for this account. The same device profile was also observed across 112 other distinct cards, demonstrating coordinated compromise. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C02923-K1 to mitigate further loss and placed linked accounts under enhanced monitoring.",
     "subjects": [
       "C02923",
-      "C02923-K1",
       "C00329-K2",
-      "C00450-K1"
+      "C00450-K1",
+      "C02923-K1"
     ],
     "total_amount_usd": 100.07,
     "activity_dates": [

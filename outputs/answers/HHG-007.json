@@ -1,16 +1,18 @@
 {
   "case_id": "HHG-007",
   "case": {
-    "status": "closed_legitimate",
-    "verdict": "legitimate",
-    "fraud_probability": 0.05,
-    "pattern": "none",
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 1.0,
+    "pattern": "out_of_region_use",
     "pattern_description": "",
-    "affected_txn_ids": [],
-    "first_suspicious_txn_id": "",
+    "affected_txn_ids": [
+      "3514948"
+    ],
+    "first_suspicious_txn_id": "3514948",
     "connected_card_ids": [],
     "connected_device_profiles": [],
-    "exposure_usd": 0.0,
+    "exposure_usd": 111.92,
     "evidence": [
       {
         "id": "EV-01",
@@ -52,7 +54,7 @@
         "id": "EV-05",
         "source": "customer",
         "ref": "evidence_request:1",
-        "claim": "Customer confirms they made this purchase while traveling and still has possession of the card",
+        "claim": "Customer states they did not make these purchases and still has the card",
         "entity_ids": []
       }
     ],
@@ -61,7 +63,7 @@
       "CC-0657",
       "CC-0765"
     ],
-    "summary": "Investigation cleared the alert for card C09933-K2 as legitimate activity. Transaction characteristics match cardholder baseline history; customer confirmation confirmed authorized use.",
+    "summary": "Investigation confirmed unauthorized activity on card C09933-K2 under pattern 'out_of_region_use'. Total exposure identified is $111.92 across 1 transaction(s). Cardholder outreach and graph evidence confirmed compromise; defensive card blocks and case progression executed.",
     "written_to_graph": true,
     "graph_case_id": "CASE-HHG-007"
   },
@@ -69,7 +71,7 @@
     {
       "type": "customer_validation",
       "asked_after_step": 3,
-      "assumed_response": "Customer confirms they made this purchase while traveling and still has possession of the card",
+      "assumed_response": "Customer states they did not make these purchases and still has the card",
       "reason": "R1: Ambiguous risk score requires cardholder validation before permanent card block."
     }
   ],
@@ -88,17 +90,17 @@
     ],
     "final": [
       {
-        "action": "ALLOW_TRANSACTION",
-        "route": "auto",
-        "reason": "R3: Customer confirmed transaction as authorized."
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: Customer confirmed unauthorized activity; exposure $111.92."
       },
       {
-        "action": "CLOSE_NO_FRAUD",
+        "action": "CREATE_CASE",
         "route": "auto",
-        "reason": "R3: Verification confirmed false alarm; alert closed without fraud."
+        "reason": "R2: Formal internal fraud case created."
       }
     ],
-    "what_changed": "Customer confirmation reduced fraud probability to 0.05, resolving the alert as legitimate and clearing the case."
+    "what_changed": "Customer denial raised fraud probability to 1.00, confirming immediate card block and case escalation."
   },
   "sar": {
     "file": false,
@@ -108,8 +110,8 @@
     "total_amount_usd": 0.0,
     "activity_dates": []
   },
-  "stop_reason": "Customer confirmation and baseline habit alignment verified legitimacy; alert cleared without fraud.",
+  "stop_reason": "Customer denial and definitive graph pattern signatures settled the verdict; further steps would not alter the defensive actions.",
   "tool_calls": 7,
   "tokens": 2250,
-  "latency_s": 0.05
+  "latency_s": 0.04
 }

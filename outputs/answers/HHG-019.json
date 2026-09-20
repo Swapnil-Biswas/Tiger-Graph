@@ -150,10 +150,10 @@
     "reason": "Section 3a & Rule R2: Confirmed unauthorized fraud with exposure of $99.92 USD and multi-card linkage.",
     "narrative": "Between 2016-12-01 and 2016-12-01, cardholder C07987 experienced unauthorized activity on card C07987-K2. A total of 1 transaction(s) amounting to $99.92 USD were executed under fraud pattern 'card_not_present_new_device'. The primary flagged transaction 3503878 ($99.92) was initiated through the online channel. Activity originated from a device profile (Windows | other | chrome 61.0 | 1280x720) marked as New for this account. The same device profile was also observed across 5 other distinct cards, demonstrating coordinated compromise. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C07987-K2 to mitigate further loss and placed linked accounts under enhanced monitoring.",
     "subjects": [
-      "C07987-K2",
-      "C07987",
+      "C01104-K2",
       "C01983-K1",
-      "C01104-K2"
+      "C07987-K2",
+      "C07987"
     ],
     "total_amount_usd": 99.92,
     "activity_dates": [

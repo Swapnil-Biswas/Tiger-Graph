@@ -77,83 +77,79 @@
         "id": "EV-06",
         "source": "graph",
         "ref": "query:similar_cases(card=C04570-K1)",
-        "claim": "Found 5 prior closed case(s) touching related entities: CC-1383, CC-1264, CC-1352.",
+        "claim": "Found 5 prior closed case(s) touching related entities: CC-1383, CC-1149, CC-0766.",
         "entity_ids": [
           "CC-1383",
-          "CC-1264",
-          "CC-1352"
+          "CC-1149",
+          "CC-0766"
         ]
-      },
-      {
-        "id": "EV-07",
-        "source": "customer",
-        "ref": "evidence_request:1",
-        "claim": "Customer states they did not make these purchases and still has the card",
-        "entity_ids": []
       }
     ],
     "similar_prior_cases": [
       "CC-1383",
-      "CC-1264",
-      "CC-1352"
+      "CC-1149",
+      "CC-0766"
     ],
     "summary": "Investigation confirmed unauthorized activity on card C04570-K1 under pattern 'card_not_present_fraud'. Total exposure identified is $100.09 across 1 transaction(s). Cardholder outreach and graph evidence confirmed compromise; defensive card blocks and case progression executed.",
     "written_to_graph": true,
     "graph_case_id": "CASE-HHG-017"
   },
-  "evidence_requests": [
-    {
-      "type": "customer_validation",
-      "asked_after_step": 3,
-      "assumed_response": "Customer states they did not make these purchases and still has the card",
-      "reason": "R1: Ambiguous risk score requires cardholder validation before permanent card block."
-    }
-  ],
+  "evidence_requests": [],
   "next_best_actions": {
     "initial": [
       {
-        "action": "VERIFY_WITH_CUSTOMER",
-        "route": "auto",
-        "reason": "R1: Assessed fraud probability is below 0.70 on weak/single signal; confirm with cardholder before any blocking action."
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: High probability unauthorized activity (1.00); exposure $100.09."
       },
       {
         "action": "CREATE_CASE",
         "route": "auto",
-        "reason": "Section 3a: Internal fraud case created pending customer verification."
+        "reason": "Section 3a: Formal fraud case opened with evidence attached."
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "Section 3a & R2: Regulatory SAR required (exposure $100.09 > $1,000 or shared device origin)."
+      },
+      {
+        "action": "MONITOR_CONNECTED_CARDS",
+        "route": "auto",
+        "reason": "R6: Compromised device profile shared with other cards."
       }
     ],
     "final": [
       {
         "action": "BLOCK_CARD",
         "route": "L1",
-        "reason": "R2: Customer confirmed unauthorized activity; exposure $100.09."
+        "reason": "R2: High probability unauthorized activity (1.00); exposure $100.09."
       },
       {
         "action": "CREATE_CASE",
         "route": "auto",
-        "reason": "R2: Formal internal fraud case created."
+        "reason": "Section 3a: Formal fraud case opened with evidence attached."
       },
       {
         "action": "FILE_REPORT",
         "route": "L2",
-        "reason": "R2 & Section 3a: SAR required (exposure $100.09 or shared origin)."
+        "reason": "Section 3a & R2: Regulatory SAR required (exposure $100.09 > $1,000 or shared device origin)."
       },
       {
         "action": "MONITOR_CONNECTED_CARDS",
         "route": "auto",
-        "reason": "R6: Shared device profile also observed on connected cards."
+        "reason": "R6: Compromised device profile shared with other cards."
       }
     ],
-    "what_changed": "Customer denial raised fraud probability to 1.00, confirming immediate card block and case escalation."
+    "what_changed": "nothing"
   },
   "sar": {
     "file": true,
     "reason": "Section 3a & Rule R2: Confirmed unauthorized fraud with exposure of $100.09 USD and multi-card linkage.",
-    "narrative": "Between 2016-11-11 and 2016-11-12, cardholder C04570 experienced unauthorized activity on card C04570-K1. A total of 1 transaction(s) amounting to $100.09 USD were executed under fraud pattern 'card_not_present_fraud'. The primary flagged transaction 3450629 ($100.09) was initiated through the online channel. The same device profile was also observed across 300 other distinct cards, demonstrating coordinated compromise. The cardholder was contacted for transaction validation and stated: 'Customer states they did not make these purchases and still has the card'. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C04570-K1 to mitigate further loss and placed linked accounts under enhanced monitoring.",
+    "narrative": "Between 2016-11-11 and 2016-11-12, cardholder C04570 experienced unauthorized activity on card C04570-K1. A total of 1 transaction(s) amounting to $100.09 USD were executed under fraud pattern 'card_not_present_fraud'. The primary flagged transaction 3450629 ($100.09) was initiated through the online channel. The same device profile was also observed across 300 other distinct cards, demonstrating coordinated compromise. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C04570-K1 to mitigate further loss and placed linked accounts under enhanced monitoring.",
     "subjects": [
       "C04570-K1",
-      "C00163-K1",
       "C00180-K1",
+      "C00163-K1",
       "C04570"
     ],
     "total_amount_usd": 100.09,

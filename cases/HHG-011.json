@@ -153,10 +153,10 @@
     "reason": "Section 3a & Rule R2: Confirmed unauthorized fraud with exposure of $131.30 USD and multi-card linkage.",
     "narrative": "Between 2016-12-29 and 2016-12-29, cardholder C11923 experienced unauthorized activity on card C11923-K2. A total of 1 transaction(s) amounting to $131.30 USD were executed under fraud pattern 'card_testing'. The primary flagged transaction 3583368 ($131.30) was initiated through the online channel. Activity originated from a device profile (SM-G610F Build/NRD90M | UnknownOS | chrome 66.0 for android | UnknownScreen) marked as New for this account. The same device profile was also observed across 4 other distinct cards, demonstrating coordinated compromise. The cardholder was contacted for transaction validation and stated: 'Customer states they did not make these purchases and still has the card'. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C11923-K2 to mitigate further loss and placed linked accounts under enhanced monitoring.",
     "subjects": [
-      "C11923-K2",
+      "C11923",
       "C03938-K1",
       "C05595-K1",
-      "C11923"
+      "C11923-K2"
     ],
     "total_amount_usd": 131.3,
     "activity_dates": [
@@ -167,5 +167,5 @@
   "stop_reason": "Customer denial and definitive graph pattern signatures settled the verdict; further steps would not alter the defensive actions.",
   "tool_calls": 8,
   "tokens": 2400,
-  "latency_s": 0.13
+  "latency_s": 0.1
 }

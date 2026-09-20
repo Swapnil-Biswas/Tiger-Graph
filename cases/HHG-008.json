@@ -151,10 +151,10 @@
     "reason": "Section 3a & Rule R2: Confirmed unauthorized fraud with exposure of $55.68 USD and multi-card linkage.",
     "narrative": "Between 2016-12-19 and 2016-12-20, cardholder C13171 experienced unauthorized activity on card C13171-K2. A total of 1 transaction(s) amounting to $55.68 USD were executed under fraud pattern 'card_not_present_fraud'. The primary flagged transaction 3558054 ($55.68) was initiated through the online channel. The same device profile was also observed across 171 other distinct cards, demonstrating coordinated compromise. The cardholder was contacted for transaction validation and stated: 'Customer states they did not make these purchases and still has the card'. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C13171-K2 to mitigate further loss and placed linked accounts under enhanced monitoring.",
     "subjects": [
-      "C13171-K2",
-      "C00027-K1",
+      "C00036-K1",
       "C13171",
-      "C00036-K1"
+      "C13171-K2",
+      "C00027-K1"
     ],
     "total_amount_usd": 55.68,
     "activity_dates": [
@@ -165,5 +165,5 @@
   "stop_reason": "Customer denial and definitive graph pattern signatures settled the verdict; further steps would not alter the defensive actions.",
   "tool_calls": 8,
   "tokens": 2400,
-  "latency_s": 0.05
+  "latency_s": 0.04
 }

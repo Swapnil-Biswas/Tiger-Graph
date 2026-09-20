@@ -86,11 +86,11 @@
         "id": "EV-07",
         "source": "graph",
         "ref": "query:similar_cases(card=C09988-K1)",
-        "claim": "Found 5 prior closed case(s) touching related entities: CC-3039, CC-3206, CC-3221.",
+        "claim": "Found 5 prior closed case(s) touching related entities: CC-3205, CC-3478, CC-3564.",
         "entity_ids": [
-          "CC-3039",
-          "CC-3206",
-          "CC-3221"
+          "CC-3205",
+          "CC-3478",
+          "CC-3564"
         ]
       },
       {
@@ -102,9 +102,9 @@
       }
     ],
     "similar_prior_cases": [
-      "CC-3039",
-      "CC-3206",
-      "CC-3221"
+      "CC-3205",
+      "CC-3478",
+      "CC-3564"
     ],
     "summary": "Investigation confirmed unauthorized activity on card C09988-K1 under pattern 'card_not_present_new_device'. Total exposure identified is $59.67 across 1 transaction(s). Cardholder outreach and graph evidence confirmed compromise; defensive card blocks and case progression executed.",
     "written_to_graph": true,
@@ -160,10 +160,10 @@
     "reason": "Section 3a & Rule R2: Confirmed unauthorized fraud with exposure of $59.67 USD and multi-card linkage.",
     "narrative": "Between 2016-12-11 and 2016-12-12, cardholder C09988 experienced unauthorized activity on card C09988-K1. A total of 1 transaction(s) amounting to $59.67 USD were executed under fraud pattern 'card_not_present_new_device'. The primary flagged transaction 3534820 ($59.67) was initiated through the online channel. Activity originated from a device profile (Windows | UnknownOS | edge 16.0 | UnknownScreen) marked as New for this account. The same device profile was also observed across 158 other distinct cards, demonstrating coordinated compromise. The cardholder was contacted for transaction validation and stated: 'Customer states they did not make these purchases and still has the card'. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C09988-K1 to mitigate further loss and placed linked accounts under enhanced monitoring.",
     "subjects": [
-      "C09988",
-      "C00005-K1",
+      "C00045-K1",
       "C09988-K1",
-      "C00045-K1"
+      "C09988",
+      "C00005-K1"
     ],
     "total_amount_usd": 59.67,
     "activity_dates": [

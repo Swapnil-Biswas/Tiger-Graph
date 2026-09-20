@@ -47,13 +47,19 @@ class UncertaintyAssessmentEngine:
         # Graph Pattern Match
         risk_points += pat_conf * 30.0
 
-        # Novelty
+        # Novelty & Identity
         if new_ent.get("is_new_device") or new_ent.get("identity_flag_new"):
             risk_points += 15.0
         if new_ent.get("is_new_region"):
             risk_points += 10.0
+        if new_ent.get("is_new_email"):
+            risk_points += 10.0
         if new_ent.get("proxy_flag"):
             risk_points += 15.0
+
+        # Impossible Travel & Geographic Anomalies
+        if geo.get("has_geo_anomaly"):
+            risk_points += 20.0
 
         # Velocity burst
         spike_ratio = vel.get("velocity_spike_ratio", 1.0)
@@ -74,7 +80,7 @@ class UncertaintyAssessmentEngine:
 
         # Customer habits dampener (only if NO customer report)
         if trigger_type != "customer_report" and profile.get("txn_count", 0) > 10:
-            if not new_ent.get("is_new_region") and not new_ent.get("is_new_device") and not sharing.get("is_shared"):
+            if not new_ent.get("is_new_region") and not new_ent.get("is_new_device") and not sharing.get("is_shared") and not geo.get("has_geo_anomaly"):
                 risk_points = max(20.0, risk_points - 20.0)
 
         # Evidence Response Update (Post-Inquiry)
@@ -142,7 +148,13 @@ class UncertaintyAssessmentEngine:
         elif best_pat != "none" and pat_conf >= 0.40:
             assigned_pattern = best_pat
             pattern_desc = ""
-        elif new_ent.get("is_new_device") and new_ent.get("proxy_flag"):
+        elif geo.get("has_geo_anomaly") or (new_ent.get("is_new_region") and not new_ent.get("is_new_device")):
+            assigned_pattern = "out_of_region_use"
+            pattern_desc = ""
+        elif new_ent.get("identity_flag_new") or (new_ent.get("is_new_email") and new_ent.get("is_new_device")):
+            assigned_pattern = "account_takeover"
+            pattern_desc = ""
+        elif new_ent.get("is_new_device"):
             assigned_pattern = "card_not_present_new_device"
             pattern_desc = ""
         else:

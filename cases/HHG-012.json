@@ -3,7 +3,7 @@
   "case": {
     "status": "closed_legitimate",
     "verdict": "legitimate",
-    "fraud_probability": 0.05,
+    "fraud_probability": 0.09,
     "pattern": "none",
     "pattern_description": "",
     "affected_txn_ids": [],
@@ -41,11 +41,11 @@
         "id": "EV-04",
         "source": "graph",
         "ref": "query:similar_cases(card=C05876-K2)",
-        "claim": "Found 5 prior closed case(s) touching related entities: CC-0003, CC-2370, CC-0222.",
+        "claim": "Found 5 prior closed case(s) touching related entities: CC-0003, CC-2370, CC-2929.",
         "entity_ids": [
           "CC-0003",
           "CC-2370",
-          "CC-0222"
+          "CC-2929"
         ]
       },
       {
@@ -59,7 +59,7 @@
     "similar_prior_cases": [
       "CC-0003",
       "CC-2370",
-      "CC-0222"
+      "CC-2929"
     ],
     "summary": "Investigation cleared the alert for card C05876-K2 as legitimate activity. Transaction characteristics match cardholder baseline history; customer confirmation confirmed authorized use.",
     "written_to_graph": true,
@@ -79,6 +79,11 @@
         "action": "VERIFY_WITH_CUSTOMER",
         "route": "auto",
         "reason": "R1: Assessed fraud probability is below 0.70 on weak/single signal; confirm with cardholder before any blocking action."
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "Section 3a: Internal fraud case created pending customer verification."
       }
     ],
     "final": [
@@ -93,7 +98,7 @@
         "reason": "R3: Verification confirmed false alarm; alert closed without fraud."
       }
     ],
-    "what_changed": "Customer confirmation reduced fraud probability to 0.05, resolving the alert as legitimate and clearing the case."
+    "what_changed": "Customer confirmation reduced fraud probability to 0.09, resolving the alert as legitimate and clearing the case."
   },
   "sar": {
     "file": false,
