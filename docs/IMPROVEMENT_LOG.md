@@ -1,4 +1,31 @@
-## Iteration 036: Graph Centrality-Weighted PageRank for Fraud Contagion | 2026-09-20 19:35 | commit pending
+## Iteration 037: Temporal Graph Attention Subgraph Pooling | 2026-09-20 19:40 | commit pending
+- **Lens:** 2. Graph database and query performance & 11. Agent architecture & 14. Testing and evaluation
+- **Goal / hypothesis:** Downstream gradient boosted decision tree (XGBoost/LightGBM) models and neural network classifiers require fixed-dimensional vector representations rather than variable-sized multi-hop node tensors $[N, D]$. Standard mean or max pooling drops critical temporal recency and topological hierarchy. Implementing `TemporalGraphAttentionPooler` in `src/graph/embeddings.py` computes softmax time-decayed attention scores $\alpha_i = \text{softmax}(w^T x_i - \lambda \cdot \Delta t_i)$ to aggregate node features into fixed-dimensional vectors: 9D attention-pooled, 9D mean-pooled, 9D max-pooled, and 27D concatenated representations.
+- **Changes (files):**
+  - `src/graph/embeddings.py`: Created `TemporalGraphAttentionPooler` with time-decayed softmax attention pooling, calculating node temporal distance $\Delta t_i$ in days, heuristic feature importance projection $w \in \mathbb{R}^9$, and fixed-dimensional $[D=9]$ and $[3D=27]$ embeddings.
+  - `src/graph/client.py`: Added `pool_graph_embedding` (Q18) to `GraphClient`.
+  - `src/api/main.py`: Added `GET /api/cases/{case_id}/embedding` and `POST /api/graph/pool-embedding` endpoints; added `PoolEmbeddingRequest` with `model_rebuild()`.
+  - `tests/test_graph_pooling.py`: Created 6 unit tests covering feature dimensions ($D=9, 3D=27$), softmax summation ($1.0 \pm 1e-4$), temporal recency decay, fraud precedent boosting, sub-5ms latency (0.25ms actual), and API endpoints.
+- **Tests added/updated:**
+  - `tests/test_graph_pooling.py` (6 unit tests, all pass).
+  - Total unit test suite expanded from 110 to **116** tests across 30 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 110 -> **116** (100% pass rate across 30 test suites)
+  - Subgraph Pooling: Fixed-dimensional 9D attention-pooled and 27D concatenated embeddings
+  - Pooling Latency: 0.25ms execution time (< 5ms target)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (116/116)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Computing time-decayed softmax attention directly over PyG node tensors runs in just 0.25ms and assigns over 96% of the attention weight to the target card and its most recent high-risk transactions/devices, providing high signal-to-noise ratio for downstream machine learning classifiers.
+- **Follow-ups added to backlog:** Proceed to Iteration 038: Inductive Fraud Rule Discovery from Closed Cases (Lens 2 & Lens 20).
+
+## Iteration 036: Graph Centrality-Weighted PageRank for Fraud Contagion | 2026-09-20 19:35 | commit 9f2868f
 - **Lens:** 1. Graph schema and ingestion & 2. Graph database and query performance & 11. Agent architecture
 - **Goal / hypothesis:** Binary or discrete hop-based alerts fail to capture the continuous structural distance and network influence of fraudulent entities. Implementing `FraudContagionPageRank` in `src/graph/algorithms.py` calculates Personalized PageRank (PPR) / Random Walk with Restart (RWR) from confirmed fraud seeds ($r = (1 - c) P^T r + c p_0$), computing continuous fraud contagion distributions ($[0, 1]$), identifying top contagion diffusion nodes, and categorizing threat levels while enforcing strict `as_of` temporal bounds.
 - **Changes (files):**

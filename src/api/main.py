@@ -83,8 +83,18 @@ class ContagionCheckRequest(BaseModel):
     custom_fraud_seeds: Optional[List[str]] = None
 
 
+class PoolEmbeddingRequest(BaseModel):
+    seed_id: str
+    entity_type: str = "card"
+    as_of: Optional[str] = None
+    k_hops: int = 2
+    max_nodes: int = 50
+    decay_lambda: float = 0.05
+
+
 StructuringCheckRequest.model_rebuild()
 ContagionCheckRequest.model_rebuild()
+PoolEmbeddingRequest.model_rebuild()
 
 
 @app.get("/api/health")
@@ -343,6 +353,43 @@ def run_contagion_check(req: ContagionCheckRequest):
         as_of=req.as_of,
         restart_prob=req.restart_prob,
         custom_fraud_seeds=req.custom_fraud_seeds,
+    )
+
+
+@app.get("/api/cases/{case_id}/embedding")
+def get_case_embedding(case_id: str, k_hops: int = 2, decay_lambda: float = 0.05):
+    """Extracts and pools temporal graph attention embeddings for a case."""
+    if case_id not in active_cases:
+        if case_id in agent.client.store.case_pack:
+            res = agent.investigate_case(case_id)
+            active_cases[case_id] = res
+            case_manager.write_case_to_graph(res)
+        else:
+            raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
+
+    case_data = active_cases[case_id]
+    card_id = case_data.get("case", {}).get("card_id")
+    as_of = case_data.get("case", {}).get("as_of")
+    embedding = agent.client.pool_graph_embedding(
+        seed_id=card_id,
+        entity_type="card",
+        as_of=as_of,
+        k_hops=k_hops,
+        decay_lambda=decay_lambda,
+    )
+    return {"case_id": case_id, "embedding": embedding}
+
+
+@app.post("/api/graph/pool-embedding")
+def run_pool_embedding(req: PoolEmbeddingRequest):
+    """On-demand temporal graph attention subgraph pooling."""
+    return agent.client.pool_graph_embedding(
+        seed_id=req.seed_id,
+        entity_type=req.entity_type,
+        as_of=req.as_of,
+        k_hops=req.k_hops,
+        max_nodes=req.max_nodes,
+        decay_lambda=req.decay_lambda,
     )
 
 

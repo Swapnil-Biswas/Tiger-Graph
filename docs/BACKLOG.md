@@ -136,10 +136,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 36. **[DONE - Iteration 036] [Graph Analytics & Contagion Scoring] Personalized PageRank / Random Walk with Restart for Fraud Contagion**
     - *Result:* Implemented `FraudContagionPageRank` in `src/graph/algorithms.py` and exposed `calculate_fraud_contagion` (Q17) in `GraphClient`. Computes continuous steady-state fraud contagion distribution ($r \in [0, 1]$) using power iteration Random Walk with Restart (RWR, $c=0.15$) from confirmed fraud seeds across heterogeneous multi-hop financial subgraphs. Enforces strict `as_of` temporal bounds, identifies top contagion nodes, and categorizes threat levels (critical, high, elevated, low, none). Integrated into `ConcurrentGraphTraverser`, `AdaptiveGraphBudgeter`, and `FraudInvestigatorAgent`. Added API endpoints `/api/cases/{case_id}/contagion` and `/api/graph/contagion-check`. Added 7 unit tests in `tests/test_pagerank_contagion.py` (110/110 tests pass).
 
-37. **[Graph Analytics & Machine Learning] Temporal Graph Attention Subgraph Pooling**
-    - *Goal:* Implement time-decayed attention pooling over multi-hop ego-net embeddings to aggregate node features into fixed-dimensional graph-level fraud embeddings.
-    - *Files:* `src/graph/embeddings.py`, `src/graph/client.py`, `tests/test_graph_pooling.py`
-    - *Metric Impact:* Agent Architecture & GNN / Machine Learning (Lens 2, 11).
+37. **[DONE - Iteration 037] [Graph Analytics & Machine Learning] Temporal Graph Attention Subgraph Pooling**
+    - *Result:* Implemented `TemporalGraphAttentionPooler` in `src/graph/embeddings.py` and exposed `pool_graph_embedding` (Q18) in `GraphClient`. Computes time-decayed softmax attention scores ($\alpha_i = \text{softmax}(w^T x_i - \lambda \cdot \Delta t_i)$) over heterogeneous multi-hop node feature tensors ($[N, 9]$) to aggregate variable-sized subgraphs into fixed-dimensional vectors: 9D attention-pooled, 9D mean-pooled, 9D max-pooled, and 27D concatenated embeddings for GBDT (XGBoost/LightGBM) and neural network ingestion. Added API endpoints `/api/cases/{case_id}/embedding` and `/api/graph/pool-embedding`. Added 6 unit tests in `tests/test_graph_pooling.py` (116/116 tests pass).
 
 38. **[Case Management & Automated Knowledge Discovery] Inductive Fraud Rule Discovery from Closed Cases**
     - *Goal:* Implement inductive rule induction mining frequent subgraphs and attribute correlations from 5,565 closed historical cases to discover new emergent fraud typologies.

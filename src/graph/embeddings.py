@@ -275,3 +275,149 @@ class TopologicalGraphEmbeddingExporter:
             "tabular_vector": tabular_vector,
             "pyg_format_ready": True,
         }
+
+
+class TemporalGraphAttentionPooler:
+    """
+    Temporal Graph Attention Subgraph Pooling Engine.
+    Aggregates variable-size heterogeneous node feature tensors ([N, D]) into fixed-dimensional
+    graph-level representations ([D] or [3D]) using time-decayed attention mechanisms.
+    """
+
+    def __init__(self, client: Any = None):
+        self.client = client
+        self.default_weights = [1.0, 0.8, 1.2, 1.0, 1.5, 1.2, 3.0, 2.0, 2.5]
+
+    def pool_subgraph(
+        self,
+        pyg_subgraph: Dict[str, Any],
+        as_of: Optional[Union[str, int]] = None,
+        decay_lambda: float = 0.05,
+        feature_weights: Optional[List[float]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Pools heterogeneous node features x ([N, D]) into fixed-dimensional vectors:
+        - pooled_attention_embedding: [D] (attention weighted)
+        - pooled_mean_embedding: [D]
+        - pooled_max_embedding: [D]
+        - concatenated_embedding: [3D]
+        """
+        import time
+
+        t0 = time.perf_counter()
+        as_of_epoch = parse_as_of_epoch(as_of)
+
+        num_nodes = pyg_subgraph.get("num_nodes", 0)
+        node_ids = pyg_subgraph.get("node_ids", [])
+        node_types = pyg_subgraph.get("node_types", [])
+        x = pyg_subgraph.get("x", [])
+
+        if num_nodes == 0 or not x:
+            return {
+                "subgraph_size": 0,
+                "feature_dim": 9,
+                "pooled_dim": 27,
+                "attention_weights": {},
+                "pooled_attention_embedding": [0.0] * 9,
+                "pooled_mean_embedding": [0.0] * 9,
+                "pooled_max_embedding": [0.0] * 9,
+                "concatenated_embedding": [0.0] * 27,
+                "top_attention_nodes": [],
+                "elapsed_ms": 0.0,
+            }
+
+        w = feature_weights or self.default_weights
+        feat_dim = len(x[0])
+
+        # Compute days_prior for each node
+        days_priors = []
+        for i, nid in enumerate(node_ids):
+            ntype = node_types[i] if i < len(node_types) else "card"
+            node_epoch = as_of_epoch
+            if self.client and hasattr(self.client, "store"):
+                if ntype == "transaction":
+                    tid = nid[4:] if nid.startswith("TXN:") else nid
+                    txn_obj = self.client.store.transactions.get(tid, {})
+                    node_epoch = txn_obj.get("epoch_s", as_of_epoch)
+                elif ntype == "card":
+                    cid = nid[5:] if nid.startswith("CARD:") else nid
+                    card_txns = self.client.store.txns_by_card.get(cid, [])
+                    valid_txns = [t["epoch_s"] for t in card_txns if t["epoch_s"] <= as_of_epoch]
+                    node_epoch = max(valid_txns) if valid_txns else as_of_epoch
+                elif ntype == "device":
+                    did = nid[4:] if nid.startswith("DEV:") else nid
+                    dev_txns = self.client.store.txns_by_device.get(did, [])
+                    valid_txns = [t["epoch_s"] for t in dev_txns if t["epoch_s"] <= as_of_epoch]
+                    node_epoch = max(valid_txns) if valid_txns else as_of_epoch
+                elif ntype == "customer":
+                    cid = nid[5:] if nid.startswith("CUST:") else nid
+                    cust_txns = self.client.store.txns_by_customer.get(cid, [])
+                    valid_txns = [t["epoch_s"] for t in cust_txns if t["epoch_s"] <= as_of_epoch]
+                    node_epoch = max(valid_txns) if valid_txns else as_of_epoch
+
+            diff_sec = max(0.0, float(as_of_epoch - node_epoch))
+            days = diff_sec / 86.4
+            days_priors.append(days)
+
+        # Compute raw attention scores
+        scores = []
+        for i in range(num_nodes):
+            feat_score = sum(w[j] * x[i][j] for j in range(min(len(w), feat_dim)))
+            time_penalty = decay_lambda * days_priors[i]
+            scores.append(feat_score - time_penalty)
+
+        # Softmax
+        max_s = max(scores)
+        exp_scores = [math.exp(s - max_s) for s in scores]
+        sum_exp = sum(exp_scores)
+        attn_weights = [e / sum_exp for e in exp_scores]
+
+        # Compute pooled vectors
+        h_attn = [0.0] * feat_dim
+        h_mean = [0.0] * feat_dim
+        h_max = [float("-inf")] * feat_dim
+
+        for i in range(num_nodes):
+            alpha = attn_weights[i]
+            for j in range(feat_dim):
+                val = x[i][j]
+                h_attn[j] += alpha * val
+                h_mean[j] += val / num_nodes
+                if val > h_max[j]:
+                    h_max[j] = val
+
+        h_concat = [round(v, 4) for v in (h_attn + h_mean + h_max)]
+        h_attn = [round(v, 4) for v in h_attn]
+        h_mean = [round(v, 4) for v in h_mean]
+        h_max = [round(v, 4) for v in h_max]
+
+        attn_map = {node_ids[i]: round(attn_weights[i], 4) for i in range(num_nodes)}
+        top_nodes = sorted(
+            [
+                {
+                    "node_id": node_ids[i],
+                    "node_type": node_types[i],
+                    "attention_weight": round(attn_weights[i], 4),
+                    "days_prior": round(days_priors[i], 1),
+                }
+                for i in range(num_nodes)
+            ],
+            key=lambda item: item["attention_weight"],
+            reverse=True,
+        )[:10]
+
+        elapsed_ms = round((time.perf_counter() - t0) * 1000.0, 2)
+
+        return {
+            "subgraph_size": num_nodes,
+            "feature_dim": feat_dim,
+            "pooled_dim": feat_dim * 3,
+            "attention_weights": attn_map,
+            "pooled_attention_embedding": h_attn,
+            "pooled_mean_embedding": h_mean,
+            "pooled_max_embedding": h_max,
+            "concatenated_embedding": h_concat,
+            "top_attention_nodes": top_nodes,
+            "elapsed_ms": elapsed_ms,
+        }
+

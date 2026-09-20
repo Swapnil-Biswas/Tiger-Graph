@@ -823,4 +823,39 @@ class GraphClient:
             custom_fraud_seeds=custom_fraud_seeds,
         )
 
+    # =========================================================================
+    # Q18: pool_graph_embedding
+    # Temporal Graph Attention Subgraph Pooling
+    # =========================================================================
+    def pool_graph_embedding(
+        self,
+        seed_id: str,
+        entity_type: str = "card",
+        as_of: Optional[Union[str, int]] = None,
+        k_hops: int = 2,
+        max_nodes: int = 50,
+        decay_lambda: float = 0.05,
+    ) -> dict:
+        """
+        Q18: Aggregates multi-hop ego-network node features into fixed-dimensional (9D / 27D)
+        embeddings via temporal graph attention pooling for GBDT / NN ingestion.
+        """
+        from src.graph.embeddings import TopologicalGraphEmbeddingExporter, TemporalGraphAttentionPooler
+        exporter = TopologicalGraphEmbeddingExporter(self)
+        pooler = TemporalGraphAttentionPooler(self)
+
+        pyg_subgraph = exporter.extract_gnn_subgraph(
+            seed_id=seed_id,
+            entity_type=entity_type,
+            as_of=as_of,
+            k_hops=k_hops,
+            max_nodes=max_nodes,
+        )
+        return pooler.pool_subgraph(
+            pyg_subgraph=pyg_subgraph,
+            as_of=as_of,
+            decay_lambda=decay_lambda,
+        )
+
+
 
