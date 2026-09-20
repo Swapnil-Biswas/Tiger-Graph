@@ -1,4 +1,4 @@
-## Iteration 047: Graph-Augmented LLM Self-Refinement & Counter-Factual Invariant Verification Loop | 2026-09-20 22:55 | commit TBD_COMMIT
+## Iteration 047: Graph-Augmented LLM Self-Refinement & Counter-Factual Invariant Verification Loop | 2026-09-20 22:55 | commit 9c63e20
 - **Lens:** 11. Agent architecture & engineering & 12. Explainability & audit trail & 10. Policy & regulatory compliance
 - **Goal / hypothesis:** Autonomous agents operating in mission-critical financial crime investigations risk generating ungrounded actions, conflicting recommendations, or policy violations when edge cases produce conflicting signals. Implementing `GraphAugmentedSelfRefiner` in `src/agent/refiner.py` enforces a post-generation verification loop checking 7 structural and regulatory invariants:
   1. `INVARIANT_R1_WEAK_SIGNAL`: Prohibits punitive `BLOCK_CARD` actions when fraud probability < 0.70 unless customer challenge has concluded.
