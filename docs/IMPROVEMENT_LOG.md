@@ -1,3 +1,30 @@
+## Iteration 064: Automated FinCEN Form 111 XML/ASCII Electronic Filing Validator & Regulatory Transmission Packager | 2026-09-21 03:00 | commit PENDING
+- **Lens:** 5. Statutory grounding & regulatory alignment, 9. Auditability & evidentiary reproducibility, 3. Next best action & policy enforcement
+- **Goal / hypothesis:** Depository institutions submitting Suspicious Activity Reports (SARs) must strictly comply with the FinCEN BSA Electronic Filing (E-Filing) XML Schema 2.0 and Form 111 technical guidelines. Outputting raw Markdown or JSON is insufficient for direct regulatory transmission to the Financial Crimes Enforcement Network. Building an automated FinCEN XML 2.0 packager provides:
+  1. **FinCEN XML 2.0 Structure**: Generates well-formed XML documents with `<fc2:SuspiciousActivityReport>`, `<fc2:Activity>`, `<fc2:ActivityParty>` (Subject & Filing Institution), `<fc2:SuspiciousActivity>` (exposure, dates, violation codes), and `<fc2:NarrativeInformation>`.
+  2. **Statutory 5-Part Narrative Engine**: Formats the narrative into the required federal structure (1. Who, 2. What, 3. When, 4. Where, 5. Why/How) strictly bounded to FinCEN's 17,000 character ceiling.
+  3. **12-Rule BSA E-Filing Validator**: Verifies document identifier, 8-digit filing date, subject account presence, institution TIN/EIN, positive whole-dollar integer amount, and narrative length requirements.
+  4. **FastAPI Endpoints**: Added `GET /api/cases/{case_id}/sar/xml` (application/xml transmission) and `POST /api/compliance/validate-sar-xml` (schema and rule validation).
+- **Changes (files):**
+  - `src/cases/sar_exporter.py`: Created `FinCENSARXMLPackager`, `FinCENValidationIssue`, and `FinCENValidationReport`.
+  - `src/api/main.py`: Registered `sar_packager` and endpoints `GET /api/cases/{case_id}/sar/xml` and `POST /api/compliance/validate-sar-xml`.
+  - `tests/test_sar_exporter.py`: Created 5 unit tests testing XML structure, narrative generation, e-filing rule validation, tamper detection, and REST endpoints.
+- **Tests added/updated:**
+  - `tests/test_sar_exporter.py` (5 unit tests, all pass).
+  - Total unit test suite expanded from 248 to **253** tests across 52 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 248 -> **253** (100% pass rate across 52 test suites)
+  - Compliance & Transmission: FinCEN Form 111 XML 2.0 schema, 5-Part Narrative, 12-Rule BSA E-Filing Validator
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 253 passed across 52 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 063: Dynamic Multi-Tenant Role-Based Access Control (RBAC) & Fine-Grained Policy Authorization Matrix | 2026-09-21 02:45 | commit 396538e
 - **Lens:** 3. Next best action & policy enforcement, 5. Statutory grounding & regulatory alignment, 11. Agent architecture & engineering
 - **Goal / hypothesis:** In enterprise fraud operations and regulatory bank examinations, investigators, AML compliance officers, external auditors, and regulatory examiners must have strictly segregated access rights, action execution authorities, and PII exposure controls. By implementing dynamic multi-tenant RBAC and PII masking, the platform delivers:

@@ -72,6 +72,10 @@ from src.auth.rbac import (
     ROLE_PERMISSIONS,
 )
 
+# FinCEN Form 111 XML Packager
+from src.cases.sar_exporter import FinCENSARXMLPackager
+sar_packager = FinCENSARXMLPackager()
+
 # In-memory store for active cases & approvals
 active_cases: Dict[str, Dict[str, Any]] = {}
 pending_approvals: Dict[str, Dict[str, Any]] = {}
@@ -1214,6 +1218,36 @@ def authorize_case_action(
         "reason": reason,
     }
 
+
+class ValidateSARXMLRequest(BaseModel):
+    xml_content: str
+
+
+ValidateSARXMLRequest.model_rebuild()
+
+
+@app.get("/api/cases/{case_id}/sar/xml")
+def get_case_sar_xml(case_id: str, user: AuthUser = Depends(get_current_user)):
+    """Exports official FinCEN Form 111 XML 2.0 electronic filing document."""
+    if case_id in active_cases:
+        res = active_cases[case_id]
+    elif case_id in agent.client.store.case_pack:
+        res = agent.investigate_case(case_id)
+        active_cases[case_id] = res
+        case_manager.write_case_to_graph(res)
+    else:
+        raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
+
+    res_masked = mask_pii_dict(res, user)
+    xml_str = sar_packager.generate_sar_xml(res_masked)
+    return Response(content=xml_str, media_type="application/xml")
+
+
+@app.post("/api/compliance/validate-sar-xml")
+def validate_sar_xml_endpoint(req: ValidateSARXMLRequest):
+    """Validates an uploaded FinCEN SAR XML document against 12 mandatory BSA E-Filing criteria."""
+    report = sar_packager.validate_sar_xml(req.xml_content)
+    return report.to_dict()
 
 
 @app.post("/api/benchmark/run")
