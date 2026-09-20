@@ -53,6 +53,7 @@
 | **048** | `79beebc` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 175/175 (100%) | 0.008s | PASS | Dynamic knowledge graph triplet export (TigerGraph GSQL, Neo4j Cypher, RDF) (Q25) |
 | **049** | `ff5f3c0` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 182/182 (100%) | 0.008s | PASS | Active learning sample selector & hard-negative mining (entropy, margin) (Q26) |
 | **050** | `v0.45` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 182/182 (100%) | 0.008s | PASS | Checkpoint 8 Audit, 50% Milestone Review, and v0.45 Release Tag |
+| **051** | `TBD_COMMIT` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 188/188 (100%) | 0.008s | PASS | Multi-agent federation: specialized AML sub-agent & statutory grounding |
 
 ---
 

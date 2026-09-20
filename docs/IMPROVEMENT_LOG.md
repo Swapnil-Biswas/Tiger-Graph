@@ -1,3 +1,30 @@
+## Iteration 051: Multi-Agent Federation: Specialized AML Sub-Agent & Statutory Grounding | 2026-09-20 23:15 | commit TBD_COMMIT
+- **Lens:** 5. Regulatory compliance, BSA & SAR narrative & 11. Agent architecture & engineering
+- **Goal / hypothesis:** In enterprise risk operations, real-time fraud containment (blocking cards, declining transactions) must be decoupled from and federated with Anti-Money Laundering (AML) compliance (longitudinal structuring analysis, correspondent transit screening, FinCEN/FATF reporting). Implementing `AMLSpecialistAgent` in `src/agent/aml_agent.py` establishes a dedicated domain sub-agent that synthesizes multi-entity structuring (Q16), correspondent layering (Q20), and quasi-cash MCCs (Q21) into an immutable `AMLAssessment`. The sub-agent formulates statutory legal citations (`31 USC 5324(a)`, `31 CFR 1020.320`, `FATF Recommendation 16`), determines mandatory SAR obligations, and federates into `FraudInvestigatorAgent.investigate_case` as Step 13.
+- **Changes (files):**
+  - `src/agent/aml_agent.py`: Implemented `AMLSpecialistAgent` and `AMLAssessment` dataclass with multi-vector synthesis, statutory citation formatting, and FinCEN SAR mandate logic.
+  - `src/agent/graph.py`: Connected Step 13 multi-agent federation attaching `answer["aml_specialist"]`.
+  - `src/api/main.py`: Added `AMLAssessmentRequest` with `model_rebuild()`, `POST /api/agents/aml/assess`, and `GET /api/cases/{case_id}/aml-assessment`.
+  - `tests/test_aml_agent.py`: Created 6 unit tests covering clean baseline cases, structuring smurfing detection, high-risk corridor & quasi-cash screening, statutory narrative formatting, master agent federation, and REST API endpoints.
+- **Tests added/updated:**
+  - `tests/test_aml_agent.py` (6 unit tests, all pass).
+  - Total unit test suite expanded from 182 to **188** tests across 41 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 182 -> **188** (100% pass rate across 41 test suites)
+  - Multi-Agent Federation: Dedicated `AMLSpecialistAgent` integrated as Step 13 in master investigation workflow
+  - Statutory Grounding: Automated citations for 31 USC 5324(a), 31 CFR 1010.311, 31 CFR 1020.320
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (188/188)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Decoupling AML compliance into a dedicated specialized agent avoids overloading the fraud decision engine with complex multi-jurisdiction reporting logic while ensuring regulatory statutory requirements are rigorously satisfied.
+- **Follow-ups added to backlog:** Proceed to Iteration 052: Cyber-Forensics & Device Fingerprint Specialist Sub-Agent (Lens 4 & Lens 11).
+
 ## Iteration 050: Checkpoint 8 Milestone Review, Comprehensive 50-Iteration Audit & Release Tag v0.45 | 2026-09-20 23:10 | commit 9d48817
 - **Lens:** All 15 Evaluation Lenses & Submission Readiness & Milestone Audit
 - **Goal / hypothesis:** Reached the **50% completion milestone (50 of 100 iterations)** in our autonomous continuous improvement loop. Perform comprehensive architecture audit across all 15 Hackathon evaluation lenses, PRD functional specifications, and complete graph query catalog (Q1 through Q26). Verify that the system demonstrates:

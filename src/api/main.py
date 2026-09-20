@@ -174,6 +174,12 @@ class ActiveLearningMineRequest(BaseModel):
     max_per_merchant: int = 3
 
 
+class AMLAssessmentRequest(BaseModel):
+    case_id: str
+    as_of: Optional[str] = None
+    window_hours: float = 48.0
+
+
 StructuringCheckRequest.model_rebuild()
 ContagionCheckRequest.model_rebuild()
 PoolEmbeddingRequest.model_rebuild()
@@ -189,6 +195,7 @@ StreamingPruneRequest.model_rebuild()
 RefineInvestigationRequest.model_rebuild()
 TripletExportRequest.model_rebuild()
 ActiveLearningMineRequest.model_rebuild()
+AMLAssessmentRequest.model_rebuild()
 
 
 @app.get("/api/health")
@@ -737,6 +744,25 @@ def get_active_learning_candidates(
         as_of=as_of,
         max_scan=max_scan,
     )
+
+
+@app.post("/api/agents/aml/assess")
+def post_aml_assess(req: AMLAssessmentRequest):
+    """Executes specialized domain assessment by the AMLSpecialistAgent."""
+    from src.agent.aml_agent import AMLSpecialistAgent
+    aml_agent = AMLSpecialistAgent(client=agent.client)
+    res = aml_agent.assess_case(case_id=req.case_id, as_of=req.as_of, window_hours=req.window_hours)
+    return res.to_dict()
+
+
+@app.get("/api/cases/{case_id}/aml-assessment")
+def get_case_aml_assessment(case_id: str, as_of: Optional[str] = None, window_hours: float = 48.0):
+    """Retrieves specialized domain assessment by the AMLSpecialistAgent for a case."""
+    from src.agent.aml_agent import AMLSpecialistAgent
+    aml_agent = AMLSpecialistAgent(client=agent.client)
+    res = aml_agent.assess_case(case_id=case_id, as_of=as_of, window_hours=window_hours)
+    return res.to_dict()
+
 
 
 

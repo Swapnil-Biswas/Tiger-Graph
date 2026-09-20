@@ -186,10 +186,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 
 ## Phase 6: Multi-Agent Orchestration & Consensus Federation (Iterations 51–65)
 
-51. **[Multi-Agent Federation] Specialized Anti-Money Laundering (AML) Sub-Agent**
-    - *Goal:* Implement dedicated `AMLSpecialistAgent` in `src/agent/aml_agent.py` specializing in structuring patterns (Q16), FATF corridor screening (Q20), and FinCEN SAR narrative enrichment.
-    - *Files:* `src/agent/aml_agent.py`, `src/agent/orchestrator.py`, `tests/test_aml_agent.py`
-    - *Metric Impact:* Agent Architecture & Regulatory Compliance (Lens 5, Lens 11).
+51. **[DONE - Iteration 051] [Multi-Agent Federation] Specialized Anti-Money Laundering (AML) Sub-Agent**
+    - *Result:* Implemented `AMLSpecialistAgent` and `AMLAssessment` in `src/agent/aml_agent.py`. Synthesizes structuring patterns (Q16), correspondent banking corridors (Q20), and quasi-cash MCCs (Q21) into an immutable statutory assessment citing 31 USC 5324(a), 31 CFR 1010.311, 31 CFR 1020.320, and FATF Recommendation 16. Integrated as Step 13 in `FraudInvestigatorAgent.investigate_case`. Added API endpoints `POST /api/agents/aml/assess` and `GET /api/cases/{case_id}/aml-assessment`. Added 6 unit tests in `tests/test_aml_agent.py` (188/188 tests pass across 41 suites).
 
 52. **[Multi-Agent Federation] Cyber-Forensics & Device Fingerprint Specialist Sub-Agent**
     - *Goal:* Implement dedicated `CyberForensicsAgent` specializing in device sharing nexuses (Q4), Jaro-Winkler sybil resolution (Q23), and proxy rotation anomaly analysis.

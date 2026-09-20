@@ -517,4 +517,9 @@ class FraudInvestigatorAgent:
         refiner = GraphAugmentedSelfRefiner()
         answer = refiner.refine_investigation(answer)
 
+        # 13. MULTI-AGENT FEDERATION: SPECIALIZED AML SUB-AGENT ASSESSMENT
+        from src.agent.aml_agent import AMLSpecialistAgent
+        aml_agent = AMLSpecialistAgent(client=self.client)
+        answer["aml_specialist"] = aml_agent.assess_case(case_id, as_of=as_of).to_dict()
+
         return answer
