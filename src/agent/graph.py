@@ -26,6 +26,7 @@ from src.agent.state import (
 from src.agent.assess import UncertaintyAssessmentEngine
 from src.agent.decide import NextBestActionPlanner
 from src.agent.counterfactual import CounterfactualExplainer
+from src.cases.sar_generator import SARNarrativeGenerator
 
 
 class FraudInvestigatorAgent:
@@ -302,53 +303,17 @@ class FraudInvestigatorAgent:
 
         # 5. SAR (Suspicious Activity Report) Generation
         file_sar = any(a.action == "FILE_REPORT" for a in final_actions)
-        sar_record = None
-        if file_sar:
-            # Generate standalone 6-12 sentence SAR narrative covering Who, What, When, Where, How, and Why
-            activity_dates = [opened_at.split()[0], opened_at.split()[0]]
-            first_txn_date = txn_obj.get("ts", "").split()[0] if txn_obj else opened_at.split()[0]
-            if first_txn_date < activity_dates[0]:
-                activity_dates[0] = first_txn_date
-
-            subjects = [s for s in [cust_id, card_id] if s]
-            if sharing.get("cards"):
-                subjects.extend(sharing["cards"][:2])
-
-            sar_narrative = (
-                f"Between {activity_dates[0]} and {activity_dates[1]}, cardholder {cust_id} experienced unauthorized activity on card {card_id}. "
-                f"A total of {len(affected_txns)} transaction(s) amounting to ${exposure_usd:.2f} USD were executed under fraud pattern '{post_assessment.pattern}'. "
-                f"The primary flagged transaction {flagged_txn} (${txn_obj['amount']:.2f}) was initiated through the {txn_obj.get('channel')} channel. "
-            )
-            if new_ent.get("is_new_device"):
-                sar_narrative += f"Activity originated from a device profile ({dev_profile}) marked as New for this account. "
-            if new_ent.get("proxy_flag"):
-                sar_narrative += "Connection details indicate the usage of an anonymous or hidden proxy to obfuscate the perpetrator's origin. "
-            if is_shared_device:
-                sar_narrative += f"The same device profile was also observed across {sharing['distinct_cards_count']} other distinct cards, demonstrating coordinated compromise. "
-            if evidence_requests:
-                sar_narrative += f"The cardholder was contacted for transaction validation and stated: '{evidence_requests[0].assumed_response}'. "
-            sar_narrative += (
-                f"The activity represents a coordinated breach consistent with regulatory typology guidance. "
-                f"The financial institution has blocked card {card_id} to mitigate further loss and placed linked accounts under enhanced monitoring."
-            )
-
-            sar_record = {
-                "file": True,
-                "reason": f"Section 3a & Rule R2: Confirmed unauthorized fraud with exposure of ${exposure_usd:.2f} USD and multi-card linkage.",
-                "narrative": sar_narrative,
-                "subjects": list(set(subjects)),
-                "total_amount_usd": exposure_usd,
-                "activity_dates": activity_dates,
-            }
-        else:
-            sar_record = {
-                "file": False,
-                "reason": "Policy criteria for filing a Suspicious Activity Report were not met.",
-                "narrative": "",
-                "subjects": [],
-                "total_amount_usd": 0.0,
-                "activity_dates": [],
-            }
+        sar_record = SARNarrativeGenerator.generate_sar(
+            case_id=case_id,
+            verdict=post_assessment.verdict,
+            pattern=post_assessment.pattern,
+            exposure_usd=exposure_usd,
+            trigger_data=trigger_data,
+            graph_evidence=graph_evidence,
+            evidence_requests=evidence_requests,
+            as_of=as_of,
+            file_sar=file_sar,
+        )
 
         # 6. SUMMARY & STOP REASON
         if post_assessment.verdict == "fraud":

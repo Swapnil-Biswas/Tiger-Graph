@@ -1,4 +1,25 @@
-## Iteration 007: Enhanced Topological Graph Context Brief in GraphRAG | 2026-09-20 16:53 | commit pending
+## Iteration 008: Structured 5-Part FinCEN SAR Narrative Generator | 2026-09-20 16:57 | commit pending
+- **Lens:** 10. Case management & 9. Explainability
+- **Goal / hypothesis:** Financial Crimes Enforcement Network (FinCEN) and Bank Secrecy Act (BSA) regulatory compliance guidelines mandate that SAR filings clearly address the Five Essential Questions (Who, What, When, Where, Why) with structured sections. Replacing ad-hoc narrative strings with a formal `SARNarrativeGenerator` creates audit-ready narratives partitioned into 5 standardized sections: Subject Demographics, Suspicious Activity Summary, Chronology & Typology Mechanics, Investigative Findings & Policies Cited, and Law Enforcement Referral.
+- **Changes (files):**
+  - `src/cases/sar_generator.py`: Created `SARNarrativeGenerator` providing structured 5-part regulatory narratives, subject extraction, and non-filing safety gates.
+  - `src/agent/graph.py`: Integrated `SARNarrativeGenerator.generate_sar` into state machine workflow.
+  - `tests/test_sar_generator.py`: Added 2 unit tests covering filing structure and non-filing edge cases.
+  - Regenerated and validated all 20 benchmark case files in `cases/`.
+- **Tests added/updated:**
+  - `tests/test_sar_generator.py` (2 tests, pass).
+  - Total unit test suite expanded from 23 to 25 tests (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 23 -> **25** (100% pass rate)
+  - SAR Narrative Standard: 5-Part FinCEN Regulatory Compliance (Subject, Summary, Chronology, Findings, Actions)
+  - Valid Benchmark Answers: 20/20 (100%)
+  - Evidence Finding Citation Validity: 100.0%
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **What I learned / what surprised me:** Banking compliance teams and regulators require consistent section delimiters (`PART I` through `PART V`) to ingest SAR narratives into automated AML/BSA filing gateways without manual human reformatting.
+- **Follow-ups added to backlog:** Next implement Iteration 009: Cytoscape Visual Glyphs & Interactive Subgraph Node Expansion in UI (Lens 15: UI/UX).
+
+## Iteration 007: Enhanced Topological Graph Context Brief in GraphRAG | 2026-09-20 16:53 | commit a3b95f6
 - **Lens:** 7. GraphRAG quality & 1. Investigation accuracy
 - **Goal / hypothesis:** Raw transaction history alone provides weak context for detecting organized crime syndicates. Enriching the GraphRAG Context Assembler (`src/rag/assemble.py`) with explicit multi-card cluster scope, shared-device nexus blast radius, transaction burst spike ratios, synthetic circular flow indicators, and temporal `as_of` boundaries provides the agent with immediate topological awareness within the strict 3,000-character budget.
 - **Changes (files):**

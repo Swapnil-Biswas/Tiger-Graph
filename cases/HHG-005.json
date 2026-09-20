@@ -180,16 +180,17 @@
   "sar": {
     "file": true,
     "reason": "Section 3a & Rule R2: Confirmed unauthorized fraud with exposure of $100.07 USD and multi-card linkage.",
-    "narrative": "Between 2016-12-07 and 2016-12-08, cardholder C02923 experienced unauthorized activity on card C02923-K1. A total of 1 transaction(s) amounting to $100.07 USD were executed under fraud pattern 'card_not_present_new_device'. The primary flagged transaction 3523199 ($100.07) was initiated through the online channel. Activity originated from a device profile (iOS Device | iOS 9.3.5 | mobile safari 9.0 | 1024x768) marked as New for this account. The same device profile was also observed across 112 other distinct cards, demonstrating coordinated compromise. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C02923-K1 to mitigate further loss and placed linked accounts under enhanced monitoring.",
+    "narrative": "SUSPICIOUS ACTIVITY REPORT (SAR) - CASE HHG-005\n\nREGULATORY JURISDICTION: Financial Crimes Enforcement Network (FinCEN) / BSA\n\nPART I: SUBJECT INFORMATION & ACCOUNT TOPOLOGY\nPrimary subject customer ID C02923, operating payment card account C02923-K1. Device profile recorded: 'Unknown Device'. Topological investigation identified a coordinated device nexus: the same hardware/browser signature is shared across 112 distinct payment cards and 112 distinct customer profiles, indicating syndicate compromise.\n\nPART II: SUSPICIOUS ACTIVITY SUMMARY & FINANCIAL EXPOSURE\nTotal identified fraudulent exposure amounts to $100.07 USD. The primary flagged transaction 3523199 occurred on 2016-12-08 03:38:37. Activity exhibits unauthorized electronic card-not-present exploitation under pattern classification 'card_not_present_new_device'.\n\nPART III: CHRONOLOGY & TYPOLOGY PATTERN MECHANICS\nInitial alert triggered via risk_score ('Real-time model scored transaction 3523199 ($100.07, online) at 0.54. Review and decide.'). Velocity analysis revealed 0 transaction(s) within the 1-hour window and 0 within 24 hours (velocity spike ratio: 0.0).\n\nPART IV: INVESTIGATIVE FINDINGS, GRAPH EVIDENCE & POLICIES CITED\nGraph traversal confirmed pattern typology 'card_not_present_new_device'. Filing is mandated pursuant to Bank Fraud Policy Section 3a (Confirmed Unauthorized Fraud), Policy Rule R2 (Customer Disavowal), and Policy Rule R6 (Syndicate Multi-Card Compromise).\n\nPART V: ACTIONS TAKEN & RECOMMENDED DISPOSITION\nThe financial institution has immediately blocked payment card C02923-K1, declined pending authorizations, and placed all connected accounts and shared devices under enhanced automated surveillance. This case is referred to law enforcement and FinCEN for coordinated syndicate interdiction.",
     "subjects": [
-      "C00450-K1",
-      "C00329-K2",
       "C02923",
-      "C02923-K1"
+      "C00329-K2",
+      "C00750-K2",
+      "C02923-K1",
+      "C00450-K1"
     ],
     "total_amount_usd": 100.07,
     "activity_dates": [
-      "2016-12-07",
+      "2016-12-08",
       "2016-12-08"
     ]
   },

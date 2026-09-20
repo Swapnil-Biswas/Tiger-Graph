@@ -41,11 +41,11 @@
         "id": "EV-04",
         "source": "graph",
         "ref": "query:similar_cases(card=C05876-K2)",
-        "claim": "Found 5 prior closed case(s) touching related entities: CC-0003, CC-2370, CC-0445.",
+        "claim": "Found 5 prior closed case(s) touching related entities: CC-0003, CC-2370, CC-3168.",
         "entity_ids": [
           "CC-0003",
           "CC-2370",
-          "CC-0445"
+          "CC-3168"
         ]
       },
       {
@@ -73,7 +73,7 @@
     "similar_prior_cases": [
       "CC-0003",
       "CC-2370",
-      "CC-0445"
+      "CC-3168"
     ],
     "summary": "Investigation cleared the alert for card C05876-K2 as legitimate activity. Transaction characteristics match cardholder baseline history; customer confirmation confirmed authorized use.\n\nDecision Sensitivity (Counterfactual Boundaries):\n  1. [Unrecognized Device / Proxy]: Transaction executed from anonymous VPN proxy or unknown mobile OS -> Would trigger Rule R1 step-up authentication challenge and elevate risk points by +30.0.\n  2. [Cross-Card Cluster Sharing]: Device or billing IP detected across \u2265 2 other compromised accounts -> Would trigger Rule R6 syndicate ring alert, escalating to immediate card hold.",
     "written_to_graph": true,
@@ -123,7 +123,7 @@
     "activity_dates": []
   },
   "stop_reason": "Customer confirmation and baseline habit alignment verified legitimacy; alert cleared without fraud.",
-  "context_brief": "=== INVESTIGATION CONTEXT BRIEF: CASE HHG-012 ===\nTRIGGER: risk_score | Subject: Card C05876-K2, Customer C05876\nTrigger Text: Real-time model scored transaction 3553342 ($30.91, in billing region 494.0) at 0.55. Review and decide.\nFlagged Transaction: 3553342 (Risk Score: 0.55)\n\n--- GRAPH TOPOLOGY & SYNDICATE METRICS ---\n- Subgraph Scope: 1 card(s), 1 customer(s)\n- Transaction Burst: 0 txn(s)/1h, 0 txn(s)/24h (Spike Ratio: 0.0)\n- Temporal Isolation: Graph expansion strictly bounded as_of 2016-12-18 05:00:31\n\n--- CONNECTED GRAPH EVIDENCE ---\n[EV-01] (graph/query:get_txn(3553342)): Flagged transaction of $30.91 executed via in_person channel (risk score: 0.55).\n[EV-02] (graph/query:entity_profile(card_id=C05876-K2)): Card baseline: 991 prior transactions totaling $79341.74 (median: $49.05, typical regions: ['325.0', '272.0']).\n[EV-03] (graph/query:velocity(card_id=C05876-K2)): Velocity activity: 0 transaction(s) in last 1h, 0 in last 24h (spike ratio: 0.0).\n[EV-04] (graph/query:similar_cases(card=C05876-K2)): Found 5 prior closed case(s) touching related entities: CC-0003, CC-2370, CC-0445.\n\n--- GRAPH PATTERN EVALUATION ---\nTop Matching Typology: account_takeover\n- card_testing: NO_MATCH (conf: 0.0)\n- card_not_present_fraud: NO_MATCH (conf: 0.1)\n- card_not_present_new_device: NO_MATCH (conf: 0.1)\n- out_of_region_use: NO_MATCH (conf: 0.1)\n\n--- APPLICABLE FRAUD POLICY CLAUSES ---\n[TYP-OUT-OF-REGION] Pattern 4: Out of Region Use: Card-present purchases in a billing region the cardholder has no history in, while normal activity continues at home. Se...\n[POLICY-R6] Rule R6: Shared Origin & Connected Ring: When several cards show fraud from the same device profile, the same billing region, or the same recipient email in one ...\n[TYP-ACCOUNT-TAKEOVER] Pattern 5: Account Takeover: Mixed-channel activity inconsistent with the cardholder, with device and match-flag anomalies, pointing to stolen creden...\n\n--- SIMILAR HISTORICAL CASES (CASE MEMORY) ---\nNo directly matching historical cases found.",
+  "context_brief": "=== INVESTIGATION CONTEXT BRIEF: CASE HHG-012 ===\nTRIGGER: risk_score | Subject: Card C05876-K2, Customer C05876\nTrigger Text: Real-time model scored transaction 3553342 ($30.91, in billing region 494.0) at 0.55. Review and decide.\nFlagged Transaction: 3553342 (Risk Score: 0.55)\n\n--- GRAPH TOPOLOGY & SYNDICATE METRICS ---\n- Subgraph Scope: 1 card(s), 1 customer(s)\n- Transaction Burst: 0 txn(s)/1h, 0 txn(s)/24h (Spike Ratio: 0.0)\n- Temporal Isolation: Graph expansion strictly bounded as_of 2016-12-18 05:00:31\n\n--- CONNECTED GRAPH EVIDENCE ---\n[EV-01] (graph/query:get_txn(3553342)): Flagged transaction of $30.91 executed via in_person channel (risk score: 0.55).\n[EV-02] (graph/query:entity_profile(card_id=C05876-K2)): Card baseline: 991 prior transactions totaling $79341.74 (median: $49.05, typical regions: ['325.0', '272.0']).\n[EV-03] (graph/query:velocity(card_id=C05876-K2)): Velocity activity: 0 transaction(s) in last 1h, 0 in last 24h (spike ratio: 0.0).\n[EV-04] (graph/query:similar_cases(card=C05876-K2)): Found 5 prior closed case(s) touching related entities: CC-0003, CC-2370, CC-3168.\n\n--- GRAPH PATTERN EVALUATION ---\nTop Matching Typology: account_takeover\n- card_testing: NO_MATCH (conf: 0.0)\n- card_not_present_fraud: NO_MATCH (conf: 0.1)\n- card_not_present_new_device: NO_MATCH (conf: 0.1)\n- out_of_region_use: NO_MATCH (conf: 0.1)\n\n--- APPLICABLE FRAUD POLICY CLAUSES ---\n[TYP-OUT-OF-REGION] Pattern 4: Out of Region Use: Card-present purchases in a billing region the cardholder has no history in, while normal activity continues at home. Se...\n[POLICY-R6] Rule R6: Shared Origin & Connected Ring: When several cards show fraud from the same device profile, the same billing region, or the same recipient email in one ...\n[TYP-ACCOUNT-TAKEOVER] Pattern 5: Account Takeover: Mixed-channel activity inconsistent with the cardholder, with device and match-flag anomalies, pointing to stolen creden...\n\n--- SIMILAR HISTORICAL CASES (CASE MEMORY) ---\nNo directly matching historical cases found.",
   "tool_calls": 7,
   "tokens": 2250,
   "latency_s": 0.01

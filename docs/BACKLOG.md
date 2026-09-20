@@ -37,10 +37,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 7. **[DONE - Iteration 007] [GraphRAG] Enhanced Topological Expansion in Context Brief**
    - *Result:* Upgraded `ContextAssembler.assemble_brief` with structured graph topology metrics (cluster scope, device nexus blast radius, velocity burst spike ratio, cycle detection, temporal boundaries). Integrated into `FraudInvestigatorAgent.investigate_case`. Added test in `tests/test_phase3.py` (23 tests, 100% pass).
 
-8. **[Case Management] Enhanced FinCEN SAR Narrative Generator with Structured Sections**
-   - *Goal:* Structure SAR narratives with formal regulatory sections: Subject Demographics, Suspicious Activity Timeline, Topology Matrix, Regulatory Impact.
-   - *Files:* `src/cases/manager.py`, `src/agent/graph.py`
-   - *Metric Impact:* Explainability & Case Management score.
+8. **[DONE - Iteration 008] [Case Management] Structured 5-Part FinCEN SAR Narrative Generator**
+   - *Result:* Built `src/cases/sar_generator.py` generating standard 5-part BSA/FinCEN regulatory narratives (Subject, Exposure Summary, Chronology, Findings & Policies, Disposition). Added 2 unit tests in `tests/test_sar_generator.py` (25 tests, 100% pass).
 
 9. **[UI/UX] Cytoscape Custom Node Glyphs & Interactive Subgraph Expansion**
    - *Goal:* Add distinct SVG icon glyphs for Card, Customer, Device, Transaction, and Case vertices with on-click node expansion.
@@ -48,26 +46,7 @@ Ranked by expected impact on Hackathon Judging Criteria:
    - *Metric Impact:* Demo Quality (10%).
 
 10. **[Release Tag v0.1] Submission-Ready Checkpoint at Iteration 10**
-
-6. **[Testing] Benchmark Run-to-Run Self-Consistency Harness**
-   - *Goal:* Verify 0% recommendation variance across repeated runs of all 20 benchmark cases.
-   - *Files:* `eval/benchmark_consistency.py`
-   - *Metric Impact:* Engineering robustness.
-
-7. **[GraphRAG] Enhanced Topological Expansion in Context Brief**
-   - *Goal:* Incorporate 2-hop community subgraph statistics and PageRank centrality into the assembled LLM brief.
-   - *Files:* `src/rag/assemble.py`, `src/rag/retrieve.py`
-   - *Metric Impact:* GraphRAG quality & retrieval relevance.
-
-8. **[Case Management] Enhanced FinCEN SAR Narrative Generator**
-   - *Goal:* Structure SAR narratives with formal regulatory sections: Subject Demographics, Suspicious Activity Timeline, Topology Matrix, Regulatory Impact.
-   - *Files:* `src/cases/manager.py`, `src/agent/graph.py`
-   - *Metric Impact:* Explainability & Case Management score.
-
-9. **[UI/UX] Cytoscape Custom Node Glyphs & Interactive Subgraph Expansion**
-   - *Goal:* Add distinct SVG icon glyphs for Card, Customer, Device, Transaction, and Case vertices with on-click node expansion.
-   - *Files:* `ui/app.js`, `ui/style.css`
-   - *Metric Impact:* Demo Quality (10%).
+    - *Goal:* Verify all gates, tag repository with `v0.1`, write state-of-project summary, and confirm zero regression.
 
 10. **[Performance] GSQL Analytical Query Caching & Batch Ingestion**
     - *Goal:* Sub-10ms latency for batch case runs.

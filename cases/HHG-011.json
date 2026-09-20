@@ -171,12 +171,13 @@
   "sar": {
     "file": true,
     "reason": "Section 3a & Rule R2: Confirmed unauthorized fraud with exposure of $131.30 USD and multi-card linkage.",
-    "narrative": "Between 2016-12-29 and 2016-12-29, cardholder C11923 experienced unauthorized activity on card C11923-K2. A total of 1 transaction(s) amounting to $131.30 USD were executed under fraud pattern 'card_testing'. The primary flagged transaction 3583368 ($131.30) was initiated through the online channel. Activity originated from a device profile (SM-G610F Build/NRD90M | UnknownOS | chrome 66.0 for android | UnknownScreen) marked as New for this account. The same device profile was also observed across 4 other distinct cards, demonstrating coordinated compromise. The cardholder was contacted for transaction validation and stated: 'Cardholder provided response for analyst_info under scenario denies'. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C11923-K2 to mitigate further loss and placed linked accounts under enhanced monitoring.",
+    "narrative": "SUSPICIOUS ACTIVITY REPORT (SAR) - CASE HHG-011\n\nREGULATORY JURISDICTION: Financial Crimes Enforcement Network (FinCEN) / BSA\n\nPART I: SUBJECT INFORMATION & ACCOUNT TOPOLOGY\nPrimary subject customer ID C11923, operating payment card account C11923-K2. Device profile recorded: 'Unknown Device'. Topological investigation identified a coordinated device nexus: the same hardware/browser signature is shared across 4 distinct payment cards and 4 distinct customer profiles, indicating syndicate compromise.\n\nPART II: SUSPICIOUS ACTIVITY SUMMARY & FINANCIAL EXPOSURE\nTotal identified fraudulent exposure amounts to $131.30 USD. The primary flagged transaction 3583368 occurred on 2016-12-29 06:27:44. Activity exhibits unauthorized electronic card-not-present exploitation under pattern classification 'card_testing'.\n\nPART III: CHRONOLOGY & TYPOLOGY PATTERN MECHANICS\nInitial alert triggered via customer_report ('Customer C11923 message: 'I never made this $131.30 purchase. Please check my card.' Refers to 3583368.'). Velocity analysis revealed 0 transaction(s) within the 1-hour window and 0 within 24 hours (velocity spike ratio: 0.0).\n\nPART IV: INVESTIGATIVE FINDINGS, GRAPH EVIDENCE & POLICIES CITED\nCardholder was contacted via out-of-band verification and affirmed: 'Cardholder provided response for analyst_info under scenario denies'. Graph traversal confirmed pattern typology 'card_testing'. Filing is mandated pursuant to Bank Fraud Policy Section 3a (Confirmed Unauthorized Fraud), Policy Rule R2 (Customer Disavowal), and Policy Rule R6 (Syndicate Multi-Card Compromise).\n\nPART V: ACTIONS TAKEN & RECOMMENDED DISPOSITION\nThe financial institution has immediately blocked payment card C11923-K2, declined pending authorizations, and placed all connected accounts and shared devices under enhanced automated surveillance. This case is referred to law enforcement and FinCEN for coordinated syndicate interdiction.",
     "subjects": [
       "C03938-K1",
-      "C11923",
+      "C11923-K2",
       "C05595-K1",
-      "C11923-K2"
+      "C11923",
+      "C05678-K1"
     ],
     "total_amount_usd": 131.3,
     "activity_dates": [

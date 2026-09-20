@@ -163,16 +163,17 @@
   "sar": {
     "file": true,
     "reason": "Section 3a & Rule R2: Confirmed unauthorized fraud with exposure of $55.68 USD and multi-card linkage.",
-    "narrative": "Between 2016-12-19 and 2016-12-20, cardholder C13171 experienced unauthorized activity on card C13171-K2. A total of 1 transaction(s) amounting to $55.68 USD were executed under fraud pattern 'card_not_present_fraud'. The primary flagged transaction 3558054 ($55.68) was initiated through the online channel. The same device profile was also observed across 171 other distinct cards, demonstrating coordinated compromise. The cardholder was contacted for transaction validation and stated: 'Cardholder provided response for analyst_info under scenario denies'. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C13171-K2 to mitigate further loss and placed linked accounts under enhanced monitoring.",
+    "narrative": "SUSPICIOUS ACTIVITY REPORT (SAR) - CASE HHG-008\n\nREGULATORY JURISDICTION: Financial Crimes Enforcement Network (FinCEN) / BSA\n\nPART I: SUBJECT INFORMATION & ACCOUNT TOPOLOGY\nPrimary subject customer ID C13171, operating payment card account C13171-K2. Device profile recorded: 'Unknown Device'. Topological investigation identified a coordinated device nexus: the same hardware/browser signature is shared across 171 distinct payment cards and 171 distinct customer profiles, indicating syndicate compromise.\n\nPART II: SUSPICIOUS ACTIVITY SUMMARY & FINANCIAL EXPOSURE\nTotal identified fraudulent exposure amounts to $55.68 USD. The primary flagged transaction 3558054 occurred on 2016-12-20 03:08:56. Activity exhibits unauthorized electronic card-not-present exploitation under pattern classification 'card_not_present_fraud'.\n\nPART III: CHRONOLOGY & TYPOLOGY PATTERN MECHANICS\nInitial alert triggered via customer_report ('Customer C13171 message: 'I never made this $55.68 purchase. Please check my card.' Refers to 3558054.'). Velocity analysis revealed 0 transaction(s) within the 1-hour window and 0 within 24 hours (velocity spike ratio: 0.0).\n\nPART IV: INVESTIGATIVE FINDINGS, GRAPH EVIDENCE & POLICIES CITED\nCardholder was contacted via out-of-band verification and affirmed: 'Cardholder provided response for analyst_info under scenario denies'. Graph traversal confirmed pattern typology 'card_not_present_fraud'. Filing is mandated pursuant to Bank Fraud Policy Section 3a (Confirmed Unauthorized Fraud), Policy Rule R2 (Customer Disavowal), and Policy Rule R6 (Syndicate Multi-Card Compromise).\n\nPART V: ACTIONS TAKEN & RECOMMENDED DISPOSITION\nThe financial institution has immediately blocked payment card C13171-K2, declined pending authorizations, and placed all connected accounts and shared devices under enhanced automated surveillance. This case is referred to law enforcement and FinCEN for coordinated syndicate interdiction.",
     "subjects": [
-      "C00027-K1",
-      "C13171-K2",
       "C00036-K1",
-      "C13171"
+      "C00073-K1",
+      "C13171-K2",
+      "C13171",
+      "C00027-K1"
     ],
     "total_amount_usd": 55.68,
     "activity_dates": [
-      "2016-12-19",
+      "2016-12-20",
       "2016-12-20"
     ]
   },
@@ -180,5 +181,5 @@
   "context_brief": "=== INVESTIGATION CONTEXT BRIEF: CASE HHG-008 ===\nTRIGGER: customer_report | Subject: Card C13171-K2, Customer C13171\nTrigger Text: Customer C13171 message: 'I never made this $55.68 purchase. Please check my card.' Refers to 3558054.\nFlagged Transaction: 3558054 (Risk Score: nan)\n\n--- GRAPH TOPOLOGY & SYNDICATE METRICS ---\n- Subgraph Scope: 10 card(s), 11 customer(s)\n- Device Nexus: Shared across 171 cards / 171 customers (Blast Radius: HIGH)\n- Transaction Burst: 0 txn(s)/1h, 0 txn(s)/24h (Spike Ratio: 0.0)\n- Temporal Isolation: Graph expansion strictly bounded as_of 2016-12-20 03:08:56\n\n--- CONNECTED GRAPH EVIDENCE ---\n[EV-01] (graph/query:get_txn(3558054)): Flagged transaction of $55.68 executed via online channel (risk score: 0.38).\n[EV-02] (graph/query:entity_profile(card_id=C13171-K2)): Card baseline: 928 prior transactions totaling $50362.89 (median: $39.42, typical regions: ['284.0', '465.0']).\n[EV-03] (graph/query:velocity(card_id=C13171-K2)): Velocity activity: 0 transaction(s) in last 1h, 0 in last 24h (spike ratio: 0.0).\n[EV-04] (graph/query:device_sharing(UnknownDevice | UnknownOS...)): Device profile is shared across 171 cards and 171 customers.\n[EV-05] (graph/query:pattern_match(card_not_present_fraud)): Pattern signature match for 'card_not_present_fraud' with confidence 0.70.\n[EV-06] (graph/query:similar_cases(card=C13171-K2)): Found 5 prior closed case(s) touching related entities: CC-0056, CC-0467, CC-0772.\n\n--- GRAPH PATTERN EVALUATION ---\nTop Matching Typology: card_not_present_fraud\n- card_testing: NO_MATCH (conf: 0.5)\n- card_not_present_fraud: MATCH (conf: 0.7)\n- card_not_present_new_device: NO_MATCH (conf: 0.1)\n- out_of_region_use: NO_MATCH (conf: 0.1)\n\n--- APPLICABLE FRAUD POLICY CLAUSES ---\n[POLICY-R5] Rule R5: Card Testing Sequence: Three or more small online authorizations on one card within an hour, followed by a larger purchase: recommend DECLINE_T...\n[POLICY-R10] Rule R10: Restrictions on BLOCK_ALL_CARDS: Never recommend BLOCK_ALL_CARDS unless at least two of the customer's cards show confirmed fraud or the customer's crede...\n[TYP-CARD-TESTING] Pattern 1: Card Testing Signature: A stolen card number is checked before use: three or more tiny online authorizations, often under $5, then a larger purc...\n\n--- SIMILAR HISTORICAL CASES (CASE MEMORY) ---\nNo directly matching historical cases found.",
   "tool_calls": 8,
   "tokens": 2400,
-  "latency_s": 0.05
+  "latency_s": 0.04
 }
