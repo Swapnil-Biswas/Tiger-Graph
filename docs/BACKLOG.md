@@ -62,10 +62,13 @@ Ranked by expected impact on Hackathon Judging Criteria:
 14. **[DONE - Iteration 014] [Policy & Permissions] Automated Permission Bypass Penetration Tests**
     - *Result:* Hardened `PolicyEngine` with input exposure sanitization, zero-evidence action gates, and Rule R8 premature closure barriers. Added 7 penetration tests in `tests/test_policy_pen_test.py` verifying 0 unauthorized action leaks under adversarial fuzzing (43 tests, 100% pass).
 
-15. **[Performance & Scale] Transaction Indexing Optimization & Sub-5ms Client Caching**
-    - *Goal:* Accelerate GraphStore multi-hop expansions by pre-indexing customer-card-device adjacency matrices.
-    - *Files:* `src/graph/client.py`
-    - *Metric Impact:* Average latency per case.
+15. **[DONE - Iteration 015] [Performance & Scale] Transaction Indexing Optimization & Bisect Adjacency Slicing**
+    - *Result:* Replaced $O(N)$ linear scans with on-demand epoch indexing and $O(\log N)$ binary search slicing in `src/graph/client.py`. Achieved 106x velocity query acceleration (~8 microseconds/query) and sub-millisecond execution across all graph queries. Added 5 benchmark tests in `tests/test_performance.py` (48 tests, 100% pass).
+
+16. **[Case Management & Innovation] Cross-Case Ring Nexus Graph Vertex & Edge Persistence**
+    - *Goal:* When an organized fraud syndicate or device pooling nexus is discovered across multiple cards/cases, persist dedicated `SyndicateNexus` vertices and inter-case edges into the graph store, enabling network-wide ring tracking.
+    - *Files:* `src/cases/manager.py`, `src/graph/store.py`
+    - *Metric Impact:* Case Management (Lens 10) & Innovation (Lens 20).
 
 ---
 

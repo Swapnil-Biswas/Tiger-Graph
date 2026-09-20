@@ -9,6 +9,7 @@ All queries strictly enforce temporal isolation via 'as_of' parameter.
 import os
 import sys
 import math
+import bisect
 from datetime import datetime
 from collections import defaultdict, Counter
 from typing import Dict, List, Set, Any, Optional, Union
@@ -73,6 +74,36 @@ class GraphClient:
                 if self.store is None:
                     self.store = GraphStore.load_cache_or_build()
 
+    def _get_card_epochs(self, card_id: str) -> List[int]:
+        if not hasattr(self.store, "_card_epochs"):
+            self.store._card_epochs = {}
+        epochs = self.store._card_epochs.get(card_id)
+        if epochs is None:
+            txns = self.store.txns_by_card.get(card_id, [])
+            epochs = [t["epoch_s"] for t in txns]
+            self.store._card_epochs[card_id] = epochs
+        return epochs
+
+    def _get_cust_epochs(self, cust_id: str) -> List[int]:
+        if not hasattr(self.store, "_cust_epochs"):
+            self.store._cust_epochs = {}
+        epochs = self.store._cust_epochs.get(cust_id)
+        if epochs is None:
+            txns = self.store.txns_by_customer.get(cust_id, [])
+            epochs = [t["epoch_s"] for t in txns]
+            self.store._cust_epochs[cust_id] = epochs
+        return epochs
+
+    def _get_dev_epochs(self, dev_id: str) -> List[int]:
+        if not hasattr(self.store, "_dev_epochs"):
+            self.store._dev_epochs = {}
+        epochs = self.store._dev_epochs.get(dev_id)
+        if epochs is None:
+            txns = self.store.txns_by_device.get(dev_id, [])
+            epochs = [t["epoch_s"] for t in txns]
+            self.store._dev_epochs[dev_id] = epochs
+        return epochs
+
     # =========================================================================
     # Q1: entity_profile
     # Baseline transaction history, typical amounts, typical regions, channels
@@ -90,11 +121,15 @@ class GraphClient:
                 pass  # fallback to embedded
 
         as_of_epoch = parse_as_of_epoch(as_of)
-        txns = []
         if entity_type == "customer":
-            txns = [t for t in self.store.txns_by_customer.get(entity_id, []) if t["epoch_s"] <= as_of_epoch]
+            all_txns = self.store.txns_by_customer.get(entity_id, [])
+            epochs = self._get_cust_epochs(entity_id)
         else:
-            txns = [t for t in self.store.txns_by_card.get(entity_id, []) if t["epoch_s"] <= as_of_epoch]
+            all_txns = self.store.txns_by_card.get(entity_id, [])
+            epochs = self._get_card_epochs(entity_id)
+
+        idx = bisect.bisect_right(epochs, as_of_epoch)
+        txns = all_txns[:idx]
 
         if not txns:
             return {
@@ -157,13 +192,21 @@ class GraphClient:
         window_sec = window_hours * 3600
 
         all_card_txns = self.store.txns_by_card.get(card_id, [])
-        historical_txns = [t for t in all_card_txns if t["epoch_s"] <= as_of_epoch]
+        epochs = self._get_card_epochs(card_id)
+        hi = bisect.bisect_right(epochs, as_of_epoch)
+        historical_txns = all_card_txns[:hi]
 
-        prior_txns = [t for t in historical_txns if (t_epoch - window_sec) <= t["epoch_s"] < t_epoch]
-        succeeding_txns = [t for t in historical_txns if t_epoch < t["epoch_s"] <= (t_epoch + window_sec)]
+        lo_prec = bisect.bisect_left(epochs, t_epoch - window_sec, 0, hi)
+        hi_prec = bisect.bisect_left(epochs, t_epoch, lo_prec, hi)
+        prior_txns = all_card_txns[lo_prec:hi_prec]
+
+        lo_succ = bisect.bisect_right(epochs, t_epoch, 0, hi)
+        hi_succ = bisect.bisect_right(epochs, t_epoch + window_sec, lo_succ, hi)
+        succeeding_txns = all_card_txns[lo_succ:hi_succ]
 
         # Baseline stats for z-score
-        prior_amounts = [t["amount"] for t in historical_txns if t["epoch_s"] < t_epoch]
+        prior_cutoff = bisect.bisect_left(epochs, t_epoch, 0, hi)
+        prior_amounts = [t["amount"] for t in all_card_txns[:prior_cutoff]]
         z_score = 0.0
         if len(prior_amounts) >= 3:
             avg_amt = sum(prior_amounts) / len(prior_amounts)
@@ -193,7 +236,9 @@ class GraphClient:
         Q3: Velocity burst detection across time windows (5m, 1h, 24h, 7d) prior to as_of.
         """
         as_of_epoch = parse_as_of_epoch(as_of)
-        all_txns = [t for t in self.store.txns_by_card.get(card_id, []) if t["epoch_s"] <= as_of_epoch]
+        all_card_txns = self.store.txns_by_card.get(card_id, [])
+        epochs = self._get_card_epochs(card_id)
+        hi = bisect.bisect_right(epochs, as_of_epoch)
 
         windows = {
             "5m": 300,
@@ -204,7 +249,8 @@ class GraphClient:
         res = {"card_id": card_id, "windows": {}}
 
         for w_name, w_sec in windows.items():
-            window_txns = [t for t in all_txns if (as_of_epoch - w_sec) <= t["epoch_s"] <= as_of_epoch]
+            lo = bisect.bisect_left(epochs, as_of_epoch - w_sec, 0, hi)
+            window_txns = all_card_txns[lo:hi]
             res["windows"][w_name] = {
                 "count": len(window_txns),
                 "total_usd": round(sum(t["amount"] for t in window_txns), 2),
@@ -228,10 +274,13 @@ class GraphClient:
         Also retrieves prior closed cases touching this device profile.
         """
         as_of_epoch = parse_as_of_epoch(as_of)
-        all_dev_txns = [t for t in self.store.txns_by_device.get(device_profile_id, []) if t["epoch_s"] <= as_of_epoch]
+        all_dev_txns = self.store.txns_by_device.get(device_profile_id, [])
+        epochs = self._get_dev_epochs(device_profile_id)
+        idx = bisect.bisect_right(epochs, as_of_epoch)
+        dev_txns = all_dev_txns[:idx]
 
-        cards_seen = sorted(list(set(t["card_id"] for t in all_dev_txns)))
-        customers_seen = sorted(list(set(t["customer_id"] for t in all_dev_txns)))
+        cards_seen = sorted(list(set(t["card_id"] for t in dev_txns)))
+        customers_seen = sorted(list(set(t["customer_id"] for t in dev_txns)))
 
         # Cases touching this device
         prior_cases = []
@@ -336,7 +385,11 @@ class GraphClient:
         cust_id = txn["customer_id"]
         t_epoch = txn["epoch_s"]
 
-        cust_txns = [t for t in self.store.txns_by_customer.get(cust_id, []) if t["epoch_s"] < t_epoch and t["epoch_s"] <= as_of_epoch]
+        all_cust_txns = self.store.txns_by_customer.get(cust_id, [])
+        epochs = self._get_cust_epochs(cust_id)
+        cutoff = min(t_epoch - 1, as_of_epoch)
+        hi = bisect.bisect_right(epochs, cutoff)
+        cust_txns = all_cust_txns[:hi]
 
         prior_devices = set(t["device_profile"] for t in cust_txns if t["device_profile"])
         prior_regions = set(t["addr1"] for t in cust_txns if t["addr1"])

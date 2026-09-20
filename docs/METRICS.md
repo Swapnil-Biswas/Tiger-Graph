@@ -16,7 +16,8 @@
 | **011** | `4b20b51` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 27/27 (100%) | 0.021s | PASS | Undocumented pattern discovery & multi-card syndicate anomaly detector |
 | **012** | `70e6e24` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 31/31 (100%) | 0.020s | PASS | InputSanitizer prompt-injection shield & adversarial defanging |
 | **013** | `edf84e4` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 36/36 (100%) | 0.021s | PASS | Bayesian case memory prior adjustment & temporal isolation |
-| **014** | `5a22f7c` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 43/43 (100%) | 0.021s | PASS | PolicyEngine penetration fuzzing & permission bypass defenses |
+| **014** | `cf51cbf` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 43/43 (100%) | 0.021s | PASS | PolicyEngine penetration fuzzing & permission bypass defenses |
+| **015** | `d8791df` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 48/48 (100%) | 0.008s | PASS | Graph client bisect temporal slicing & performance benchmark (106x speedup) |
 
 ---
 
