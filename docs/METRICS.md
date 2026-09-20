@@ -23,7 +23,8 @@
 | **018** | `90415ee` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 55/55 (100%) | 0.008s | PASS | GraphRAG BM25 & n-gram policy retrieval optimization (1.0000 MRR) |
 | **019** | `0d5b1c5` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 59/59 (100%) | 0.050s | PASS | Automated component ablation study harness (Graph, Memory, Policy) |
 | **020** | `08e92de` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 59/59 (100%) | 0.015s | PASS | Checkpoint 3 Audit, State of the Project, and v0.2 Release Tag |
-| **021** | pending | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 63/63 (100%) | 0.012s | PASS | Adaptive graph query budgeting & traversal pruning |
+| **021** | `18b2e5a` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 63/63 (100%) | 0.012s | PASS | Adaptive graph query budgeting & traversal pruning |
+| **022** | pending | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 65/65 (100%) | 0.012s | PASS | Real-time SSE investigation streaming (11 event types) |
 
 ---
 

@@ -389,11 +389,14 @@ function addTimelineStep(stepName, message) {
   const icons = {
     TRIGGER: "🎯",
     OPEN_CASE: "📂",
+    BUDGET_PLAN: "📊",
     RETRIEVE_MEMORY: "🧠",
     INVESTIGATE: "🔍",
+    GRAPHRAG_BM25: "📚",
     ASSESS: "⚖️",
     REQUEST_EVIDENCE: "💬",
     DECIDE_ACTIONS: "🛡️",
+    SELF_CRITIQUE: "🔍",
     COMPLETE: "✅"
   };
 

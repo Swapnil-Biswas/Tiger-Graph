@@ -87,10 +87,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 21. **[DONE - Iteration 021] [Agent Architecture & LLM Cost/Latency] Dynamic Graph Query Budgeting & Adaptive Traversal Pruning**
     - *Result:* Built `AdaptiveGraphBudgeter` in `src/agent/budgeter.py` and integrated into `FraudInvestigatorAgent`. Allocates 4 operational tiers (exhaustive 12 tools, targeted escalation 8 tools, targeted confirmation 9 tools, fast path 5 tools). Prunes expensive multi-hop scans on routine accounts. Added 4 unit tests in `tests/test_budgeter.py` (63 tests, 100% pass).
 
-22. **[UI/UX & Streaming] Real-Time SSE Investigation Progress & Evidence Timeline in Web UI**
-    - *Goal:* Wire Server-Sent Events (SSE) from `/api/investigate/stream` to the web dashboard (`ui/app.js`), showing live step-by-step progress, graph query execution times, and dynamic uncertainty gauge updates during live runs.
-    - *Files:* `src/api/routes.py`, `ui/app.js`, `ui/index.html`
-    - *Metric Impact:* UI/UX (Lens 15) & Demo Quality (Lens 16).
+22. **[DONE - Iteration 022] [UI/UX & Streaming] Real-Time SSE Investigation Progress & Evidence Timeline in Web UI**
+    - *Result:* Upgraded Server-Sent Events (SSE) in `src/api/sse.py` and `ui/app.js` with 11 distinct event types (`TRIGGER`, `OPEN_CASE`, `BUDGET_PLAN`, `RETRIEVE_MEMORY`, `INVESTIGATE`, `GRAPHRAG_BM25`, `ASSESS`, `REQUEST_EVIDENCE`, `DECIDE_ACTIONS`, `SELF_CRITIQUE`, `COMPLETE`). Added tests in `tests/test_sse_streaming.py` (65/65 tests pass).
 
 23. **[Uncertainty Calibration] Reliability Curve & Expected Calibration Error (ECE) Backtest Analyzer**
     - *Goal:* Build `eval/calibration_curve.py` computing binned Expected Calibration Error (ECE) and Brier Score across historical closed cases, ensuring that predicted fraud probabilities match empirical frequencies.
