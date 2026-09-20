@@ -1,4 +1,4 @@
-## Iteration 041: Cross-Case Syndicate Expansion & Shared Merchant Collusion | 2026-09-20 20:30 | commit pending
+## Iteration 041: Cross-Case Syndicate Expansion & Shared Merchant Collusion | 2026-09-20 20:30 | commit 77d139b
 - **Lens:** 1. Graph schema and ingestion & 2. Undocumented pattern discovery & 14. Testing and evaluation
 - **Goal / hypothesis:** Sophisticated cybercrime syndicates frequently funnel stolen cards through shared collusive merchant accounts or coordinated testing merchant endpoints. Individual card-level views fail to detect that multiple cards in a syndicate nexus overlap on specific merchants. Implementing `expand_syndicate_merchants` in `src/cases/manager.py` analyzes transaction activity across all member cards and cases, detects multi-card merchant overlaps, flags high-risk merchant concentration, computes syndicate collusion risk scores, creates `COLLUSIVE_MERCHANT_LINK` graph edges, and integrates into `ConcurrentGraphTraverser` and the REST API.
 - **Changes (files):**
