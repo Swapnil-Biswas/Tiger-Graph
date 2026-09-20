@@ -46,9 +46,37 @@ class PolicyEngine:
         Returns: {decision: 'allow' | 'needs_approval' | 'deny', route: 'auto' | 'L1' | 'L2', approver: str, reasons: list[str], policy_refs: list[str]}
         """
         action = action.upper().strip()
+        try:
+            exposure_usd = max(0.0, float(exposure_usd))
+        except (ValueError, TypeError):
+            exposure_usd = 0.0
+
+        actor_role = str(actor_role).lower().strip()
         route = PolicyEngine.get_approval_route(action, exposure_usd)
         reasons = []
         policy_refs = []
+
+        # Zero Evidence Punitive Action Gate
+        if action in ["BLOCK_CARD", "BLOCK_ALL_CARDS", "FILE_REPORT"]:
+            if signal_count <= 0 and (evidence_claims is None or len(evidence_claims) == 0):
+                return {
+                    "decision": "deny",
+                    "route": route,
+                    "approver": "None",
+                    "reasons": ["Policy Violation: Punitive actions require verified evidence claims and at least one risk signal."],
+                    "policy_refs": ["POLICY-EVIDENCE-GATE"],
+                }
+
+        # Rule R8 Check: High Exposure / High Risk Premature Closure Gate
+        if action == "CLOSE_NO_FRAUD":
+            if exposure_usd > 5000.0 or fraud_probability >= 0.70:
+                return {
+                    "decision": "deny",
+                    "route": "L2",
+                    "approver": "None",
+                    "reasons": ["Rule R8 Violation: Cannot CLOSE_NO_FRAUD when exposure exceeds $5,000 or fraud probability >= 0.70 without formal analyst review."],
+                    "policy_refs": ["POLICY-R8"],
+                }
 
         # R1 Check: Weak / Single Signal Verify Before Block
         if action in ["BLOCK_CARD", "BLOCK_ALL_CARDS"]:

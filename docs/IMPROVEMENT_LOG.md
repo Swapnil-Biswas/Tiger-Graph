@@ -1,4 +1,28 @@
-## Iteration 013: Dynamic Bayesian Case Memory Prior Adjustment Loop | 2026-09-20 17:18 | commit 70a4b2d
+## Iteration 014: Automated Policy & Permission Bypass Penetration Tests | 2026-09-20 17:22 | commit 5a22f7c
+- **Lens:** 6. Policy and permissions & 18. Security and safety
+- **Goal / hypothesis:** Financial institutions require mathematical proof that autonomous agents can never bypass human approval routing, execute punitive card blocks without sufficient evidence, or quietly close high-exposure cases. Implementing adversarial fuzzing and policy guardrails ensures that Rule R1 weak-signal blocks, Rule R7 recurring subscription disputes, Rule R10 multi-card constraints, exposure parameter tampering, and zero-evidence actions are strictly denied under all circumstances with 0 policy violations.
+- **Changes (files):**
+  - `src/policy/engine.py`: Added input exposure sanitization against negative/non-numeric tampering, zero-evidence punitive action gates, and Rule R8 high-exposure ($5,000+) / high-risk (fraud_prob >= 0.70) premature closure barriers.
+  - `tests/test_policy_pen_test.py`: Created comprehensive penetration and fuzzing test suite verifying R1 weak-signal blocks across [0.01-0.69], R7 subscription dispute shields, R10 multi-card compromise gates, tiered approval routing (auto, L1, L2), adversarial negative exposure injection, R8 high-exposure closure barriers, and zero-evidence blocks.
+- **Tests added/updated:**
+  - `tests/test_policy_pen_test.py` (7 tests, all pass).
+  - Total unit test suite expanded from 36 to **43** tests across 11 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 36 -> **43** (100% pass rate)
+  - Policy Penetration Resistance: 100% (7/7 adversarial bypass categories blocked)
+  - Unauthorized Actions: 0 (Strictly 0 verified across all fuzzed scenarios)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (43/43)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Malicious attempts to pass negative exposure (e.g. -$99,999) to bypass the $2,500 L2 threshold must be explicitly coerced to `max(0.0, float(exposure))` before route determination; otherwise mathematical comparator bugs could allow an attacker to bypass fraud manager approvals.
+- **Follow-ups added to backlog:** Next implement Iteration 015: Graph Client Performance Optimization & Transaction Adjacency Pre-Indexing (Lens 13: Performance and scale).
+
+## Iteration 013: Dynamic Bayesian Case Memory Prior Adjustment Loop | 2026-09-20 17:18 | commit edf84e4
 - **Lens:** 8. Case memory & 3. Uncertainty calibration
 - **Goal / hypothesis:** Static heuristics for entity history (+10 points if past cases exist) treat all past interactions identically and risk overwhelming real-time telemetry. Implementing a Beta-Binomial empirical Bayesian prior adjustment engine (`BayesianCaseMemoryPrior`) conditions agent risk priors on historical closed cases while strictly enforcing temporal isolation (`opened_at < as_of`). Historical confirmed fraud elevates posterior fraud risk; cleared precedents safely dampen false alarms, and shared device compromise history is factored in with mathematically calibrated bounds.
 - **Changes (files):**

@@ -59,10 +59,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 13. **[DONE - Iteration 013] [Case Memory] Dynamic Prior-Based Bayesian Adjustment Loop**
     - *Result:* Built `src/cases/memory.py` implementing `BayesianCaseMemoryPrior` with Beta-Binomial smoothing ($\alpha=1.0, \beta=10.0$), strict temporal isolation (`opened_at < as_of`), device-level compromise detection, and calibrated risk scaling. Integrated into `UncertaintyAssessmentEngine` and `FraudInvestigatorAgent`. Added 5 unit tests in `tests/test_case_memory.py` (36 tests, 100% pass).
 
-14. **[Policy & Permissions] Automated Permission Bypass Penetration Tests**
-    - *Goal:* Implement exhaustive fuzzing verifying that unauthorized actions (e.g. attempting to block card on single low-confidence signal) can never execute through PolicyEngine.
-    - *Files:* `tests/test_policy_pen_test.py`
-    - *Metric Impact:* Policy & Permissions compliance (must remain 0 violations).
+14. **[DONE - Iteration 014] [Policy & Permissions] Automated Permission Bypass Penetration Tests**
+    - *Result:* Hardened `PolicyEngine` with input exposure sanitization, zero-evidence action gates, and Rule R8 premature closure barriers. Added 7 penetration tests in `tests/test_policy_pen_test.py` verifying 0 unauthorized action leaks under adversarial fuzzing (43 tests, 100% pass).
 
 15. **[Performance & Scale] Transaction Indexing Optimization & Sub-5ms Client Caching**
     - *Goal:* Accelerate GraphStore multi-hop expansions by pre-indexing customer-card-device adjacency matrices.
