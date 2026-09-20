@@ -1,4 +1,4 @@
-## Iteration 079: Interactive CLI Fraud Investigator & Terminal Dashboard | 2026-09-21 06:45 | commit pending
+## Iteration 079: Interactive CLI Fraud Investigator & Terminal Dashboard | 2026-09-21 06:45 | commit 6a530d1
 - **Lens:** 8. Explainability & human-in-the-loop, 10. Case summary, explanation & visual reporting, 11. Agent architecture & engineering, 7. Graph query design & efficiency
 - **Goal / hypothesis:** Security Operations Center (SOC) fraud investigators, compliance officers, and command-line power users require rapid terminal access to inspect cases, view multi-hop graph evidence, evaluate multi-agent consensus verdicts, and monitor streaming transactions without launching a full browser. Building `src/cli/investigate_cli.py` delivers:
   1. **Comprehensive Case Dossiers (`--case HHG-001`)**: Renders full investigation briefs directly in the terminal including verdict, pattern, exposure, graph/sensor evidence, dual-gate next best actions with auto/L1/L2 routing badges, FinCEN SAR requirements, and counterfactual decision boundaries.
