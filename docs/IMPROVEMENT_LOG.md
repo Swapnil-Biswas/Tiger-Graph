@@ -1,4 +1,4 @@
-## Iteration 083: LRU Query Cache with Dynamic Invalidation on Edge Updates | 2026-09-21 07:45 | commit pending
+## Iteration 083: LRU Query Cache with Dynamic Invalidation on Edge Updates | 2026-09-21 07:45 | commit 45aaf26
 - **Lens:** 13. System performance & scalability, 7. Graph query design & efficiency, 11. Agent architecture & engineering
 - **Goal / hypothesis:** In high-concurrency multi-agent swarms (Orchestrator, AML Specialist, Cyber Forensics) and real-time streaming ingestion (> 1,000 EPS), repeated queries against the same card, customer, or device generate redundant traversals. Implementing a thread-safe LRU query cache delivers:
   1. **Thread-Safe LRU Query Caching (`src/graph/cache.py`)**: `LRUQueryCache` provides $O(1)$ lookup and eviction with `threading.RLock`, configurable capacity, and TTL bounds.
