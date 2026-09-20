@@ -1,4 +1,4 @@
-## Iteration 058: Interactive Temporal Graph Playback & Syndicate Cascade Visualizer | 2026-09-21 01:30 | commit pending
+## Iteration 058: Interactive Temporal Graph Playback & Syndicate Cascade Visualizer | 2026-09-21 01:30 | commit 202571e
 - **Lens:** 8. Explainability & human-in-the-loop, 12. Visuals & UI experience, 11. Agent architecture & engineering
 - **Goal / hypothesis:** Static graph snapshots fail to convey the dynamic speed, sequence, and coordination of complex fraud syndicates, mule account grooming, and bot bursts. Implementing `TemporalGraphPlaybackEngine` in `src/graph/playback.py` provides:
   1. **Chronological Step-by-Step Playback**: Reconstructs payment card and multi-hop syndicate cascades frame-by-frame sorted by timestamp up to the `as_of` investigation boundary.
