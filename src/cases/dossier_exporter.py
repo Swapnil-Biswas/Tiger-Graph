@@ -275,9 +275,72 @@ class IncidentDossierExporter:
       </table>
     </div>
 
-    <!-- Counterfactual Analysis -->
+    <!-- Counterfactual Analysis & Interactive Decision Boundary -->
     <div class="section-card">
-      <h2>4. Counterfactual Decision Sensitivity</h2>
+      <h2>4. Counterfactual Decision Boundary & Sensitivity Sliders</h2>
+
+      <!-- Visual Decision Boundary Bar -->
+      <div style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.35rem;">
+          <span style="color: #10b981;">&larr; Legitimate (&lt; 0.30)</span>
+          <span style="color: #f59e0b;">Step-Up / Review (0.30 - 0.70)</span>
+          <span style="color: #ef4444;">Confirmed Fraud (&gt; 0.70) &rarr;</span>
+        </div>
+        <div style="position: relative; height: 18px; border-radius: 9px; background: linear-gradient(90deg, #10b981 0%, #f59e0b 50%, #ef4444 100%); overflow: visible;">
+          <div id="sim-marker" style="position: absolute; left: {min(98, max(2, int(prob * 100)))}%; top: -6px; transform: translateX(-50%); width: 6px; height: 30px; background: #fff; border-radius: 3px; box-shadow: 0 0 8px rgba(0,0,0,0.8);"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #fff; margin-top: 0.5rem;">
+          <span>Assessed Base Probability: <strong>{prob:.2f}</strong></span>
+          <span>Simulated Probability: <strong id="sim-prob-val" style="color: var(--accent);">{prob:.2f}</strong></span>
+          <span>Simulated Verdict: <span id="sim-verdict-badge" class="route-badge route-{verdict.lower()}">{verdict}</span></span>
+        </div>
+      </div>
+
+      <!-- Interactive Sliders Simulator -->
+      <div style="background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem;">
+        <h3 style="font-size: 0.95rem; color: var(--accent); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">Interactive Sensitivity Simulator</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Adjust counterfactual evidence levers below to simulate real-time decision boundary transitions.</p>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+          <div>
+            <label style="font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+              <span>Customer Verification</span>
+              <span id="lbl-cust-val" style="color: #fff;">Unverified (0.00)</span>
+            </label>
+            <input type="range" id="slider-cust" min="0" max="1" step="0.05" value="0" style="width: 100%; accent-color: var(--accent);" oninput="updateSimulation()">
+          </div>
+
+          <div>
+            <label style="font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+              <span>Device Recognition History</span>
+              <span id="lbl-dev-val" style="color: #fff;">Novel Device (0.00)</span>
+            </label>
+            <input type="range" id="slider-dev" min="0" max="1" step="0.05" value="0" style="width: 100%; accent-color: var(--accent);" oninput="updateSimulation()">
+          </div>
+
+          <div>
+            <label style="font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+              <span>Geographic Alignment</span>
+              <span id="lbl-geo-val" style="color: #fff;">Out of Region (0.00)</span>
+            </label>
+            <input type="range" id="slider-geo" min="0" max="1" step="0.05" value="0" style="width: 100%; accent-color: var(--accent);" oninput="updateSimulation()">
+          </div>
+
+          <div>
+            <label style="font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+              <span>Velocity Burst Intensity</span>
+              <span id="lbl-vel-val" style="color: #fff;">Baseline (0.00)</span>
+            </label>
+            <input type="range" id="slider-vel" min="0" max="1" step="0.05" value="0" style="width: 100%; accent-color: var(--accent);" oninput="updateSimulation()">
+          </div>
+        </div>
+
+        <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 0.75rem;">
+          <strong>Simulated Action Recommendation:</strong> <span id="sim-action-text" style="color: #fff;">Maintain existing policy actions.</span>
+        </div>
+      </div>
+
+      <!-- Static Counterfactual Table -->
       <table>
         <thead>
           <tr>
@@ -328,6 +391,48 @@ class IncidentDossierExporter:
   </div>
 
   <script>
+    function updateSimulation() {{
+      const baseProb = parseFloat("{prob:.2f}");
+      const cust = parseFloat(document.getElementById("slider-cust").value);
+      const dev = parseFloat(document.getElementById("slider-dev").value);
+      const geo = parseFloat(document.getElementById("slider-geo").value);
+      const vel = parseFloat(document.getElementById("slider-vel").value);
+
+      document.getElementById("lbl-cust-val").innerText = cust > 0.5 ? "Customer Confirmed (-0.60)" : (cust > 0 ? "Partial Response (-" + (cust * 0.6).toFixed(2) + ")" : "Unverified (0.00)");
+      document.getElementById("lbl-dev-val").innerText = dev > 0.5 ? "Recognized Device (-0.35)" : "Novel Device (0.00)";
+      document.getElementById("lbl-geo-val").innerText = geo > 0.5 ? "Home Region (-0.25)" : "Out of Region (0.00)";
+      document.getElementById("lbl-vel-val").innerText = vel > 0.5 ? "High Burst (+0.25)" : "Baseline (0.00)";
+
+      let simProb = baseProb - (cust * 0.60) - (dev * 0.35) - (geo * 0.25) + (vel * 0.25);
+      simProb = Math.min(0.99, Math.max(0.01, simProb));
+
+      document.getElementById("sim-prob-val").innerText = simProb.toFixed(2);
+      const markerPos = Math.min(98, Math.max(2, Math.round(simProb * 100)));
+      document.getElementById("sim-marker").style.left = markerPos + "%";
+
+      const badge = document.getElementById("sim-verdict-badge");
+      const actText = document.getElementById("sim-action-text");
+      if (simProb >= 0.70) {{
+        badge.innerText = "FRAUD";
+        badge.className = "route-badge route-L2";
+        badge.style.background = "rgba(239, 68, 68, 0.2)";
+        badge.style.color = "#ef4444";
+        actText.innerText = "BLOCK_CARD, DECLINE_TRANSACTION, FILE_SAR";
+      }} else if (simProb >= 0.30) {{
+        badge.innerText = "UNCERTAIN";
+        badge.className = "route-badge route-L1";
+        badge.style.background = "rgba(245, 158, 11, 0.2)";
+        badge.style.color = "#f59e0b";
+        actText.innerText = "STEP_UP_AUTH, VERIFY_WITH_CUSTOMER, MONITOR_CARD";
+      }} else {{
+        badge.innerText = "LEGITIMATE";
+        badge.className = "route-badge route-auto";
+        badge.style.background = "rgba(16, 185, 129, 0.2)";
+        badge.style.color = "#10b981";
+        actText.innerText = "ALLOW_TRANSACTION, CLOSE_NO_FRAUD";
+      }}
+    }}
+
     document.addEventListener("DOMContentLoaded", function() {{
       const elements = {cy_elements_json};
       cytoscape({{

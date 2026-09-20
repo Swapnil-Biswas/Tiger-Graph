@@ -40,7 +40,7 @@ class TestIncidentDossierExporter(unittest.TestCase):
         self.assertIn("1. Autonomous Investigation Narrative", html_str)
         self.assertIn("2. Incident Graph Topology", html_str)
         self.assertIn("3. Grounding Evidence & Citations", html_str)
-        self.assertIn("4. Counterfactual Decision Sensitivity", html_str)
+        self.assertIn("4. Counterfactual Decision Boundary & Sensitivity Sliders", html_str)
         self.assertIn("5. Next-Best-Action Decisions & Policy Routing", html_str)
         self.assertIn("6. Regulatory Filing", html_str)
         self.assertIn("Deterministic Audit Trail Certified", html_str)
@@ -65,6 +65,26 @@ class TestIncidentDossierExporter(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertIn("text/html", resp.headers["content-type"])
         self.assertIn("TigerGraph Incident Dossier", resp.text)
+
+    def test_decision_boundary_and_sliders_visualization(self):
+        """Dossier must render interactive decision boundary gauge and counterfactual sliders."""
+        ans = self.agent.investigate_case("HHG-001")
+        html_str = IncidentDossierExporter.export_html_dossier(ans)
+
+        # Decision boundary gauge assertions
+        self.assertIn("4. Counterfactual Decision Boundary & Sensitivity Sliders", html_str)
+        self.assertIn("id=\"sim-marker\"", html_str)
+        self.assertIn("id=\"sim-prob-val\"", html_str)
+        self.assertIn("id=\"sim-verdict-badge\"", html_str)
+        self.assertIn("linear-gradient(90deg, #10b981 0%, #f59e0b 50%, #ef4444 100%)", html_str)
+
+        # Interactive slider assertions
+        self.assertIn("id=\"slider-cust\"", html_str)
+        self.assertIn("id=\"slider-dev\"", html_str)
+        self.assertIn("id=\"slider-geo\"", html_str)
+        self.assertIn("id=\"slider-vel\"", html_str)
+        self.assertIn("updateSimulation()", html_str)
+        self.assertIn("Interactive Sensitivity Simulator", html_str)
 
 
 if __name__ == "__main__":

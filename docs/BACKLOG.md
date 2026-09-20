@@ -155,10 +155,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 41. **[DONE - Iteration 041] [Syndicate Intelligence] Cross-Case Syndicate Expansion & Shared Merchant Traversal**
     - *Result:* Implemented `expand_syndicate_merchants` in `src/cases/manager.py` analyzing transactions across all member cards and cases in a `SyndicateNexus`. Flags multi-card shared merchants, evaluates merchant collusion risk scores ($[0, 1]$), creates `COLLUSIVE_MERCHANT_LINK` graph edges, and integrates into `reconstruct_case_from_graph` and `ConcurrentGraphTraverser`. Exposed `expand_syndicate` and `expand_syndicate_for_card` in `GraphClient`. Added API endpoint `/api/syndicates/{nexus_id}/merchants`. Added 6 unit tests in `tests/test_syndicate_merchant_expansion.py` (134/134 tests pass).
 
-42. **[Explainability & Compliance] Decision Boundary Visualization in HTML Incident Dossier**
-    - *Goal:* Render interactive counterfactual sensitivity sliders and decision boundary charts directly inside `IncidentDossierExporter` HTML reports.
-    - *Files:* `src/cases/dossier_exporter.py`, `tests/test_dossier_exporter.py`
-    - *Metric Impact:* Explainability & Case Summary (Lens 9, 10).
+42. **[DONE - Iteration 042] [Explainability & Compliance] Decision Boundary Visualization in HTML Incident Dossier**
+    - *Result:* Implemented interactive counterfactual decision boundary bar (Legitimate < 0.30, Review 0.30–0.70, Fraud > 0.70) with live probability marker and sensitivity sliders (customer verification, device history, geographic alignment, velocity burst) in `IncidentDossierExporter`. Embedded standalone client-side JavaScript simulator recalculating simulated probabilities and action recommendations offline. Updated `tests/test_dossier_exporter.py` (135/135 tests pass).
 
 43. **[Policy & Compliance] Dynamic High-Risk Merchant MCC Blacklisting & Adaptive Velocity Multipliers**
     - *Goal:* Implement adaptive velocity multipliers and risk tier escalation for high-risk Merchant Category Codes (MCC 7995 gambling, 6051 crypto/quasi-cash, 4829 wire transfers).
