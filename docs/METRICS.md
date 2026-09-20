@@ -42,6 +42,7 @@
 | **037** | `4872be5` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 116/116 (100%) | 0.008s | PASS | Temporal graph attention subgraph pooling (9D/27D embeddings) |
 | **038** | `b265531` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 122/122 (100%) | 0.008s | PASS | Inductive fraud rule discovery from 5,565 closed cases (Q19) |
 | **039** | `c235572` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 128/128 (100%) | 0.008s | PASS | Cross-border AML transaction bundling & correspondent banking risk (Q20) |
+| **040** | pending | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 128/128 (100%) | 0.008s | PASS | Checkpoint 7 Audit, 40% Milestone Review, and v0.4 Release Tag |
 
 ---
 

@@ -145,10 +145,27 @@ Ranked by expected impact on Hackathon Judging Criteria:
 39. **[DONE - Iteration 039] [Policy & Compliance] Cross-Border AML Transaction Bundling & Correspondent Banking Risk**
     - *Result:* Implemented `CrossBorderAMLRiskDetector` in `src/policy/jurisdiction.py` and exposed `detect_cross_border_aml` (Q20) in `GraphClient`. Evaluates FATF high-risk corridors (Iran, North Korea, Myanmar, Russia, etc.), FATF grey lists (UAE, Panama, Cayman Islands, etc.), rapid layering across 3+ regions, and correspondent banking thresholds ($5,000 EDD, $2,500 SAR-AML). Integrated into `JurisdictionComplianceRouter.generate_dispatch_bundle`, automatically escalating filing requirements. Added API endpoints `/api/cases/{case_id}/cross-border-aml` and `/api/regulatory/cross-border-check`. Added 6 unit tests in `tests/test_cross_border_aml.py` (128/128 tests pass).
 
-40. **[Checkpoint 7 & Release Tag v0.4] Mid-Point Major Milestone Review**
-    - *Goal:* Conduct 40% milestone audit, re-verify all 100+ tests, evaluate graph analytics scalability, verify 20/20 benchmark stability, and create tag `v0.4`.
-    - *Files:* `docs/IMPROVEMENT_LOG.md`, `docs/METRICS.md`, git tag `v0.4`
-    - *Metric Impact:* Documentation & Deliverables (Lens 17).
+40. **[DONE - Iteration 040] [Checkpoint 7 & Release Tag v0.4] 40% Major Milestone Review & Release Tag v0.4**
+    - *Result:* Comprehensive PRD Section 25 audit completed. All 6 mandatory gates passed (128/128 unit tests across 32 test suites, 100% backtest recall/precision, 0.00% benchmark variance across repeated runs, 1.0000 policy retrieval MRR, 1.00 audit faithfulness, 20/20 valid benchmark answers, ECE 0.0116, Brier 0.0006, 0 secrets, demo path green). Tagged and pushed `v0.4`.
+
+---
+
+## Phase 5: Advanced Syndication & Operational Hardening (Iterations 41–60)
+
+41. **[Syndicate Intelligence] Cross-Case Syndicate Expansion & Shared Merchant Traversal**
+    - *Goal:* Implement multi-case shared merchant and proxy hub expansion in `SyndicateNexus` to track distributed merchant collusions.
+    - *Files:* `src/cases/manager.py`, `src/graph/traverser.py`, `tests/test_syndicate_merchant_expansion.py`
+    - *Metric Impact:* Syndicate Detection (Lens 1, 2).
+
+42. **[Explainability & Compliance] Decision Boundary Visualization in HTML Incident Dossier**
+    - *Goal:* Render interactive counterfactual sensitivity sliders and decision boundary charts directly inside `IncidentDossierExporter` HTML reports.
+    - *Files:* `src/cases/dossier_exporter.py`, `tests/test_dossier_exporter.py`
+    - *Metric Impact:* Explainability & Case Summary (Lens 9, 10).
+
+43. **[Policy & Compliance] Dynamic High-Risk Merchant MCC Blacklisting & Adaptive Velocity Multipliers**
+    - *Goal:* Implement adaptive velocity multipliers and risk tier escalation for high-risk Merchant Category Codes (MCC 7995 gambling, 6051 crypto/quasi-cash, 4829 wire transfers).
+    - *Files:* `src/policy/jurisdiction.py`, `src/graph/client.py`, `tests/test_mcc_risk.py`
+    - *Metric Impact:* Policy Engine & Fraud Accuracy (Lens 6, 8).
 
 ---
 
