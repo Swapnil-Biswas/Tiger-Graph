@@ -3,7 +3,8 @@
 | Iteration | Commit | Backtest Precision | Backtest Recall | Backtest F1 | Backtest FPR | Valid Benchmark (20/20) | Evidence Citation Pass | Policy Violations | Test Count (Pass Rate) | Avg Latency | Demo Path | Notes / Key Focus |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---|
 | **0** | `2401641` | 100.0% | 49.4% | 66.1% | 0.0% | 20/20 (100%) | 100.0% | 0 | 14/14 (100%) | 0.019s | PASS | Baseline audit and scaffolding |
-| **001** | `pending` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 14/14 (100%) | 0.063s | PASS | Expanded ATO, out-of-region, and trigger resolution |
+| **001** | `984040d` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 14/14 (100%) | 0.063s | PASS | Expanded ATO, out-of-region, and trigger resolution |
+| **002** | `pending` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 17/17 (100%) | 0.063s | PASS | Complete evidence response matrix (R4, R5, R7) |
 
 ---
 

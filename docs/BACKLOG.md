@@ -15,10 +15,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 1. **[DONE - Iteration 001] [Investigation Accuracy] Expand Account Takeover (ATO) & Out-of-Region Graph Signals**
    - *Result:* Backtest recall reached **100.00%** (251/251) and F1 **100.00%** with 0 false positives. Trigger resolution from analyst notes and `geo_impossible` integration proved highly effective.
 
-2. **[Next-Best-Action] Implement Full Evidence Response Matrix (No-Response, Step-Up Fail)**
-   - *Goal:* Support all customer response scenarios: `customer_confirms`, `customer_denies`, `no_response_24h` (Rule R4), `step_up_failed` (Rule R5).
-   - *Files:* `src/mock/customer_sim.py`, `src/agent/decide.py`, `src/policy/engine.py`
-   - *Metric Impact:* Policy compliance and Next-Best-Action score.
+2. **[DONE - Iteration 002] [Next-Best-Action] Implement Full Evidence Response Matrix (No-Response, Step-Up Fail)**
+   - *Result:* Implemented complete scenario matrix in `decide.py` for `no_response` (R4), `step_up_fail` (R5), `recurring_confirmed` (R7), and `recognizes` (R3). Added 3 unit tests, expanding test suite to 17 tests (100% pass).
 
 3. **[Innovation] Graph-Native Counterfactual Explainer**
    - *Goal:* Generate deterministic "What would change this verdict?" counterfactuals (e.g., "If the device fingerprint had 3+ prior authentications, verdict would shift from fraud to legitimate").

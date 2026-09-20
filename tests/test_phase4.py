@@ -87,6 +87,33 @@ class TestPhase4AgentCore(unittest.TestCase):
         self.assertEqual(PolicyEngine.get_approval_route("ALLOW_TRANSACTION"), "auto")
         print("PASS: Approval routes auto, L1, L2 accurately assigned across exposure tiers.")
 
+    def test_04_no_response_rule_r4(self):
+        """Verify Rule R4: no response in 24h leads to DECLINE_TRANSACTION and MONITOR_CARD without permanent block."""
+        res = self.agent.investigate_case("HHG-001", simulated_scenario="no_response")
+        final_actions = [a["action"] for a in res["next_best_actions"]["final"]]
+        self.assertIn("DECLINE_TRANSACTION", final_actions)
+        self.assertIn("MONITOR_CARD", final_actions)
+        self.assertNotIn("BLOCK_CARD", final_actions)
+        print(f"PASS: Rule R4 enforced on no_response: {final_actions}")
+
+    def test_05_step_up_fail_rule_r5(self):
+        """Verify Rule R5: failed step-up authentication triggers BLOCK_CARD and DECLINE_TRANSACTION."""
+        res = self.agent.investigate_case("HHG-001", simulated_scenario="step_up_fail")
+        final_actions = [a["action"] for a in res["next_best_actions"]["final"]]
+        self.assertIn("BLOCK_CARD", final_actions)
+        self.assertIn("DECLINE_TRANSACTION", final_actions)
+        print(f"PASS: Rule R5 enforced on step_up_fail: {final_actions}")
+
+    def test_06_recurring_confirmed_rule_r7(self):
+        """Verify Rule R7: recognized recurring charge issues WARN_CUSTOMER without blocking card."""
+        res = self.agent.investigate_case("HHG-001", simulated_scenario="recurring_confirmed")
+        final_actions = [a["action"] for a in res["next_best_actions"]["final"]]
+        self.assertIn("WARN_CUSTOMER", final_actions)
+        self.assertIn("ALLOW_TRANSACTION", final_actions)
+        self.assertNotIn("BLOCK_CARD", final_actions)
+        print(f"PASS: Rule R7 enforced on recurring_confirmed: {final_actions}")
+
 
 if __name__ == "__main__":
     unittest.main()
+

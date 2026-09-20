@@ -1,4 +1,26 @@
-## Iteration 001: Expanded ATO, Out-of-Region Detection, and Accurate Trigger Resolution | 2026-09-20 16:35 | commit pending
+## Iteration 002: Complete Evidence Response Decision Matrix (R4, R5, R7) | 2026-09-20 16:37 | commit pending
+- **Lens:** 4. Next-best-action quality & 5. Evidence-request design
+- **Goal / hypothesis:** In real operations, customer inquiries yield diverse responses: `denies`, `recognizes`, `recurring_confirmed` (Rule R7 subscription), `step_up_fail` (Rule R5 OTP timeout), and `no_response` (Rule R4 24h expiration). Implementing explicit deterministic decision paths for all these scenarios ensures complete policy fidelity.
+- **Changes (files):**
+  - `src/agent/decide.py`: Implemented distinct handlers in `plan_final_actions` for `step_up_fail` (BLOCK_CARD, DECLINE_TRANSACTION), `recurring_confirmed` (WARN_CUSTOMER, CREATE_CASE, ALLOW_TRANSACTION), and `no_response` (DECLINE_TRANSACTION, MONITOR_CARD, ESCALATE_TO_ANALYST if exposure > $500).
+  - `tests/test_phase4.py`: Added 3 new unit tests (`test_04_no_response_rule_r4`, `test_05_step_up_fail_rule_r5`, `test_06_recurring_confirmed_rule_r7`).
+- **Tests added/updated:**
+  - `tests/test_phase4.py` test count expanded from 3 to 6 (all 6 pass).
+  - Total test count across all suites expanded from 14 to 17 (100% pass).
+- **Metrics before -> after:**
+  - Test Count: 14 -> **17** (100% pass rate)
+  - Policy Violations: 0 (verified across all branches)
+  - Valid Benchmark Answers: 20/20 (100%)
+  - Backtest Recall/Precision/F1: 100.0% / 100.0% / 100.0%
+- **Verification gates:**
+  - Unit tests: PASS (17/17)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Rule R7 explicitly protects recurring subscriptions from disruptive card cancellations when a confused cardholder disputes a regular charge. Modeling this edge case properly preserves merchant relationships and customer retention while still generating an audit case.
+- **Follow-ups added to backlog:** Next implement Innovation item 3: Graph-Native Counterfactual Explainer ("What would change this verdict?") to boost Innovation (15%) and Explainability (10%).
+
+## Iteration 001: Expanded ATO, Out-of-Region Detection, and Accurate Trigger Resolution | 2026-09-20 16:35 | commit 984040d
 - **Lens:** 1. Investigation accuracy
 - **Goal / hypothesis:** In historical cases, 83.7% of fraud investigations originated from customer reports ("reported unrecognized activity"), but were defaulting to score triggers with 0.50 risk score and lacking geographic travel anomalies (`geo_impossible`) and account takeover signals in the assessment engine. Accurately extracting trigger types and integrating geo anomalies will dramatically improve detection recall without compromising precision.
 - **Changes (files):**

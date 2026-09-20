@@ -129,8 +129,8 @@ class NextBestActionPlanner:
         post_prob = post_assessment.fraud_probability
         final_actions = []
 
-        # Customer Denies / Unauthorized confirmed
-        if scenario in ["denies", "step_up_fail"]:
+        # 1. Customer Denies
+        if scenario == "denies":
             route_block = PolicyEngine.get_approval_route("BLOCK_CARD", exposure_usd)
             final_actions.append(ProposedAction(
                 action="BLOCK_CARD",
@@ -156,8 +156,53 @@ class NextBestActionPlanner:
                 ))
             what_changed = f"Customer denial raised fraud probability to {post_prob:.2f}, confirming immediate card block and case escalation."
 
-        # Customer Confirms / Legitimate
-        elif scenario in ["recognizes", "recurring_confirmed", "step_up_pass"]:
+        # 2. Step-Up Authentication Failed (Rule R5)
+        elif scenario == "step_up_fail":
+            route_block = PolicyEngine.get_approval_route("BLOCK_CARD", exposure_usd)
+            final_actions.append(ProposedAction(
+                action="BLOCK_CARD",
+                route=route_block,
+                reason=f"R5: Step-up authentication failed; defensive block executed on exposure ${exposure_usd:.2f}.",
+            ))
+            final_actions.append(ProposedAction(
+                action="DECLINE_TRANSACTION",
+                route="L1",
+                reason="R5: Decline transaction following failed identity challenge.",
+            ))
+            final_actions.append(ProposedAction(
+                action="CREATE_CASE",
+                route="auto",
+                reason="Section 3a: Internal fraud case opened following authentication failure.",
+            ))
+            if exposure_usd > 1000.0 or is_shared_device:
+                final_actions.append(ProposedAction(
+                    action="FILE_REPORT",
+                    route="L2",
+                    reason=f"Section 3a & R5: Regulatory SAR required for high exposure failed challenge.",
+                ))
+            what_changed = f"Step-up authentication challenge failed, raising fraud probability to {post_prob:.2f} and triggering immediate card block and transaction decline under Rule R5."
+
+        # 3. Disputed Recurring / Legitimate Subscription (Rule R7)
+        elif scenario == "recurring_confirmed":
+            final_actions.append(ProposedAction(
+                action="CREATE_CASE",
+                route="auto",
+                reason="R7: Case logged for recurring subscription dispute record.",
+            ))
+            final_actions.append(ProposedAction(
+                action="WARN_CUSTOMER",
+                route="auto",
+                reason="R7: Inform cardholder of active recurring billing subscription details.",
+            ))
+            final_actions.append(ProposedAction(
+                action="ALLOW_TRANSACTION",
+                route="auto",
+                reason="R7: Transaction permitted as recognized subscription.",
+            ))
+            what_changed = "Cardholder identified transaction as recognized recurring charge. Avoided card block and issued customer subscription advisory under Rule R7."
+
+        # 4. Customer Confirms / Recognized / Step-Up Pass (Rule R3)
+        elif scenario in ["recognizes", "step_up_pass"]:
             final_actions.append(ProposedAction(
                 action="ALLOW_TRANSACTION",
                 route="auto",
@@ -170,7 +215,7 @@ class NextBestActionPlanner:
             ))
             what_changed = f"Customer confirmation reduced fraud probability to {post_prob:.2f}, resolving the alert as legitimate and clearing the case."
 
-        # No Reply within 24h (Rule R4)
+        # 5. No Reply within 24h (Rule R4)
         else:
             final_actions.append(ProposedAction(
                 action="DECLINE_TRANSACTION",
