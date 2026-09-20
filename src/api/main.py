@@ -53,6 +53,10 @@ simulator = GraphScenarioSimulator(agent=agent)
 from src.graph.playback import TemporalGraphPlaybackEngine
 playback_engine = TemporalGraphPlaybackEngine(client=agent.client)
 
+# Compliance Evidence Packager
+from src.cases.evidence_bundle import ComplianceEvidencePackager
+evidence_packager = ComplianceEvidencePackager()
+
 # In-memory store for active cases & approvals
 active_cases: Dict[str, Dict[str, Any]] = {}
 pending_approvals: Dict[str, Dict[str, Any]] = {}
@@ -1080,6 +1084,55 @@ def get_graph_playback_frame(case_id: str, frame_idx: int):
     if frame_idx < 0 or frame_idx >= len(timeline.frames):
         raise HTTPException(status_code=404, detail=f"Frame {frame_idx} out of range [0, {len(timeline.frames)-1}]")
     return timeline.frames[frame_idx].to_dict()
+
+
+@app.get("/api/cases/{case_id}/evidence-bundle")
+def get_case_evidence_bundle(case_id: str):
+    """Generates an immutable, cryptographically certified compliance evidence bundle with Merkle root and digital signature."""
+    if case_id not in active_cases:
+        if case_id in agent.client.store.case_pack:
+            res = agent.investigate_case(case_id)
+            active_cases[case_id] = res
+            case_manager.write_case_to_graph(res)
+        else:
+            cfile = os.path.join("cases", f"{case_id}.json")
+            if os.path.exists(cfile):
+                with open(cfile, "r", encoding="utf-8") as f:
+                    active_cases[case_id] = json.load(f)
+            else:
+                raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
+
+    case_ans = active_cases[case_id]
+    bundle = evidence_packager.build_evidence_bundle(case_ans)
+    return bundle.to_dict()
+
+
+@app.get("/api/cases/{case_id}/evidence-manifest")
+def get_case_evidence_manifest(case_id: str):
+    """Retrieves a regulatory submission manifest listing Merkle root and item hashes."""
+    if case_id not in active_cases:
+        if case_id in agent.client.store.case_pack:
+            res = agent.investigate_case(case_id)
+            active_cases[case_id] = res
+            case_manager.write_case_to_graph(res)
+        else:
+            cfile = os.path.join("cases", f"{case_id}.json")
+            if os.path.exists(cfile):
+                with open(cfile, "r", encoding="utf-8") as f:
+                    active_cases[case_id] = json.load(f)
+            else:
+                raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
+
+    case_ans = active_cases[case_id]
+    bundle = evidence_packager.build_evidence_bundle(case_ans)
+    return bundle.export_manifest()
+
+
+@app.post("/api/compliance/verify-evidence-bundle")
+def verify_evidence_bundle_endpoint(bundle: Dict[str, Any]):
+    """Performs full cryptographic audit on an uploaded evidence bundle to detect bit-flips or tampering."""
+    report = evidence_packager.verify_bundle(bundle)
+    return report
 
 
 @app.post("/api/benchmark/run")
