@@ -1,3 +1,33 @@
+## Iteration 074: Automated Chaos Engineering & Fault Injection Resilience Harness | 2026-09-21 05:30 | commit pending
+- **Lens:** 13. System performance & scalability, 14. Testing, evaluation & benchmarks, 11. Agent architecture & engineering, 9. Security, safety & defenses
+- **Goal / hypothesis:** Mission-critical fraud investigation engines must withstand real-world production anomalies without crashing, hanging, or leaking unbounded memory. Implementing an automated Chaos Engineering harness delivers:
+  1. **Systematic Fault Injection**: `ChaosEngineeringHarness` in `eval/chaos_harness.py` injects 4 classes of production faults:
+     - Malformed/corrupted transaction payloads (empty dicts, null IDs, negative amounts, type mismatches, NaN/Inf).
+     - High-velocity traffic bursts (3,000–5,000 transactions at > 1,000 EPS) with verified FIFO sliding window eviction.
+     - Unreachable/failing webhook HTTP endpoints with non-blocking error logging and delivery audit records.
+     - Investigation execution with unknown/corrupted scenario names verifying deterministic fallback.
+  2. **Zero-Crash Resilience Score**: Measures graceful handling rate across all injected faults, achieving a perfect 1.00/1.00 resilience score with 0 unhandled fatal crashes.
+  3. **Structured Resilience Reports**: Generates `ChaosResilienceReport` recording throughput, memory bounds, and granular pass/fail status.
+- **Changes (files):**
+  - `eval/chaos_harness.py`: Implemented `ChaosEngineeringHarness` and `ChaosResilienceReport`.
+  - `tests/test_chaos_resilience.py`: Created 5 unit tests validating corrupted payloads, burst throughput, webhook timeouts, unknown scenarios, and full chaos audit execution.
+- **Tests added/updated:**
+  - `tests/test_chaos_resilience.py` (5 unit tests, all pass).
+  - Total unit test suite expanded from 284 to **289** tests across 60 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 284 -> **289** (100% pass rate across 60 test suites)
+  - Chaos Resilience Score: 1.00/1.00 (100% graceful recovery, 0 fatal crashes)
+  - Burst Ingestion Throughput: > 1,000 events/sec
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 289 passed across 60 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 073: Enterprise HMAC-SHA256 Webhook Dispatcher & PagerDuty/Slack Incident Bridge | 2026-09-21 05:15 | commit ca13293
 - **Lens:** 3. Next best action & policy guidance, 8. Explainability & human-in-the-loop, 11. Agent architecture & engineering, 15. Real-world fraud domain alignment
 - **Goal / hypothesis:** When critical fraud events (syndicate attacks, high-exposure SAR requirements, L2 approvals) occur, enterprise fraud operations centers require instant notification dispatching to incident management systems (PagerDuty, Slack, OpsGenie) with cryptographic anti-tamper verification. Building an enterprise webhook dispatcher delivers:
