@@ -1,0 +1,49 @@
+# Prometheus Alertmanager Alerting Rules for TigerGraph Fraud Operations
+groups:
+  - name: tigergraph_fraud_sla_alerts
+    rules:
+      - alert: FraudInvestigationSLAViolation
+        expr: histogram_quantile(0.95, sum(rate(investigation_latency_seconds_bucket[5m])) by (le)) > 0.050
+        for: 1m
+        labels:
+          severity: critical
+          team: fraud-ops
+          tier: p0
+        annotations:
+          summary: "Fraud Investigation P95 Latency SLA Exceeded (> 50ms)"
+          description: "End-to-end fraud investigation P95 latency is currently {{ $value | humanizeDuration }}, violating the 50ms SLA target."
+          runbook_url: "https://wiki.example.com/fraud-ops/sla-latency-runbook"
+
+      - alert: HighSeverityStreamingAnomalySurge
+        expr: sum(rate(streaming_alerts_emitted_total{severity="CRITICAL"}[1m])) * 60 > 5
+        for: 30s
+        labels:
+          severity: critical
+          team: security-ops
+          tier: p0
+        annotations:
+          summary: "Surge in Critical Real-Time Streaming Anomalies (> 5/min)"
+          description: "Real-time streaming anomaly monitor has detected {{ $value | printf \"%.0f\" }} critical alerts in the past minute (possible syndicate attack)."
+          runbook_url: "https://wiki.example.com/fraud-ops/syndicate-surge-runbook"
+
+      - alert: StreamingVelocitySpikeBurst
+        expr: sum(rate(streaming_alerts_emitted_total{rule="VELOCITY_SPIKE"}[2m])) * 60 > 10
+        for: 1m
+        labels:
+          severity: warning
+          team: fraud-ops
+          tier: p1
+        annotations:
+          summary: "Elevated Transaction Velocity Spikes Detected"
+          description: "Card velocity burst anomaly rate is currently {{ $value | printf \"%.0f\" }} alerts/min, indicating automated card testing."
+
+      - alert: GraphEntityCapacityWarning
+        expr: graph_indexed_entities{type="transactions"} > 1000000
+        for: 5m
+        labels:
+          severity: warning
+          team: data-infra
+          tier: p2
+        annotations:
+          summary: "Graph Store Transaction Count Exceeds 1,000,000 Entities"
+          description: "Active graph store contains {{ $value }} transactions; prepare for memory compaction or horizontal shard expansion."

@@ -253,6 +253,9 @@ Ranked by expected impact on Hackathon Judging Criteria:
 71. **[DONE - Iteration 071] [Cloud-Native & Kubernetes Orchestration] Automated Kubernetes Helm Chart & Enterprise Health/Readiness Probes**
     - *Result:* Implemented enterprise Helm v2/v3 chart in `deploy/helm/tigergraph-agent/` with `Chart.yaml`, `values.yaml`, and templates for `Deployment`, `Service`, `HorizontalPodAutoscaler` (HPA v2), and `ServiceAccount`. Features non-root security context (`appuser`, UID/GID 10001), liveness and readiness probes targeting `/api/telemetry/dashboard`, dynamic CPU/memory autoscaling (2 to 10 replicas), Prometheus annotations, and ServiceMonitor integration. Added 4 unit tests in `tests/test_helm_chart.py` (277/277 tests pass across 57 suites).
 
+72. **[DONE - Iteration 072] [Observability & SRE Dashboards] Production Grafana SLA Monitoring Dashboard & Prometheus Alertmanager Rules**
+    - *Result:* Created production Grafana 10 dashboard in `deploy/grafana/fraud_sla_dashboard.json` (uid: `tigergraph-fraud-sla`) featuring 9 panels: SLA Health Status Single-Stat, End-to-End Investigation Latency Percentiles (P50/P90/P99), Streaming Influx Throughput, Real-Time Streaming Anomaly Alerts by Rule & Severity, Policy Actions Authorized by Role, and Graph Store Entity Gauges. Added Prometheus Alertmanager alerting rules in `deploy/grafana/alerts.yml` covering P95 latency violations (> 50ms), critical streaming anomaly surges (> 5/min), velocity burst clusters, and graph capacity warnings. Added 3 unit tests in `tests/test_grafana_dashboard.py` (280/280 tests pass across 58 suites).
+
 ---
 
 ## Polish & Submission Readiness (Iterations 76–100)
