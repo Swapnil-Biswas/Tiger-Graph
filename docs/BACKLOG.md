@@ -77,9 +77,36 @@ Ranked by expected impact on Hackathon Judging Criteria:
 19. **[DONE - Iteration 019] [Testing & Evaluation] Automated Component Ablation Study Harness**
     - *Result:* Built `eval/ablation_study.py` and `tests/test_ablation.py`. Evaluates 4 conditions (Full System, Graph Signals OFF, Case Memory OFF, Policy Rules OFF). Proved that Graph Signals provide critical topological context while reducing latency by 37%, Case Memory conditions historical priors, and Policy Rules prevent unconstrained Rule R1 breaches. Added 4 unit tests (59 tests, 100% pass).
 
-20. **[Release Tag v0.2] Checkpoint 3 Audit & Submission-Ready Release Tag v0.2**
-    - *Goal:* Perform complete audit against PRD Section 25, verify all verification gates, create annotated git tag `v0.2`, push to GitHub, and document State of the Project v0.2 summary.
-    - *Files:* `docs/IMPROVEMENT_LOG.md`, git tag `v0.2`
+20. **[DONE - Iteration 020] [Release Tag v0.2] Checkpoint 3 Audit & Submission-Ready Release Tag v0.2**
+    - *Result:* Comprehensive PRD Section 25 audit completed. All 6 mandatory gates passed (59/59 unit tests across 15 suites, 100% backtest recall/precision, 0.00% benchmark variance, 1.0000 policy retrieval MRR, 1.00 audit faithfulness score, 20/20 valid benchmark answers, 0 secrets, demo path green). Tagged and pushed `v0.2`.
+
+---
+
+## Phase 3: Advanced Agentic Autonomy, Streaming, & Calibration (Iterations 21–40)
+
+21. **[Agent Architecture & LLM Cost/Latency] Dynamic Graph Query Budgeting & Adaptive Traversal Pruning**
+    - *Goal:* Implement `AdaptiveGraphBudgeter` dynamically allocating tool call budgets based on initial risk entropy and early evidence sufficiency, pruning redundant 2-hop neighborhood traversals when single-hop evidence is already conclusive.
+    - *Files:* `src/agent/budgeter.py`, `src/agent/graph.py`, `tests/test_budgeter.py`
+    - *Metric Impact:* Agent Architecture (Lens 11) & LLM Prompting/Cost (Lens 12).
+
+22. **[UI/UX & Streaming] Real-Time SSE Investigation Progress & Evidence Timeline in Web UI**
+    - *Goal:* Wire Server-Sent Events (SSE) from `/api/investigate/stream` to the web dashboard (`ui/app.js`), showing live step-by-step progress, graph query execution times, and dynamic uncertainty gauge updates during live runs.
+    - *Files:* `src/api/routes.py`, `ui/app.js`, `ui/index.html`
+    - *Metric Impact:* UI/UX (Lens 15) & Demo Quality (Lens 16).
+
+23. **[Uncertainty Calibration] Reliability Curve & Expected Calibration Error (ECE) Backtest Analyzer**
+    - *Goal:* Build `eval/calibration_curve.py` computing binned Expected Calibration Error (ECE) and Brier Score across historical closed cases, ensuring that predicted fraud probabilities match empirical frequencies.
+    - *Files:* `eval/calibration_curve.py`, `tests/test_calibration.py`
+    - *Metric Impact:* Uncertainty Calibration (Lens 3) & Testing & Evaluation (Lens 14).
+
+24. **[Policy & Approvals] Interactive Human-in-the-Loop Analyst Override & Audit Trail**
+    - *Goal:* Implement analyst override endpoint `/api/cases/{case_id}/override` allowing human fraud analysts to override verdicts, record structured justifications, and append immutable audit log entries to the case record in the graph.
+    - *Files:* `src/cases/manager.py`, `src/api/routes.py`, `tests/test_analyst_override.py`
+    - *Metric Impact:* Policy & Permissions (Lens 6) & Case Management (Lens 10).
+
+25. **[Checkpoint 4 & Release Tag v0.25] Quarter-Way Milestone Review**
+    - *Goal:* Review all system components against PRD Section 25, verify 0 regressions across all suites, and create annotated release tag `v0.25`.
+    - *Files:* `docs/IMPROVEMENT_LOG.md`, git tag `v0.25`
     - *Metric Impact:* Documentation & Deliverables (Lens 17).
 
 ---
