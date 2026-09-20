@@ -26,7 +26,8 @@
 | **021** | `18b2e5a` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 63/63 (100%) | 0.012s | PASS | Adaptive graph query budgeting & traversal pruning |
 | **022** | `807c4f0` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 65/65 (100%) | 0.012s | PASS | Real-time SSE investigation streaming (11 event types) |
 | **023** | `1c726d0` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 69/69 (100%) | 0.012s | PASS | Uncertainty calibration (ECE 0.0116 < 0.08, Brier 0.0006 < 0.12) |
-| **024** | pending | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 73/73 (100%) | 0.012s | PASS | Interactive human-in-the-loop analyst override & immutable graph audit trail |
+| **024** | `0059e3a` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 73/73 (100%) | 0.012s | PASS | Interactive human-in-the-loop analyst override & immutable graph audit trail |
+| **025** | pending | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 73/73 (100%) | 0.012s | PASS | Checkpoint 4 Audit, State of the Project, and v0.25 Release Tag |
 
 ---
 

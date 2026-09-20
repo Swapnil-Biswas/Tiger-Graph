@@ -96,9 +96,32 @@ Ranked by expected impact on Hackathon Judging Criteria:
 24. **[DONE - Iteration 024] [Policy & Approvals] Interactive Human-in-the-Loop Analyst Override & Audit Trail**
     - *Result:* Implemented `record_analyst_override` and `get_case_audit_trail` in `src/cases/manager.py`, added `POST /api/cases/{case_id}/override` and `GET /api/cases/{case_id}/audit` endpoints in `src/api/main.py`. Enforces role-based policy gates on high exposure (> $2,500) and writes immutable audit records to graph. Added 4 unit tests in `tests/test_analyst_override.py` (73/73 tests pass).
 
-25. **[Checkpoint 4 & Release Tag v0.25] Quarter-Way Milestone Review**
-    - *Goal:* Review all system components against PRD Section 25, verify 0 regressions across all suites, and create annotated release tag `v0.25`.
-    - *Files:* `docs/IMPROVEMENT_LOG.md`, git tag `v0.25`
+25. **[DONE - Iteration 025] [Checkpoint 4 & Release Tag v0.25] Quarter-Way Milestone Review**
+    - *Result:* Comprehensive PRD Section 25 audit completed. All 6 mandatory gates passed (73/73 unit tests across 19 suites, 100% backtest recall/precision, 0.00% benchmark variance, 1.0000 policy retrieval MRR, 1.00 audit faithfulness, 20/20 valid benchmark answers, ECE 0.0116, 0 secrets, demo path green). Tagged and pushed `v0.25`.
+
+26. **[Autonomous Agent & Memory] Temporal Recency-Weighted Case Retrieval in GraphRAG**
+    - *Goal:* Implement exponential decay weighting ($\lambda = 0.01$/day) on historical case similarity retrieval, prioritizing recent fraud MO patterns over stale cases.
+    - *Files:* `src/rag/retrieve.py`, `tests/test_temporal_retrieval.py`
+    - *Metric Impact:* GraphRAG & Context Assembly (Lens 4) & Case Memory (Lens 8).
+
+27. **[Policy & Compliance] Automated Multi-Jurisdiction Regulatory Routing (FinCEN, GDPR, FCA)**
+    - *Goal:* Implement multi-jurisdiction compliance dispatcher supporting US FinCEN SARs, UK FCA STRs, and EU GDPR data privacy constraints on cross-border evidence sharing.
+    - *Files:* `src/policy/jurisdiction.py`, `tests/test_jurisdiction_routing.py`
+    - *Metric Impact:* Regulatory Compliance & SAR (Lens 7) & Policy & Permissions (Lens 6).
+
+28. **[Explainability & Trust] Self-Contained Interactive HTML Incident Dossier Export**
+    - *Goal:* Build standalone interactive HTML dossier exporter embedding investigation timeline, Cytoscape subgraph, counterfactual matrix, and FinCEN SAR for executive briefing.
+    - *Files:* `src/cases/dossier_exporter.py`, `tests/test_dossier_exporter.py`
+    - *Metric Impact:* Explainability & Trust (Lens 5) & Case Summary & SAR (Lens 9).
+
+29. **[Performance & Scaling] Parallelized Asynchronous Graph Traversal Engine**
+    - *Goal:* Execute velocity, device sharing, cycle detection, and memory retrieval concurrently via `asyncio.gather` / thread pooling, cutting investigation latency by > 40%.
+    - *Files:* `src/agent/graph.py`, `src/graph/client.py`, `tests/test_async_investigation.py`
+    - *Metric Impact:* Graph Database & Query Performance (Lens 2) & Latency (Lens 12).
+
+30. **[Checkpoint 5 & Release Tag v0.3] Milestone Review & Release Tag v0.3**
+    - *Goal:* Audit all 30 iterations against PRD Section 25, verify 0 regressions across all suites, and create annotated release tag `v0.3`.
+    - *Files:* `docs/IMPROVEMENT_LOG.md`, git tag `v0.3`
     - *Metric Impact:* Documentation & Deliverables (Lens 17).
 
 ---

@@ -20,6 +20,11 @@ class TestAnalystOverrideAndAuditTrail(unittest.TestCase):
         cls.case_manager = CaseManager(client=cls.agent.client)
         cls.client = TestClient(app)
 
+    @classmethod
+    def tearDownClass(cls):
+        if hasattr(cls, "client"):
+            cls.client.close()
+
     def test_analyst_override_success_and_audit_trail(self):
         """Valid override must update vertex, status, and append immutable audit log."""
         case_id = "HHG-003"
