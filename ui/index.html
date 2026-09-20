@@ -51,6 +51,7 @@
       <button class="nav-btn" data-tab="approvals" id="tab-approvals">Approvals Queue <span class="badge" id="badge-approvals">0</span></button>
       <button class="nav-btn" data-tab="compliance" id="tab-compliance">Compliance Vault (FRE 902)</button>
       <button class="nav-btn" data-tab="playback" id="tab-playback">Temporal Playback</button>
+      <button class="nav-btn" data-tab="streaming" id="tab-streaming">Live Streaming Influx <span class="badge" id="badge-streaming-alerts">0</span></button>
       <button class="nav-btn" data-tab="memory" id="tab-memory">Graph Memory & Typologies</button>
     </nav>
   </header>
@@ -485,6 +486,99 @@
           <span class="badge" id="playback-nodes-count">0 Active Nodes</span>
         </div>
         <div id="cy-playback-container" class="cy-canvas" style="height: 480px;"></div>
+      </div>
+    </section>
+
+    <!-- 6. LIVE STREAMING INFLUX & ANOMALY MONITOR VIEW -->
+    <section id="view-streaming" class="tab-view">
+      <div class="glass-card mb-4">
+        <div class="card-header">
+          <div class="header-left">
+            <h2>Real-Time Streaming Transaction Influx & Graph Anomaly Monitor</h2>
+            <p class="subtitle">Sub-millisecond sliding window anomaly detection across velocity bursts, novel devices, and impossible travel</p>
+          </div>
+          <div class="header-right">
+            <button id="btn-refresh-streaming" class="btn btn-secondary btn-small">🔄 Refresh Feed</button>
+          </div>
+        </div>
+
+        <!-- Live Operational Metrics Ticker -->
+        <div class="streaming-ticker-grid mt-3">
+          <div class="ticker-card">
+            <span class="ticker-label">Total Events Ingested</span>
+            <strong class="ticker-value" id="streaming-stat-total">0</strong>
+            <span class="ticker-sub">Sub-millisecond latency</span>
+          </div>
+          <div class="ticker-card">
+            <span class="ticker-label">Active Window Events (5m)</span>
+            <strong class="ticker-value" id="streaming-stat-window">0</strong>
+            <span class="ticker-sub">FIFO sliding eviction</span>
+          </div>
+          <div class="ticker-card">
+            <span class="ticker-label">Active Cards in Window</span>
+            <strong class="ticker-value" id="streaming-stat-cards">0</strong>
+            <span class="ticker-sub">Rolling state tracking</span>
+          </div>
+          <div class="ticker-card">
+            <span class="ticker-label">Total Alerts Emitted</span>
+            <strong class="ticker-value text-amber" id="streaming-stat-alerts">0</strong>
+            <span class="ticker-sub">Rule violation triggers</span>
+          </div>
+          <div class="ticker-card">
+            <span class="ticker-label">Critical Severity Alerts</span>
+            <strong class="ticker-value text-red" id="streaming-stat-critical">0</strong>
+            <span class="ticker-sub">Immediate action required</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Streaming Injection Sandbox -->
+      <div class="glass-card mb-4">
+        <div class="card-header">
+          <h3>⚡ Real-Time Streaming Attack Simulator (1-Click Influx Testing)</h3>
+          <span class="badge badge-info">Sub-Millisecond Engine</span>
+        </div>
+        <div class="sim-buttons-grid mt-3">
+          <button id="btn-sim-velocity" class="btn btn-secondary sim-btn">
+            <strong>🔥 Velocity Spike</strong>
+            <span>Inject 3 rapid txns ($150 each)</span>
+          </button>
+          <button id="btn-sim-device" class="btn btn-secondary sim-btn">
+            <strong>📱 Novel Device Link</strong>
+            <span>Inject new card on existing device</span>
+          </button>
+          <button id="btn-sim-travel" class="btn btn-secondary sim-btn">
+            <strong>✈️ Impossible Travel</strong>
+            <span>Inject NY -> London (22,000 km/h)</span>
+          </button>
+          <button id="btn-sim-mcc" class="btn btn-secondary sim-btn">
+            <strong>💳 High-Risk MCC</strong>
+            <span>Inject $1,250 Quasi-Cash (MCC 6051)</span>
+          </button>
+        </div>
+        <div id="streaming-inject-status" class="inject-status-pill mt-3 hidden"></div>
+      </div>
+
+      <!-- Live Streaming Alert Feed -->
+      <div class="glass-card">
+        <div class="card-header">
+          <div class="header-left">
+            <h3>Live Streaming Graph Alerts Feed</h3>
+            <span class="badge" id="streaming-alerts-count-badge">0 Alerts</span>
+          </div>
+          <div class="header-right">
+            <label for="select-alert-severity" class="mr-2">Severity:</label>
+            <select id="select-alert-severity" class="custom-select custom-select-small">
+              <option value="">All Severities</option>
+              <option value="CRITICAL">Critical Only</option>
+              <option value="HIGH">High & Above</option>
+              <option value="MEDIUM">Medium & Above</option>
+            </select>
+          </div>
+        </div>
+        <div class="streaming-alerts-feed mt-3" id="streaming-alerts-feed">
+          <div class="empty-placeholder">No streaming alerts emitted yet. Click one of the simulation buttons above to inject live transactions.</div>
+        </div>
       </div>
     </section>
 

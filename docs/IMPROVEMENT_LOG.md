@@ -1,3 +1,31 @@
+## Iteration 067: Real-Time Web UI Streaming Live Monitor & Dynamic Alert Feed with Action Dispatcher | 2026-09-21 03:45 | commit PENDING
+- **Lens:** 12. Visuals & UI experience, 8. Explainability & human-in-the-loop, 3. Next best action & policy enforcement, 7. Real-time latency & computational efficiency
+- **Goal / hypothesis:** Enterprise fraud operations centers (FOC) require live visual dashboards where operators can observe real-time transaction streams, inspect incoming rule alerts, test streaming attacks in a sandbox, and dispatch authorized policy actions with one click. Integrating a dedicated streaming dashboard into the web UI delivers:
+  1. **Live Operational Metrics Ticker**: Real-time counter cards tracking Total Events Ingested, 5-Minute Window Events, Active Cards, Total Alerts, and Critical Severity Alerts.
+  2. **1-Click Streaming Attack Simulator**: Sandbox buttons allowing operators to simulate Velocity Spikes (3 rapid txns), Novel Device Linkages, Impossible Physical Travel (NY -> London in 5 min), and High-Risk MCC 6051 quasi-cash transactions.
+  3. **Live Streaming Alert Feed**: Dynamic list rendering incoming alerts with severity-coded left borders (`CRITICAL` red, `HIGH` amber, `MEDIUM` cyan), rule badges, target card ID, and expandable details.
+  4. **1-Click Action Dispatcher**: Direct "Authorize Action" trigger on each alert card that invokes `/api/cases/{case_id}/actions/authorize` with role validation (`L2_SENIOR_INVESTIGATOR`).
+- **Changes (files):**
+  - `ui/index.html`: Added Live Streaming Influx tab button (`#tab-streaming`) and full `#view-streaming` section with ticker cards, simulation buttons, and alert feed container.
+  - `ui/app.js`: Implemented `loadStreamingDashboard`, `loadStreamingStats`, `loadStreamingAlerts`, `setupStreamingListeners`, `postStreamingTransactions`, and `dispatchStreamingAction` with 5-second auto-refresh polling.
+  - `ui/style.css`: Added dark-mode styles for streaming ticker grid, simulation buttons, alert cards, and status indicators.
+  - `tests/test_ui_streaming.py`: Created 5 unit tests validating static assets, DOM elements, script bindings, CSS rules, and API compatibility.
+- **Tests added/updated:**
+  - `tests/test_ui_streaming.py` (5 unit tests, all pass).
+  - Total unit test suite expanded from 258 to **263** tests across 54 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 258 -> **263** (100% pass rate across 54 test suites)
+  - UI Capabilities: Live Streaming Influx Tab, Attack Simulator Sandbox, Real-Time Alert Feed & Action Dispatcher
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 263 passed across 54 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 066: Streaming Transaction Influx Monitor & Dynamic Graph Anomaly Window Detector | 2026-09-21 03:30 | commit 965ca18
 - **Lens:** 13. System performance & scalability, 7. Real-time latency & computational efficiency, 10. Graph data modeling & schema design, 2. Investigation workflow & graph traversal
 - **Goal / hypothesis:** In high-throughput banking architectures, transactions arrive as continuous event streams (e.g. 1,000+ txns/sec). Full graph re-indexing for every incoming transaction is computationally prohibitive. By implementing an in-memory sliding window accumulator and sub-millisecond streaming anomaly detector, the platform enables:

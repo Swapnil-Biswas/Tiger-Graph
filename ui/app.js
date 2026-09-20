@@ -40,6 +40,9 @@ function initTabs() {
         const targetCid = (cCase && cCase.value) ? cCase.value : "HHG-001";
         loadEvidenceVault(targetCid);
       }
+      if (tabId === "streaming") {
+        loadStreamingDashboard();
+      }
     });
   });
 }
@@ -1001,5 +1004,211 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+// =========================================================================
+// Streaming Influx Monitor & Dynamic Alert Feed
+// =========================================================================
+let streamingInterval = null;
+
+function loadStreamingDashboard() {
+  loadStreamingStats();
+  loadStreamingAlerts();
+  setupStreamingListeners();
+
+  if (!streamingInterval) {
+    streamingInterval = setInterval(() => {
+      const activeTab = document.querySelector(".nav-btn.active");
+      if (activeTab && activeTab.getAttribute("data-tab") === "streaming") {
+        loadStreamingStats();
+        loadStreamingAlerts();
+      }
+    }, 5000);
+  }
+}
+
+async function loadStreamingStats() {
+  try {
+    const res = await fetch("/api/streaming/stats");
+    if (!res.ok) return;
+    const stats = await res.json();
+    
+    const elTotal = document.getElementById("streaming-stat-total");
+    const elWindow = document.getElementById("streaming-stat-window");
+    const elCards = document.getElementById("streaming-stat-cards");
+    const elAlerts = document.getElementById("streaming-stat-alerts");
+    const elCrit = document.getElementById("streaming-stat-critical");
+    const elBadge = document.getElementById("badge-streaming-alerts");
+
+    if (elTotal) elTotal.textContent = (stats.total_processed || 0).toLocaleString();
+    if (elWindow) elWindow.textContent = (stats.current_window_events || 0).toLocaleString();
+    if (elCards) elCards.textContent = (stats.active_cards_in_window || 0).toLocaleString();
+    if (elAlerts) elAlerts.textContent = (stats.total_alerts_emitted || 0).toLocaleString();
+    if (elCrit) elCrit.textContent = (stats.critical_alerts || 0).toLocaleString();
+    if (elBadge) elBadge.textContent = (stats.total_alerts_emitted || 0).toString();
+  } catch (err) {
+    console.error("Failed to load streaming stats:", err);
+  }
+}
+
+async function loadStreamingAlerts() {
+  const feed = document.getElementById("streaming-alerts-feed");
+  const countBadge = document.getElementById("streaming-alerts-count-badge");
+  const sevSelect = document.getElementById("select-alert-severity");
+  const sevFilter = (sevSelect && sevSelect.value) ? `?severity=${sevSelect.value}` : "";
+
+  try {
+    const res = await fetch(`/api/streaming/alerts${sevFilter}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    const alerts = data.alerts || [];
+
+    if (countBadge) countBadge.textContent = `${alerts.length} Alerts`;
+    if (!feed) return;
+
+    if (alerts.length === 0) {
+      feed.innerHTML = `<div class="empty-placeholder">No streaming alerts emitted yet. Click one of the simulation buttons above to inject live transactions.</div>`;
+      return;
+    }
+
+    feed.innerHTML = alerts.slice().reverse().map(a => {
+      const sevClass = (a.severity || "medium").toLowerCase();
+      const badgeClass = `badge-${sevClass}`;
+      const detailsStr = Object.entries(a.details || {})
+        .map(([k, v]) => `<strong>${k}:</strong> ${typeof v === 'object' ? JSON.stringify(v) : v}`)
+        .join(" | ");
+
+      return `
+        <div class="streaming-alert-card ${sevClass}">
+          <div class="alert-card-top">
+            <span class="alert-rule-badge ${badgeClass}">${a.rule_triggered}</span>
+            <span class="badge ${badgeClass}">${a.severity}</span>
+          </div>
+          <div class="alert-card-body">
+            <div>Target Card: <strong class="text-cyan">${a.card_id}</strong></div>
+            <div class="mt-1">${detailsStr}</div>
+          </div>
+          <div class="alert-card-actions">
+            <span class="alert-time">${a.timestamp} (Epoch: ${a.epoch_s})</span>
+            <button class="btn btn-secondary btn-small" onclick="dispatchStreamingAction('${a.card_id}', '${a.rule_triggered}')">
+              ⚡ Authorize Action
+            </button>
+          </div>
+        </div>
+      `;
+    }).join("");
+  } catch (err) {
+    console.error("Failed to load streaming alerts:", err);
+  }
+}
+
+function setupStreamingListeners() {
+  const btnRefresh = document.getElementById("btn-refresh-streaming");
+  if (btnRefresh && !btnRefresh.dataset.bound) {
+    btnRefresh.dataset.bound = "true";
+    btnRefresh.addEventListener("click", () => {
+      loadStreamingStats();
+      loadStreamingAlerts();
+    });
+  }
+
+  const sevSelect = document.getElementById("select-alert-severity");
+  if (sevSelect && !sevSelect.dataset.bound) {
+    sevSelect.dataset.bound = "true";
+    sevSelect.addEventListener("change", loadStreamingAlerts);
+  }
+
+  // Simulation Buttons
+  setupSimButton("btn-sim-velocity", async () => {
+    const card = `C_SIM_VEL_${Math.floor(Math.random() * 900 + 100)}`;
+    const now = Math.floor(Date.now() / 1000);
+    const txns = [
+      { TransactionID: `TX_V1_${now}`, card_id: card, amount: 150.0, epoch_s: now },
+      { TransactionID: `TX_V2_${now}`, card_id: card, amount: 200.0, epoch_s: now + 5 },
+      { TransactionID: `TX_V3_${now}`, card_id: card, amount: 250.0, epoch_s: now + 10 },
+    ];
+    return postStreamingTransactions(txns, "Injected 3 rapid transactions (Velocity Spike triggered!)");
+  });
+
+  setupSimButton("btn-sim-device", async () => {
+    const now = Math.floor(Date.now() / 1000);
+    const dev = "Shared_iPhone_14_Pro_Fingerprint";
+    const txns = [
+      { TransactionID: `TX_D1_${now}`, card_id: "CARD_PRIME", amount: 50.0, device_profile: dev, epoch_s: now },
+      { TransactionID: `TX_D2_${now}`, card_id: `CARD_NEW_${Math.floor(Math.random()*900+100)}`, amount: 80.0, device_profile: dev, epoch_s: now + 2 },
+    ];
+    return postStreamingTransactions(txns, "Injected secondary card on existing device (Novel Device Link triggered!)");
+  });
+
+  setupSimButton("btn-sim-travel", async () => {
+    const now = Math.floor(Date.now() / 1000);
+    const card = `C_TRAVEL_${Math.floor(Math.random() * 900 + 100)}`;
+    const txns = [
+      { TransactionID: `TX_NY_${now}`, card_id: card, amount: 45.0, latitude: 40.7128, longitude: -74.0060, epoch_s: now },
+      { TransactionID: `TX_LON_${now}`, card_id: card, amount: 120.0, latitude: 51.5074, longitude: -0.1278, epoch_s: now + 300 },
+    ];
+    return postStreamingTransactions(txns, "Injected NY -> London within 5 mins (Impossible Travel triggered!)");
+  });
+
+  setupSimButton("btn-sim-mcc", async () => {
+    const now = Math.floor(Date.now() / 1000);
+    const card = `C_MCC_${Math.floor(Math.random() * 900 + 100)}`;
+    const txns = [
+      { TransactionID: `TX_MCC_${now}`, card_id: card, amount: 1250.0, mcc: "6051", epoch_s: now },
+    ];
+    return postStreamingTransactions(txns, "Injected $1,250 Quasi-Cash transaction (High-Risk MCC 6051 triggered!)");
+  });
+}
+
+function setupSimButton(id, handler) {
+  const btn = document.getElementById(id);
+  if (btn && !btn.dataset.bound) {
+    btn.dataset.bound = "true";
+    btn.addEventListener("click", handler);
+  }
+}
+
+async function postStreamingTransactions(txns, successMsg) {
+  const statusPill = document.getElementById("streaming-inject-status");
+  try {
+    const res = await fetch("/api/streaming/ingest", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ transactions: txns }),
+    });
+    const data = await res.json();
+    if (statusPill) {
+      statusPill.textContent = `✓ ${successMsg} [${data.alerts_triggered} alert(s) emitted]`;
+      statusPill.classList.remove("hidden");
+      setTimeout(() => statusPill.classList.add("hidden"), 4000);
+    }
+    loadStreamingStats();
+    loadStreamingAlerts();
+  } catch (err) {
+    console.error("Failed to inject streaming txns:", err);
+  }
+}
+
+async function dispatchStreamingAction(cardId, ruleTriggered) {
+  const actionName = (ruleTriggered === "IMPOSSIBLE_TRAVEL" || ruleTriggered === "VELOCITY_SPIKE") ? "BLOCK_CARD" : "STEP_UP_AUTH";
+  try {
+    const res = await fetch(`/api/cases/HHG-001/actions/authorize`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-User-Role": "L2_SENIOR_INVESTIGATOR",
+      },
+      body: JSON.stringify({ action_name: actionName, exposure_usd: 500.0 }),
+    });
+    const data = await res.json();
+    if (data.authorized) {
+      alert(`Action '${actionName}' successfully authorized for card ${cardId} by L2_SENIOR_INVESTIGATOR.`);
+    } else {
+      alert(`Action '${actionName}' denied: ${data.reason}`);
+    }
+  } catch (err) {
+    alert(`Action dispatch failed: ${err.message}`);
+  }
+}
+
 
 
