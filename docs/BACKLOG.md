@@ -189,10 +189,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 51. **[DONE - Iteration 051] [Multi-Agent Federation] Specialized Anti-Money Laundering (AML) Sub-Agent**
     - *Result:* Implemented `AMLSpecialistAgent` and `AMLAssessment` in `src/agent/aml_agent.py`. Synthesizes structuring patterns (Q16), correspondent banking corridors (Q20), and quasi-cash MCCs (Q21) into an immutable statutory assessment citing 31 USC 5324(a), 31 CFR 1010.311, 31 CFR 1020.320, and FATF Recommendation 16. Integrated as Step 13 in `FraudInvestigatorAgent.investigate_case`. Added API endpoints `POST /api/agents/aml/assess` and `GET /api/cases/{case_id}/aml-assessment`. Added 6 unit tests in `tests/test_aml_agent.py` (188/188 tests pass across 41 suites).
 
-52. **[Multi-Agent Federation] Cyber-Forensics & Device Fingerprint Specialist Sub-Agent**
-    - *Goal:* Implement dedicated `CyberForensicsAgent` specializing in device sharing nexuses (Q4), Jaro-Winkler sybil resolution (Q23), and proxy rotation anomaly analysis.
-    - *Files:* `src/agent/cyber_agent.py`, `src/agent/orchestrator.py`, `tests/test_cyber_agent.py`
-    - *Metric Impact:* Device Sharing & Identity Graph (Lens 4, Lens 11).
+52. **[DONE - Iteration 052] [Multi-Agent Federation] Cyber-Forensics & Device Fingerprint Specialist Sub-Agent**
+    - *Result:* Implemented `CyberForensicsAgent` and `CyberForensicsAssessment` in `src/agent/cyber_agent.py`. Coordinates hardware sharing nexuses (Q4), bot attack periodicity (Q15), and probabilistic sybil account resolution (Q23) into an immutable forensics assessment. Emits proactive defense controls (hardware blacklisting, biometrics step-up, IP rate limiting). Integrated as Step 14 in `FraudInvestigatorAgent.investigate_case`. Added API endpoints `POST /api/agents/cyber/assess` and `GET /api/cases/{case_id}/cyber-assessment`. Added 6 unit tests in `tests/test_cyber_agent.py` (194/194 tests pass across 42 suites).
 
 53. **[Agentic Consensus & Debate] Multi-Agent Debate & Weighted Majority Voting Protocol**
     - *Goal:* Implement structured multi-agent debate and consensus protocol where Fraud, AML, and Cyber agents exchange findings, debate borderline risk probabilities, and compute calibrated consensus verdicts.

@@ -522,4 +522,9 @@ class FraudInvestigatorAgent:
         aml_agent = AMLSpecialistAgent(client=self.client)
         answer["aml_specialist"] = aml_agent.assess_case(case_id, as_of=as_of).to_dict()
 
+        # 14. MULTI-AGENT FEDERATION: SPECIALIZED CYBER-FORENSICS SUB-AGENT
+        from src.agent.cyber_agent import CyberForensicsAgent
+        cyber_agent = CyberForensicsAgent(client=self.client)
+        answer["cyber_forensics"] = cyber_agent.assess_case(case_id, as_of=as_of).to_dict()
+
         return answer
