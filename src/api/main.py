@@ -7,6 +7,7 @@ memory retrieval, mock actions, and serves the web frontend.
 import os
 import sys
 import json
+import time
 from typing import Dict, Any, Optional, List, Union
 from fastapi import FastAPI, HTTPException, Query, Body, Response, Depends
 from fastapi.responses import StreamingResponse, JSONResponse, FileResponse
@@ -79,6 +80,13 @@ sar_packager = FinCENSARXMLPackager()
 # Streaming Transaction Monitor
 from src.graph.streaming_monitor import StreamingGraphMonitor, StreamingAlert
 streaming_monitor = StreamingGraphMonitor()
+
+# Enterprise Prometheus & SLA Telemetry
+from src.api.telemetry import telemetry
+telemetry.set_gauge("graph_indexed_entities", len(agent.client.store.transactions), {"type": "transactions"})
+telemetry.set_gauge("graph_indexed_entities", len(agent.client.store.cards), {"type": "cards"})
+telemetry.set_gauge("graph_indexed_entities", len(agent.client.store.customers), {"type": "customers"})
+telemetry.set_gauge("graph_indexed_entities", len(agent.client.store.closed_cases), {"type": "cases"})
 
 # In-memory store for active cases & approvals
 active_cases: Dict[str, Dict[str, Any]] = {}
@@ -352,9 +360,14 @@ def get_case(case_id: str, user: AuthUser = Depends(get_current_user)):
 @app.post("/api/investigate")
 def start_investigation(req: InvestigateRequest):
     """Synchronous investigation endpoint."""
+    t0 = time.perf_counter()
     res = agent.investigate_case(req.case_id, simulated_scenario=req.scenario)
+    elapsed = time.perf_counter() - t0
     active_cases[req.case_id] = res
     case_manager.write_case_to_graph(res)
+
+    telemetry.inc_counter("fraud_investigations_total", 1.0, {"verdict": res["case"]["verdict"], "status": "completed"})
+    telemetry.observe_histogram("investigation_latency_seconds", elapsed)
 
     # Queue any gated L1 / L2 approvals
     for act in res["next_best_actions"]["final"]:
@@ -1213,6 +1226,12 @@ def authorize_case_action(
 ):
     """Checks whether the authenticated user has authority to execute a specific action on a case."""
     authorized, reason = user.can_execute_action(req.action_name, req.exposure_usd or 0.0)
+    if authorized:
+        telemetry.inc_counter(
+            "policy_actions_authorized_total",
+            1.0,
+            {"action": req.action_name, "role": user.role.value},
+        )
     return {
         "case_id": case_id,
         "action_name": req.action_name,
@@ -1265,11 +1284,18 @@ StreamingIngestRequest.model_rebuild()
 @app.post("/api/streaming/ingest")
 def ingest_streaming_transaction(req: StreamingIngestRequest):
     """Ingests live streaming transactions and returns any triggered anomaly alerts."""
+    t0 = time.perf_counter()
     txns = req.transactions or ([req.transaction] if req.transaction else [])
     alerts = []
     for t in txns:
         al = streaming_monitor.ingest_transaction(t)
         alerts.extend(al)
+    elapsed = time.perf_counter() - t0
+    telemetry.inc_counter("streaming_transactions_ingested_total", float(len(txns)))
+    telemetry.observe_histogram("streaming_ingest_latency_seconds", elapsed, buckets=telemetry.STREAMING_BUCKETS)
+    if alerts:
+        for a in alerts:
+            telemetry.inc_counter("streaming_alerts_emitted_total", 1.0, {"rule": a.rule_triggered, "severity": a.severity})
     return {
         "processed": len(txns),
         "alerts_triggered": len(alerts),
@@ -1287,6 +1313,21 @@ def get_streaming_alerts(severity: Optional[str] = None, limit: int = 50):
 def get_streaming_stats():
     """Returns sliding window operational metrics."""
     return streaming_monitor.get_stats()
+
+
+@app.get("/metrics")
+def get_prometheus_metrics():
+    """Prometheus/OpenMetrics exposition endpoint for Grafana/Prometheus scraper."""
+    return Response(
+        content=telemetry.generate_prometheus_metrics(),
+        media_type="text/plain; version=0.0.4; charset=utf-8",
+    )
+
+
+@app.get("/api/telemetry/dashboard")
+def get_telemetry_dashboard():
+    """Returns operational SLA telemetry metrics and health status."""
+    return telemetry.get_dashboard_summary()
 
 
 @app.post("/api/benchmark/run")
