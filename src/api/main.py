@@ -1622,6 +1622,11 @@ def get_case_graph_diff(case_id: str):
         raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
     cid = raw.get("case", {}).get("first_suspicious_txn_id") or case_id
     t_alert = time.time()
+    t_base = t_alert - 30 * 86400
+    diff_data = agent.client.compare_topology_snapshots(entity_id=cid, t1=t_base, t2=t_alert, hops=2)
+    return diff_data
+
+
 # Statutory & Policy Compliance Audit Packager
 from src.policy.compliance_report import compliance_packager
 

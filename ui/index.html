@@ -52,6 +52,8 @@
       <button class="nav-btn" data-tab="compliance" id="tab-compliance">Compliance Vault (FRE 902)</button>
       <button class="nav-btn" data-tab="playback" id="tab-playback">Temporal Playback</button>
       <button class="nav-btn" data-tab="streaming" id="tab-streaming">Live Streaming Influx <span class="badge" id="badge-streaming-alerts">0</span></button>
+      <button class="nav-btn" data-tab="briefing" id="tab-briefing">Executive Briefing & Audit</button>
+      <button class="nav-btn" data-tab="graphql" id="tab-graphql">GraphQL & Diff Explorer</button>
       <button class="nav-btn" data-tab="memory" id="tab-memory">Graph Memory & Typologies</button>
     </nav>
   </header>
@@ -578,6 +580,176 @@
         </div>
         <div class="streaming-alerts-feed mt-3" id="streaming-alerts-feed">
           <div class="empty-placeholder">No streaming alerts emitted yet. Click one of the simulation buttons above to inject live transactions.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. EXECUTIVE CASE BRIEFING & AUDIT CERTIFICATE VIEW -->
+    <section id="view-briefing" class="tab-view">
+      <div class="case-selector-bar glass-card">
+        <div class="selector-group">
+          <label for="select-briefing-case">Target Case:</label>
+          <select id="select-briefing-case" class="custom-select">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+        <div class="selector-group">
+          <label for="select-briefing-mode">View Format:</label>
+          <select id="select-briefing-mode" class="custom-select">
+            <option value="html">Printable HTML Dossier</option>
+            <option value="compliance">Statutory Compliance Certificate</option>
+            <option value="markdown">Raw Markdown</option>
+          </select>
+        </div>
+        <button id="btn-load-briefing" class="btn btn-primary glow-button">
+          📄 Load Executive Briefing
+        </button>
+        <button id="btn-print-briefing" class="btn btn-secondary">
+          🖨️ Print / Save PDF
+        </button>
+      </div>
+
+      <!-- Compliance Summary Bar -->
+      <div class="glass-card mb-4" id="briefing-compliance-bar">
+        <div class="card-header">
+          <div class="header-left">
+            <h3>Statutory Compliance & FRE 902 Audit Status</h3>
+            <p class="subtitle" id="briefing-cert-id">Certificate ID: COMP-CERT-PENDING</p>
+          </div>
+          <span class="badge badge-success" id="briefing-compliance-badge">100.0% COMPLIANT</span>
+        </div>
+        <div class="streaming-ticker-grid mt-3">
+          <div class="ticker-card">
+            <span class="ticker-label">FinCEN 31 CFR 1020</span>
+            <strong class="ticker-value text-green" id="briefing-stat-fincen">PASS</strong>
+            <span class="ticker-sub">SAR threshold & retention</span>
+          </div>
+          <div class="ticker-card">
+            <span class="ticker-label">UK POCA / FCA</span>
+            <strong class="ticker-value text-green" id="briefing-stat-poca">PASS</strong>
+            <span class="ticker-sub">DAML STR compliance</span>
+          </div>
+          <div class="ticker-card">
+            <span class="ticker-label">EU GDPR Art. 5</span>
+            <strong class="ticker-value text-green" id="briefing-stat-gdpr">PASS</strong>
+            <span class="ticker-sub">Data minimization</span>
+          </div>
+          <div class="ticker-card">
+            <span class="ticker-label">Internal Policies (R1-R10)</span>
+            <strong class="ticker-value text-green" id="briefing-stat-policy">PASS</strong>
+            <span class="ticker-sub">Deterministic guardrails</span>
+          </div>
+          <div class="ticker-card">
+            <span class="ticker-label">FRE 902(13)/(14)</span>
+            <strong class="ticker-value text-green" id="briefing-stat-fre902">CERTIFIED</strong>
+            <span class="ticker-sub">Cryptographic chain</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Document Display Frame / Container -->
+      <div class="glass-card">
+        <div class="card-header">
+          <h3 id="briefing-content-title">Executive Case Summary & Dossier</h3>
+          <span class="badge badge-info" id="briefing-format-badge">HTML View</span>
+        </div>
+        <div id="briefing-content-container" style="min-height: 500px; padding: 15px; background: rgba(15, 23, 42, 0.6); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); overflow-y: auto;">
+          <iframe id="briefing-iframe" style="width: 100%; min-height: 600px; border: none; border-radius: 6px; background: #ffffff;"></iframe>
+          <pre id="briefing-markdown-pre" class="hidden" style="white-space: pre-wrap; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #e2e8f0;"></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. GRAPHQL EXPLORER & GRAPH TEMPORAL DIFF VIEW -->
+    <section id="view-graphql" class="tab-view">
+      <!-- Section 1: Graph Temporal Diff Comparator -->
+      <div class="glass-card mb-4">
+        <div class="card-header">
+          <div class="header-left">
+            <h2>Graph Temporal Motif & Topology Diff Comparator</h2>
+            <p class="subtitle">Compares graph structure between baseline t1 and incident t2 to detect structural surges and motif emergence</p>
+          </div>
+          <span class="badge" id="diff-risk-badge">STABLE</span>
+        </div>
+
+        <div class="case-selector-bar mt-3">
+          <div class="selector-group">
+            <label for="select-diff-case">Select Case:</label>
+            <select id="select-diff-case" class="custom-select">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+          <button id="btn-run-diff" class="btn btn-primary glow-button">
+            🔍 Compare Ego-Network Snapshots
+          </button>
+        </div>
+
+        <!-- Diff Metrics Grid -->
+        <div class="streaming-ticker-grid mt-3">
+          <div class="ticker-card">
+            <span class="ticker-label">Added Nodes</span>
+            <strong class="ticker-value text-green" id="diff-stat-nodes-added">+0</strong>
+            <span class="ticker-sub">Novel entities</span>
+          </div>
+          <div class="ticker-card">
+            <span class="ticker-label">Added Edges</span>
+            <strong class="ticker-value text-green" id="diff-stat-edges-added">+0</strong>
+            <span class="ticker-sub">Transaction surges</span>
+          </div>
+          <div class="ticker-card">
+            <span class="ticker-label">Persistent Subgraph</span>
+            <strong class="ticker-value" id="diff-stat-persistent">0 nodes</strong>
+            <span class="ticker-sub">Historical anchor</span>
+          </div>
+          <div class="ticker-card">
+            <span class="ticker-label">Motif Shifts</span>
+            <strong class="ticker-value text-amber" id="diff-stat-motifs">0 triangles</strong>
+            <span class="ticker-sub">Ring / star formations</span>
+          </div>
+          <div class="ticker-card">
+            <span class="ticker-label">Structural Risk</span>
+            <strong class="ticker-value text-green" id="diff-stat-classification">STABLE</strong>
+            <span class="ticker-sub">Topology change tier</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Interactive GraphQL Query Runner -->
+      <div class="glass-card">
+        <div class="card-header">
+          <div class="header-left">
+            <h2>GraphQL Query Resolver & GraphiQL IDE</h2>
+            <p class="subtitle">Zero-dependency recursive descent GraphQL parser & schema resolver</p>
+          </div>
+          <a href="/graphql" target="_blank" class="btn btn-secondary btn-small" id="link-open-graphiql">
+            🚀 Open Full GraphiQL IDE
+          </a>
+        </div>
+
+        <div class="case-selector-bar mt-3">
+          <div class="selector-group">
+            <label for="select-graphql-preset">Query Preset:</label>
+            <select id="select-graphql-preset" class="custom-select">
+              <option value="CaseOverview">CaseOverview(caseId: "HHG-001")</option>
+              <option value="RecentFraudCases">RecentFraudCases(limit: 5, verdict: "fraud")</option>
+              <option value="AuditLedger">AuditLedger(limit: 5)</option>
+              <option value="BenchmarkAnalytics">BenchmarkSummary</option>
+            </select>
+          </div>
+          <button id="btn-execute-graphql" class="btn btn-primary glow-button">
+            ▶ Execute GraphQL Query
+          </button>
+        </div>
+
+        <div class="grid-2col mt-3" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <div>
+            <label style="font-size: 0.85rem; color: #94a3b8; display: block; margin-bottom: 5px;">GraphQL Query (AST Input):</label>
+            <textarea id="graphql-query-input" style="width: 100%; height: 220px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; background: #0f172a; color: #38bdf8; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 10px; resize: vertical;"></textarea>
+          </div>
+          <div>
+            <label style="font-size: 0.85rem; color: #94a3b8; display: block; margin-bottom: 5px;">Resolved JSON Response:</label>
+            <pre id="graphql-response-output" style="width: 100%; height: 220px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; background: #0b0f19; color: #a5f3fc; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 10px; overflow: auto; margin: 0;"></pre>
+          </div>
         </div>
       </div>
     </section>

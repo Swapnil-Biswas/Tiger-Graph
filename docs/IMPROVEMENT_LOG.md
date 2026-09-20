@@ -1,3 +1,34 @@
+## Iteration 096: Interactive Web UI Executive Briefing & GraphQL Tabs | 2026-09-21 11:00 | commit iter-096
+- **Lens:** 8. Explainability & human-in-the-loop, 10. Demo quality & presentation, 11. Agent architecture & engineering
+- **Goal / hypothesis:** Providing investigators, compliance officers, and hackathon judges with an intuitive, unified visual dashboard to inspect publication-grade executive briefings, statutory compliance audit certificates, graph temporal topology diffs, and arbitrary GraphQL queries elevates demo quality and operational trust:
+  1. **Executive Briefing & Compliance Vault (`#view-briefing`)**: Integrated responsive tab in `ui/index.html` and `ui/app.js` with mode toggles (Printable HTML Dossier, Statutory Compliance Certificate, Raw Markdown), one-click `window.print()` PDF generation, and live compliance scorecards (FinCEN 31 CFR 1020, UK POCA, EU GDPR Art. 5, Rules R1-R10, FRE 902).
+  2. **Graph Temporal Motif & Topology Diff Viewer (`#view-graphql`)**: Visualizes ego-network evolution between baseline $t_1$ and incident $t_2$, highlighting added/persistent nodes and edges, motif changes (triangles, cycles), and real-time risk classification badges (`STABLE`, `RING_FORMATION`, `STRUCTURAL_EXPLOSION`).
+  3. **Interactive GraphQL Query Runner & GraphiQL IDE Bridge**: Embedded AST query runner with 4 production presets (`CaseOverview`, `RecentFraudCases`, `AuditLedger`, `BenchmarkAnalytics`), formatted JSON responses, and a direct link to the full `/graphql` GraphiQL playground.
+  4. **Automated UI Testing**: Built `tests/test_ui_briefing_graphql.py` validating HTML elements, JavaScript handlers, and backend endpoint responsiveness.
+- **Changes (files):**
+  - `ui/index.html`: Added navigation buttons (`tab-briefing`, `tab-graphql`) and view sections (`view-briefing`, `view-graphql`).
+  - `ui/app.js`: Added tab activation handlers, dropdown population, event listeners, and API execution functions.
+  - `src/api/main.py`: Restored full response body for `get_case_graph_diff`.
+  - `tests/test_ui_briefing_graphql.py`: Created 6 unit tests covering HTML structure, JS functions, and backend APIs.
+  - `docs/METRICS.md`: Added Iteration 096 row.
+  - `docs/BACKLOG.md`: Marked item 96 as DONE.
+  - `docs/IMPROVEMENT_LOG.md`: Documented Iteration 096.
+- **Tests added/updated:**
+  - `tests/test_ui_briefing_graphql.py` (6 unit tests, all pass).
+  - Total unit test suite expanded from 387 to **393** tests across 77 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 387 -> **393** (100% pass rate across 77 test suites)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Extended Benchmark Answers Valid: 50/50 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 393 passed across 77 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 095: Checkpoint 17 Audit, 95-Iteration Milestone Review, and v0.95 Release Tag | 2026-09-21 10:45 | commit v0.95
 - **Lens:** All 15 PRD Evaluation Lenses
 - **Goal / hypothesis:** Reaching 95% completion (95/100 iterations) represents nineteen-twentieths of the journey. Conducting a comprehensive checkpoint audit across all 15 PRD evaluation lenses validates:

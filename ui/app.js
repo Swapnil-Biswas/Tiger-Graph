@@ -43,6 +43,17 @@ function initTabs() {
       if (tabId === "streaming") {
         loadStreamingDashboard();
       }
+      if (tabId === "briefing") {
+        const bCase = document.getElementById("select-briefing-case");
+        const targetCid = (bCase && bCase.value) ? bCase.value : "HHG-001";
+        loadExecutiveBriefing(targetCid);
+      }
+      if (tabId === "graphql") {
+        initGraphQLRunner();
+        const dCase = document.getElementById("select-diff-case");
+        const targetCid = (dCase && dCase.value) ? dCase.value : "HHG-001";
+        runGraphTemporalDiff(targetCid);
+      }
     });
   });
 }
@@ -242,6 +253,10 @@ async function loadCasesList() {
     if (selectCompliance) selectCompliance.innerHTML = "";
     const selectPlayback = document.getElementById("select-playback-case");
     if (selectPlayback) selectPlayback.innerHTML = "";
+    const selectBriefing = document.getElementById("select-briefing-case");
+    if (selectBriefing) selectBriefing.innerHTML = "";
+    const selectDiff = document.getElementById("select-diff-case");
+    if (selectDiff) selectDiff.innerHTML = "";
     const tbody = document.getElementById("case-board-tbody");
     tbody.innerHTML = "";
 
@@ -259,6 +274,14 @@ async function loadCasesList() {
       if (selectPlayback) {
         const optPlay = opt.cloneNode(true);
         selectPlayback.appendChild(optPlay);
+      }
+      if (selectBriefing) {
+        const optBrief = opt.cloneNode(true);
+        selectBriefing.appendChild(optBrief);
+      }
+      if (selectDiff) {
+        const optDiff = opt.cloneNode(true);
+        selectDiff.appendChild(optDiff);
       }
 
       // Table row in Case Board
@@ -358,6 +381,71 @@ function setupEventListeners() {
         btnRunAll.disabled = false;
         btnRunAll.textContent = "⚡ Run Full Benchmark (20 Cases)";
       }
+    });
+  }
+
+  // Executive Briefing Event Listeners
+  const btnLoadBriefing = document.getElementById("btn-load-briefing");
+  if (btnLoadBriefing) {
+    btnLoadBriefing.addEventListener("click", () => {
+      const cid = document.getElementById("select-briefing-case").value;
+      loadExecutiveBriefing(cid);
+    });
+  }
+
+  const btnPrintBriefing = document.getElementById("btn-print-briefing");
+  if (btnPrintBriefing) {
+    btnPrintBriefing.addEventListener("click", () => {
+      printExecutiveBriefing();
+    });
+  }
+
+  const selectBriefingCase = document.getElementById("select-briefing-case");
+  if (selectBriefingCase) {
+    selectBriefingCase.addEventListener("change", (e) => {
+      loadExecutiveBriefing(e.target.value);
+    });
+  }
+
+  const selectBriefingMode = document.getElementById("select-briefing-mode");
+  if (selectBriefingMode) {
+    selectBriefingMode.addEventListener("change", () => {
+      const cid = document.getElementById("select-briefing-case").value;
+      loadExecutiveBriefing(cid);
+    });
+  }
+
+  // Graph Temporal Diff Event Listeners
+  const btnRunDiff = document.getElementById("btn-run-diff");
+  if (btnRunDiff) {
+    btnRunDiff.addEventListener("click", () => {
+      const cid = document.getElementById("select-diff-case").value;
+      runGraphTemporalDiff(cid);
+    });
+  }
+
+  const selectDiffCase = document.getElementById("select-diff-case");
+  if (selectDiffCase) {
+    selectDiffCase.addEventListener("change", (e) => {
+      runGraphTemporalDiff(e.target.value);
+    });
+  }
+
+  // GraphQL Explorer Event Listeners
+  const selectGqlPreset = document.getElementById("select-graphql-preset");
+  if (selectGqlPreset) {
+    selectGqlPreset.addEventListener("change", (e) => {
+      const input = document.getElementById("graphql-query-input");
+      if (input && GRAPHQL_PRESETS[e.target.value]) {
+        input.value = GRAPHQL_PRESETS[e.target.value];
+      }
+    });
+  }
+
+  const btnExecGql = document.getElementById("btn-execute-graphql");
+  if (btnExecGql) {
+    btnExecGql.addEventListener("click", () => {
+      executeGraphQLQuery();
     });
   }
 }
@@ -1210,5 +1298,216 @@ async function dispatchStreamingAction(cardId, ruleTriggered) {
   }
 }
 
+// =========================================================================
+// Executive Case Briefing & Statutory Compliance Audit
+// =========================================================================
+async function loadExecutiveBriefing(caseId, mode = "html") {
+  const briefingIframe = document.getElementById("briefing-iframe");
+  const markdownPre = document.getElementById("briefing-markdown-pre");
+  const badgeFormat = document.getElementById("briefing-format-badge");
+  const titleElem = document.getElementById("briefing-content-title");
+  const certIdElem = document.getElementById("briefing-cert-id");
+  const certBadge = document.getElementById("briefing-compliance-badge");
 
+  const modeSelect = document.getElementById("select-briefing-mode");
+  const selectedMode = modeSelect ? modeSelect.value : mode;
 
+  try {
+    // 1. Fetch compliance report JSON for stats bar
+    const compRes = await fetch(`/api/compliance/report/${caseId}?format=json`);
+    if (compRes.ok) {
+      const compData = await compRes.json();
+      if (certIdElem) certIdElem.textContent = `Certificate ID: ${compData.certificate_id} | FRE 902 Hash: ${compData.signature_hash.substring(0, 16)}...`;
+      if (certBadge) {
+        certBadge.textContent = `${compData.compliance_score.toFixed(1)}% ${compData.overall_status}`;
+        certBadge.className = compData.overall_status === "COMPLIANT" ? "badge badge-success" : (compData.overall_status === "CONDITIONAL_COMPLIANCE" ? "badge badge-warning" : "badge badge-danger");
+      }
+
+      // Update ticker cards
+      const fincenStat = document.getElementById("briefing-stat-fincen");
+      if (fincenStat && compData.framework_assessments && compData.framework_assessments.BSA_FINCEN) {
+        const fa = compData.framework_assessments.BSA_FINCEN;
+        fincenStat.textContent = fa.status;
+        fincenStat.className = fa.status === "PASS" ? "ticker-value text-green" : "ticker-value text-red";
+      }
+      const pocaStat = document.getElementById("briefing-stat-poca");
+      if (pocaStat && compData.framework_assessments && compData.framework_assessments.UK_POCA) {
+        const fa = compData.framework_assessments.UK_POCA;
+        pocaStat.textContent = fa.status;
+        pocaStat.className = fa.status === "PASS" ? "ticker-value text-green" : "ticker-value text-red";
+      }
+      const gdprStat = document.getElementById("briefing-stat-gdpr");
+      if (gdprStat && compData.framework_assessments && compData.framework_assessments.EU_GDPR_6AMLD) {
+        const fa = compData.framework_assessments.EU_GDPR_6AMLD;
+        gdprStat.textContent = fa.status;
+        gdprStat.className = fa.status === "PASS" ? "ticker-value text-green" : "ticker-value text-amber";
+      }
+      const policyStat = document.getElementById("briefing-stat-policy");
+      if (policyStat && compData.framework_assessments && compData.framework_assessments.INTERNAL_POLICY_R1_R10) {
+        const fa = compData.framework_assessments.INTERNAL_POLICY_R1_R10;
+        policyStat.textContent = fa.status;
+        policyStat.className = fa.status === "PASS" ? "ticker-value text-green" : "ticker-value text-red";
+      }
+      const freStat = document.getElementById("briefing-stat-fre902");
+      if (freStat && compData.framework_assessments && compData.framework_assessments.FRE_902_CHAIN_OF_CUSTODY) {
+        const fa = compData.framework_assessments.FRE_902_CHAIN_OF_CUSTODY;
+        freStat.textContent = fa.status === "PASS" ? "CERTIFIED" : "TAMPERED";
+        freStat.className = fa.status === "PASS" ? "ticker-value text-green" : "ticker-value text-red";
+      }
+    }
+
+    // 2. Load selected view format
+    if (selectedMode === "markdown") {
+      const res = await fetch(`/api/cases/${caseId}/briefing/markdown`);
+      const text = await res.text();
+      if (briefingIframe) briefingIframe.classList.add("hidden");
+      if (markdownPre) {
+        markdownPre.textContent = text;
+        markdownPre.classList.remove("hidden");
+      }
+      if (badgeFormat) badgeFormat.textContent = "Markdown View";
+      if (titleElem) titleElem.textContent = `Executive Case Briefing (Markdown) — ${caseId}`;
+    } else if (selectedMode === "compliance") {
+      const url = `/api/compliance/report/${caseId}?format=html`;
+      if (markdownPre) markdownPre.classList.add("hidden");
+      if (briefingIframe) {
+        briefingIframe.src = url;
+        briefingIframe.classList.remove("hidden");
+      }
+      if (badgeFormat) badgeFormat.textContent = "Compliance Certificate";
+      if (titleElem) titleElem.textContent = `Statutory Compliance Audit Certificate — ${caseId}`;
+    } else {
+      // Default: printable HTML dossier
+      const url = `/api/cases/${caseId}/briefing/html`;
+      if (markdownPre) markdownPre.classList.add("hidden");
+      if (briefingIframe) {
+        briefingIframe.src = url;
+        briefingIframe.classList.remove("hidden");
+      }
+      if (badgeFormat) badgeFormat.textContent = "Printable HTML Dossier";
+      if (titleElem) titleElem.textContent = `Executive Case Summary & Dossier — ${caseId}`;
+    }
+  } catch (err) {
+    console.error("Failed to load executive briefing:", err);
+  }
+}
+
+function printExecutiveBriefing() {
+  const iframe = document.getElementById("briefing-iframe");
+  if (iframe && !iframe.classList.contains("hidden") && iframe.contentWindow) {
+    iframe.contentWindow.print();
+  } else {
+    window.print();
+  }
+}
+
+// =========================================================================
+// Graph Temporal Motif & Topology Diff Comparator
+// =========================================================================
+async function runGraphTemporalDiff(caseId) {
+  try {
+    const res = await fetch(`/api/cases/${caseId}/graph-diff`);
+    if (!res.ok) return;
+    const data = await res.json();
+
+    const riskBadge = document.getElementById("diff-risk-badge");
+    const classVal = document.getElementById("diff-stat-classification");
+    const risk = data.risk_shift || "STABLE";
+    if (riskBadge) {
+      riskBadge.textContent = risk;
+      riskBadge.className = risk === "STABLE" ? "badge badge-success" : (risk === "RING_FORMATION" ? "badge badge-warning" : "badge badge-danger");
+    }
+    if (classVal) {
+      classVal.textContent = risk;
+      classVal.className = risk === "STABLE" ? "ticker-value text-green" : "ticker-value text-red";
+    }
+
+    const addedNodes = document.getElementById("diff-stat-nodes-added");
+    if (addedNodes) addedNodes.textContent = `+${data.delta_node_count || 0}`;
+
+    const addedEdges = document.getElementById("diff-stat-edges-added");
+    if (addedEdges) addedEdges.textContent = `+${data.delta_edge_count || 0}`;
+
+    const persistent = document.getElementById("diff-stat-persistent");
+    if (persistent) persistent.textContent = `${data.narrative ? 'Resolved' : 'Stable'}`;
+
+    const motifs = document.getElementById("diff-stat-motifs");
+    if (motifs) {
+      const m = data.motif_deltas || {};
+      motifs.textContent = `${m.triangles || 0} triangles, ${m.cycles || 0} cycles`;
+    }
+  } catch (err) {
+    console.error("Failed to run graph temporal diff:", err);
+  }
+}
+
+// =========================================================================
+// Interactive GraphQL Query Runner
+// =========================================================================
+const GRAPHQL_PRESETS = {
+  CaseOverview: `query {
+  case(caseId: "HHG-001") {
+    case_id
+    verdict
+    fraud_probability
+    exposure
+    pattern
+    status
+  }
+}`,
+  RecentFraudCases: `query {
+  cases(limit: 5, verdict: "fraud") {
+    case_id
+    verdict
+    exposure
+    pattern
+  }
+}`,
+  AuditLedger: `query {
+  auditLedger(limit: 5) {
+    index
+    timestamp
+    caseId
+    actor
+    action
+    prevHash
+    entryHash
+  }
+}`,
+  BenchmarkAnalytics: `query {
+  benchmarkSummary {
+    totalCases
+    fraudCases
+    legitimateCases
+    autoApprovalRate
+    averageExposureUsd
+  }
+}`
+};
+
+function initGraphQLRunner() {
+  const input = document.getElementById("graphql-query-input");
+  const presetSelect = document.getElementById("select-graphql-preset");
+  if (input && presetSelect && !input.value) {
+    input.value = GRAPHQL_PRESETS[presetSelect.value] || GRAPHQL_PRESETS.CaseOverview;
+  }
+}
+
+async function executeGraphQLQuery() {
+  const input = document.getElementById("graphql-query-input");
+  const output = document.getElementById("graphql-response-output");
+  if (!input || !output) return;
+
+  output.textContent = "Executing query...";
+  try {
+    const res = await fetch("/graphql", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: input.value })
+    });
+    const data = await res.json();
+    output.textContent = JSON.stringify(data, null, 2);
+  } catch (err) {
+    output.textContent = `Error executing GraphQL query:\n${err.message}`;
+  }
+}

@@ -98,6 +98,7 @@
 | **093** | `62d744a` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 380/380 (100%) | 0.008s | PASS | Graph temporal motif and topology diff comparator (node/edge deltas, motif shifts, risk classification) |
 | **094** | `d347625` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 387/387 (100%) | 0.008s | PASS | Fine-grained policy audit and compliance report packager (FinCEN, UK POCA, EU 6AMLD/GDPR, R1-R10) |
 | **095** | `v0.95` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 387/387 (100%) | 0.008s | PASS | Checkpoint 17 Audit, 95-Iteration Milestone Review, and v0.95 Release Tag |
+| **096** | `iter-096` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 393/393 (100%) | 0.008s | PASS | Interactive Web UI Executive Briefing & GraphQL Tabs (briefings, diff viewer, GraphQL runner) |
 
 ---
 
