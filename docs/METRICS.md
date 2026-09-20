@@ -93,6 +93,7 @@
 | **088** | `eb4ccdd` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 355/355 (100%) | 0.008s | PASS | Dynamic rate limiting, token bucket tiering, DoS interception filter, and security stats |
 | **089** | `56dd4a7` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 361/361 (100%) | 0.008s | PASS | Executive case summary briefing exporter (Markdown & printable HTML/PDF) |
 | **090** | `v0.9` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 361/361 (100%) | 0.008s | PASS | Checkpoint 16 Audit, 90-Iteration Milestone Review, and v0.9 Release Tag |
+| **091** | `d1b4803` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 366/366 (100%) | 0.008s | PASS | Automated concurrent load & stress testing harness (RPS, P50-P99 percentiles) |
 
 ---
 
