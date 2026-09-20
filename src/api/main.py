@@ -229,6 +229,26 @@ def get_case_audit_trail(case_id: str):
     return {"case_id": case_id, "audit_trail": audit_trail}
 
 
+@app.get("/api/cases/{case_id}/regulatory")
+def get_regulatory_dispatch(case_id: str, jurisdiction: Optional[str] = None):
+    """Retrieves multi-jurisdiction regulatory filing package and GDPR certifications."""
+    if case_id not in active_cases:
+        if case_id in agent.client.store.case_pack:
+            res = agent.investigate_case(case_id)
+            active_cases[case_id] = res
+            case_manager.write_case_to_graph(res)
+        else:
+            raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
+
+    case_data = active_cases[case_id]
+    from src.policy.jurisdiction import JurisdictionComplianceRouter
+    bundle = JurisdictionComplianceRouter.generate_dispatch_bundle(
+        case_answer=case_data,
+        override_jurisdiction=jurisdiction,
+    )
+    return bundle
+
+
 @app.get("/api/memory/similar")
 def get_similar_cases(card_id: str, customer_id: Optional[str] = None):
     """Retrieves similar cases from graph memory."""

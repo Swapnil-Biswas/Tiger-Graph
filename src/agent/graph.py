@@ -466,4 +466,9 @@ class FraudInvestigatorAgent:
         answer["audit_critique"] = critique
         answer["budget_plan"] = budget_plan
 
+        # 11. MULTI-JURISDICTION REGULATORY ROUTING & GDPR MINIMIZATION
+        from src.policy.jurisdiction import JurisdictionComplianceRouter
+        dispatch = JurisdictionComplianceRouter.generate_dispatch_bundle(answer)
+        answer["regulatory_dispatch"] = dispatch
+
         return answer

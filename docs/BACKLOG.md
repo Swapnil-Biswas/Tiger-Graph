@@ -102,10 +102,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 26. **[DONE - Iteration 026] [Autonomous Agent & Memory] Temporal Recency-Weighted Case Retrieval in GraphRAG**
     - *Result:* Implemented exponential recency decay weighting ($t_{1/2} = 30$ days) with $0.20$ retention floor in `src/rag/retrieve.py` and updated `src/graph/client.py`. Dynamically ranks active campaign precedents higher while strictly preserving temporal isolation. Added 3 unit tests in `tests/test_temporal_retrieval.py` (76/76 tests pass).
 
-27. **[Policy & Compliance] Automated Multi-Jurisdiction Regulatory Routing (FinCEN, GDPR, FCA)**
-    - *Goal:* Implement multi-jurisdiction compliance dispatcher supporting US FinCEN SARs, UK FCA STRs, and EU GDPR data privacy constraints on cross-border evidence sharing.
-    - *Files:* `src/policy/jurisdiction.py`, `tests/test_jurisdiction_routing.py`
-    - *Metric Impact:* Regulatory Compliance & SAR (Lens 7) & Policy & Permissions (Lens 6).
+27. **[DONE - Iteration 027] [Policy & Compliance] Automated Multi-Jurisdiction Regulatory Routing (FinCEN, GDPR, FCA)**
+    - *Result:* Implemented `JurisdictionComplianceRouter` in `src/policy/jurisdiction.py`, added endpoint `GET /api/cases/{case_id}/regulatory`, and integrated into `FraudInvestigatorAgent`. Enforces statutory authorities (FinCEN, NCA, 6AMLD) and GDPR Article 5 PAN/email data minimization. Added 4 unit tests in `tests/test_jurisdiction_routing.py` (80/80 tests pass).
 
 28. **[Explainability & Trust] Self-Contained Interactive HTML Incident Dossier Export**
     - *Goal:* Build standalone interactive HTML dossier exporter embedding investigation timeline, Cytoscape subgraph, counterfactual matrix, and FinCEN SAR for executive briefing.

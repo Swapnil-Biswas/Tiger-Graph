@@ -28,7 +28,8 @@
 | **023** | `1c726d0` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 69/69 (100%) | 0.012s | PASS | Uncertainty calibration (ECE 0.0116 < 0.08, Brier 0.0006 < 0.12) |
 | **024** | `0059e3a` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 73/73 (100%) | 0.012s | PASS | Interactive human-in-the-loop analyst override & immutable graph audit trail |
 | **025** | `db724ad` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 73/73 (100%) | 0.012s | PASS | Checkpoint 4 Audit, State of the Project, and v0.25 Release Tag |
-| **026** | pending | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 76/76 (100%) | 0.012s | PASS | Temporal recency-weighted case retrieval in GraphRAG (exponential decay) |
+| **026** | `782055f` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 76/76 (100%) | 0.012s | PASS | Temporal recency-weighted case retrieval in GraphRAG (exponential decay) |
+| **027** | pending | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 80/80 (100%) | 0.012s | PASS | Multi-jurisdiction regulatory routing (FinCEN, GDPR, FCA) & PII minimization |
 
 ---
 

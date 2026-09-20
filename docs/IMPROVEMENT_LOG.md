@@ -1,4 +1,31 @@
-## Iteration 026: Temporal Recency-Weighted Case Retrieval in GraphRAG | 2026-09-20 18:25 | commit pending
+## Iteration 027: Multi-Jurisdiction Regulatory Routing (FinCEN, GDPR, FCA) | 2026-09-20 18:28 | commit pending
+- **Lens:** 6. Policy and permissions & 7. Regulatory compliance and SAR & 13. Security and adversarial robustness
+- **Goal / hypothesis:** Global banking fraud operations require compliance across differing sovereign jurisdictions with specific statutory filing authorities (US FinCEN 31 CFR 1020.320, UK FCA/NCA POCA 2002 Part 7, EU 6AMLD) and strict data privacy regulations (GDPR Article 5 data minimization). Creating `src/policy/jurisdiction.py` automates regulatory detection, evaluates jurisdictional obligations, enforces 16-digit PAN truncation and email masking, and dispatches jurisdiction-compliant filing packages.
+- **Changes (files):**
+  - `src/policy/jurisdiction.py`: Created `JurisdictionComplianceRouter` with `detect_jurisdiction`, `evaluate_regulatory_obligations`, `apply_gdpr_data_minimization`, and `generate_dispatch_bundle`.
+  - `src/agent/graph.py`: Integrated automated regulatory dispatch into `FraudInvestigatorAgent.investigate_case`.
+  - `src/api/main.py`: Added `GET /api/cases/{case_id}/regulatory` endpoint.
+  - `tests/test_jurisdiction_routing.py`: Added 4 unit tests verifying US FinCEN routing, UK NCA DAML STR routing, GDPR PAN/email data minimization, and regulatory dispatch generation.
+- **Tests added/updated:**
+  - `tests/test_jurisdiction_routing.py` (4 unit tests, all pass).
+  - Total unit test suite expanded from 76 to **80** tests across 21 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 76 -> **80** (100% pass rate)
+  - Regulatory Routing: US FinCEN, UK NCA, and EU 6AMLD automated dispatch
+  - Privacy Compliance: GDPR Article 5(1)(c) PAN truncation and email redaction
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (80/80)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Unifying regulatory obligation assessment with automated PII masking ensures cross-border evidence sharing can be conducted safely without violating European data transfer mandates or exposing full card numbers in audit logs.
+- **Follow-ups added to backlog:** Proceed to Iteration 028: Self-Contained Interactive HTML Incident Dossier Export (Lens 5 & Lens 9).
+
+## Iteration 026: Temporal Recency-Weighted Case Retrieval in GraphRAG | 2026-09-20 18:25 | commit 782055f
 - **Lens:** 4. GraphRAG & context assembly & 8. Case memory & dynamic context
 - **Goal / hypothesis:** Fraud syndicate modii operandi evolve dynamically over weeks; treating a 120-day-old precedent with equal weight to an incident from 5 days ago dilutes context relevance. Implementing exponential recency decay weighting ($\text{Decay}(\Delta t) = \exp(-\lambda \Delta t)$ with half-life $t_{1/2} = 30$ days and a $0.20$ retention floor) in `src/rag/retrieve.py` ranks active campaign precedents higher while preserving long-term structural links and strict `as_of` temporal isolation.
 - **Changes (files):**
