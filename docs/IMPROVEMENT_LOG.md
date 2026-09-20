@@ -1,4 +1,29 @@
-## Iteration 002: Complete Evidence Response Decision Matrix (R4, R5, R7) | 2026-09-20 16:37 | commit pending
+## Iteration 003: Graph-Native Counterfactual Decision Explainer | 2026-09-20 16:39 | commit pending
+- **Lens:** 20. Innovation & 9. Explainability
+- **Goal / hypothesis:** Financial crime compliance and regulatory audits demand transparent counterfactual sensitivity ("What would change this verdict?"). Implementing a deterministic `CounterfactualExplainer` that maps topological inversion conditions (device history, billing region proximity, step-up challenge) into the case payload and analyst summary raises auditability and innovation.
+- **Changes (files):**
+  - `src/agent/counterfactual.py`: Created `CounterfactualExplainer` generating structured inversion conditions for fraud (what flips to legitimate/uncertain), legitimate (what flips to fraud), and uncertain verdicts.
+  - `src/agent/graph.py`: Integrated `CounterfactualExplainer` into investigation pipeline, attaching structured counterfactuals and appending sensitivity notes to `summary`.
+  - `tests/test_counterfactual.py`: Added 2 unit tests for counterfactual generation and formatting across verdict states.
+  - Regenerated and validated all 20 benchmark case outputs.
+- **Tests added/updated:**
+  - `tests/test_counterfactual.py` (2 tests, pass).
+  - Total test count expanded from 17 to 19 (100% pass rate).
+- **Metrics before -> after:**
+  - Test Count: 17 -> **19** (100% pass rate)
+  - Valid Benchmark Answers: 20/20 (100%)
+  - Evidence Finding Citation Validity: 100.0%
+  - Policy Violations: 0
+  - Decision Transparency: Added structured counterfactual sensitivity to all 20 benchmark cases
+- **Verification gates:**
+  - Unit tests: PASS (19/19)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Counterfactuals provide immediate clarity to human reviewers during approval routing: an analyst reviewing an L1 block can instantly see that verified baseline usage in region 299.0 would have eliminated the fraud penalty, directing their line of questioning during customer outreach.
+- **Follow-ups added to backlog:** Next implement Innovation item 4: Evidence Value-of-Information (VOI) Ranking to quantify expected entropy reduction before selecting inquiries.
+
+## Iteration 002: Complete Evidence Response Decision Matrix (R4, R5, R7) | 2026-09-20 16:37 | commit 7306d42
 - **Lens:** 4. Next-best-action quality & 5. Evidence-request design
 - **Goal / hypothesis:** In real operations, customer inquiries yield diverse responses: `denies`, `recognizes`, `recurring_confirmed` (Rule R7 subscription), `step_up_fail` (Rule R5 OTP timeout), and `no_response` (Rule R4 24h expiration). Implementing explicit deterministic decision paths for all these scenarios ensures complete policy fidelity.
 - **Changes (files):**

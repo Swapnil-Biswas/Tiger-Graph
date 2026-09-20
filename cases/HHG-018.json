@@ -58,12 +58,26 @@
         "entity_ids": []
       }
     ],
+    "counterfactuals": [
+      {
+        "factor": "Cardholder Confirmation",
+        "condition": "Customer confirms authorization during SMS or mobile push challenge",
+        "impact": "Fraud probability would reduce from 1.00 to \u2264 0.10, flipping verdict to LEGITIMATE (Rule R3).",
+        "flip_verdict": "legitimate"
+      },
+      {
+        "factor": "Billing Region Proximity",
+        "condition": "Transaction billing region aligned with baseline regions (325.0, 126.0)",
+        "impact": "Eliminates geographic distance anomaly penalty (-20.0 pts) and impossible travel flag.",
+        "flip_verdict": "uncertain"
+      }
+    ],
     "similar_prior_cases": [
       "CC-0255",
       "CC-0405",
       "CC-0454"
     ],
-    "summary": "Investigation confirmed unauthorized activity on card C02354-K2 under pattern 'out_of_region_use'. Total exposure identified is $39.08 across 1 transaction(s). Cardholder outreach and graph evidence confirmed compromise; defensive card blocks and case progression executed.",
+    "summary": "Investigation confirmed unauthorized activity on card C02354-K2 under pattern 'out_of_region_use'. Total exposure identified is $39.08 across 1 transaction(s). Cardholder outreach and graph evidence confirmed compromise; defensive card blocks and case progression executed.\n\nDecision Sensitivity (Counterfactual Boundaries):\n  1. [Cardholder Confirmation]: Customer confirms authorization during SMS or mobile push challenge -> Fraud probability would reduce from 1.00 to \u2264 0.10, flipping verdict to LEGITIMATE (Rule R3).\n  2. [Billing Region Proximity]: Transaction billing region aligned with baseline regions (325.0, 126.0) -> Eliminates geographic distance anomaly penalty (-20.0 pts) and impossible travel flag.",
     "written_to_graph": true,
     "graph_case_id": "CASE-HHG-018"
   },

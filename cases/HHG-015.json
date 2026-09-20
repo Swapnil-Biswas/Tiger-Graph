@@ -91,12 +91,38 @@
         ]
       }
     ],
+    "counterfactuals": [
+      {
+        "factor": "Cardholder Confirmation",
+        "condition": "Customer confirms authorization during SMS or mobile push challenge",
+        "impact": "Fraud probability would reduce from 1.00 to \u2264 0.10, flipping verdict to LEGITIMATE (Rule R3).",
+        "flip_verdict": "legitimate"
+      },
+      {
+        "factor": "Device Fingerprint Baseline",
+        "condition": "Device had \u22652 prior authorized transactions in cardholder history",
+        "impact": "Eliminates new-device risk penalty (-15.0 pts), preventing automated card block.",
+        "flip_verdict": "uncertain"
+      },
+      {
+        "factor": "Billing Region Proximity",
+        "condition": "Transaction billing region aligned with baseline regions (325.0, 299.0)",
+        "impact": "Eliminates geographic distance anomaly penalty (-20.0 pts) and impossible travel flag.",
+        "flip_verdict": "uncertain"
+      },
+      {
+        "factor": "Device Exclusivity",
+        "condition": "Device profile observed solely on this customer account",
+        "impact": "Removes syndicate sharing flag (8 linked cards), downgrading from SAR requirement.",
+        "flip_verdict": "fraud (lower tier)"
+      }
+    ],
     "similar_prior_cases": [
       "CC-0615",
       "CC-1313",
       "CC-3886"
     ],
-    "summary": "Investigation confirmed unauthorized activity on card C03042-K1 under pattern 'card_not_present_new_device'. Total exposure identified is $599.94 across 1 transaction(s). Cardholder outreach and graph evidence confirmed compromise; defensive card blocks and case progression executed.",
+    "summary": "Investigation confirmed unauthorized activity on card C03042-K1 under pattern 'card_not_present_new_device'. Total exposure identified is $599.94 across 1 transaction(s). Cardholder outreach and graph evidence confirmed compromise; defensive card blocks and case progression executed.\n\nDecision Sensitivity (Counterfactual Boundaries):\n  1. [Cardholder Confirmation]: Customer confirms authorization during SMS or mobile push challenge -> Fraud probability would reduce from 1.00 to \u2264 0.10, flipping verdict to LEGITIMATE (Rule R3).\n  2. [Device Fingerprint Baseline]: Device had \u22652 prior authorized transactions in cardholder history -> Eliminates new-device risk penalty (-15.0 pts), preventing automated card block.\n  3. [Billing Region Proximity]: Transaction billing region aligned with baseline regions (325.0, 299.0) -> Eliminates geographic distance anomaly penalty (-20.0 pts) and impossible travel flag.\n  4. [Device Exclusivity]: Device profile observed solely on this customer account -> Removes syndicate sharing flag (8 linked cards), downgrading from SAR requirement.",
     "written_to_graph": true,
     "graph_case_id": "CASE-HHG-015"
   },
@@ -153,9 +179,9 @@
     "reason": "Section 3a & Rule R2: Confirmed unauthorized fraud with exposure of $599.94 USD and multi-card linkage.",
     "narrative": "Between 2016-11-17 and 2016-11-17, cardholder C03042 experienced unauthorized activity on card C03042-K1. A total of 1 transaction(s) amounting to $599.94 USD were executed under fraud pattern 'card_not_present_new_device'. The primary flagged transaction 3464869 ($599.94) was initiated through the online channel. Activity originated from a device profile (Trident/7.0 | Windows 8.1 | ie 11.0 for desktop | 1680x1050) marked as New for this account. The same device profile was also observed across 8 other distinct cards, demonstrating coordinated compromise. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C03042-K1 to mitigate further loss and placed linked accounts under enhanced monitoring.",
     "subjects": [
-      "C01155-K2",
-      "C00681-K1",
       "C03042-K1",
+      "C00681-K1",
+      "C01155-K2",
       "C03042"
     ],
     "total_amount_usd": 599.94,

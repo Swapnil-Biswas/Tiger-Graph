@@ -25,6 +25,7 @@ from src.agent.state import (
 )
 from src.agent.assess import UncertaintyAssessmentEngine
 from src.agent.decide import NextBestActionPlanner
+from src.agent.counterfactual import CounterfactualExplainer
 
 
 class FraudInvestigatorAgent:
@@ -351,12 +352,23 @@ class FraudInvestigatorAgent:
             stop_reason = "Ambiguity remains above policy threshold; escalated to fraud analyst per Rule R8."
             status = "escalated"
 
-        # 7. CONNECTED ENTITIES & PROFILES
+        # 7. COUNTERFACTUAL EXPLANATION & SENSITIVITY
+        counterfactuals = CounterfactualExplainer.generate_counterfactuals(
+            verdict=post_assessment.verdict,
+            fraud_probability=post_assessment.fraud_probability,
+            pattern=post_assessment.pattern,
+            graph_evidence=graph_evidence,
+            trigger=trigger_data,
+        )
+        cf_text = CounterfactualExplainer.format_counterfactual_summary(counterfactuals)
+        summary = f"{summary}\n\n{cf_text}"
+
+        # 8. CONNECTED ENTITIES & PROFILES
         connected_cards = sharing.get("cards", [])
         connected_cards = [c for c in connected_cards if c != card_id]
         connected_devices = [dev_profile] if (dev_profile and dev_profile != "None | None | None | None") else []
 
-        # 8. ASSEMBLE COMPLETE ANSWER STRUCTURE
+        # 9. ASSEMBLE COMPLETE ANSWER STRUCTURE
         total_latency = round(time.time() - start_time, 2)
         total_tokens = 1200 + (tool_calls * 150)
 
@@ -374,6 +386,7 @@ class FraudInvestigatorAgent:
                 "connected_device_profiles": connected_devices,
                 "exposure_usd": exposure_usd,
                 "evidence": [ev.model_dump() for ev in evidence_items],
+                "counterfactuals": counterfactuals,
                 "similar_prior_cases": prior_case_ids[:3],
                 "summary": summary,
                 "written_to_graph": True,

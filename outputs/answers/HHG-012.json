@@ -41,11 +41,11 @@
         "id": "EV-04",
         "source": "graph",
         "ref": "query:similar_cases(card=C05876-K2)",
-        "claim": "Found 5 prior closed case(s) touching related entities: CC-0003, CC-2370, CC-2929.",
+        "claim": "Found 5 prior closed case(s) touching related entities: CC-0003, CC-2370, CC-0345.",
         "entity_ids": [
           "CC-0003",
           "CC-2370",
-          "CC-2929"
+          "CC-0345"
         ]
       },
       {
@@ -56,12 +56,26 @@
         "entity_ids": []
       }
     ],
+    "counterfactuals": [
+      {
+        "factor": "Unrecognized Device / Proxy",
+        "condition": "Transaction executed from anonymous VPN proxy or unknown mobile OS",
+        "impact": "Would trigger Rule R1 step-up authentication challenge and elevate risk points by +30.0.",
+        "flip_verdict": "uncertain"
+      },
+      {
+        "factor": "Cross-Card Cluster Sharing",
+        "condition": "Device or billing IP detected across \u2265 2 other compromised accounts",
+        "impact": "Would trigger Rule R6 syndicate ring alert, escalating to immediate card hold.",
+        "flip_verdict": "fraud"
+      }
+    ],
     "similar_prior_cases": [
       "CC-0003",
       "CC-2370",
-      "CC-2929"
+      "CC-0345"
     ],
-    "summary": "Investigation cleared the alert for card C05876-K2 as legitimate activity. Transaction characteristics match cardholder baseline history; customer confirmation confirmed authorized use.",
+    "summary": "Investigation cleared the alert for card C05876-K2 as legitimate activity. Transaction characteristics match cardholder baseline history; customer confirmation confirmed authorized use.\n\nDecision Sensitivity (Counterfactual Boundaries):\n  1. [Unrecognized Device / Proxy]: Transaction executed from anonymous VPN proxy or unknown mobile OS -> Would trigger Rule R1 step-up authentication challenge and elevate risk points by +30.0.\n  2. [Cross-Card Cluster Sharing]: Device or billing IP detected across \u2265 2 other compromised accounts -> Would trigger Rule R6 syndicate ring alert, escalating to immediate card hold.",
     "written_to_graph": true,
     "graph_case_id": "CASE-HHG-012"
   },

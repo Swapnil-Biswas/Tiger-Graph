@@ -18,10 +18,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 2. **[DONE - Iteration 002] [Next-Best-Action] Implement Full Evidence Response Matrix (No-Response, Step-Up Fail)**
    - *Result:* Implemented complete scenario matrix in `decide.py` for `no_response` (R4), `step_up_fail` (R5), `recurring_confirmed` (R7), and `recognizes` (R3). Added 3 unit tests, expanding test suite to 17 tests (100% pass).
 
-3. **[Innovation] Graph-Native Counterfactual Explainer**
-   - *Goal:* Generate deterministic "What would change this verdict?" counterfactuals (e.g., "If the device fingerprint had 3+ prior authentications, verdict would shift from fraud to legitimate").
-   - *Files:* `src/agent/explainer_validator.py`, `src/agent/graph.py`
-   - *Metric Impact:* Innovation (15%) and Explainability (10%).
+3. **[DONE - Iteration 003] [Innovation] Graph-Native Counterfactual Explainer**
+   - *Result:* Implemented `CounterfactualExplainer` calculating decision inversion boundaries across topological factors (device history, region alignment, OTP challenges). Added 2 unit tests, expanding test suite to 19 tests (100% pass).
 
 4. **[Innovation] Evidence Value-of-Information (VOI) Ranking**
    - *Goal:* Formally calculate expected uncertainty reduction for candidate evidence requests before selecting the optimal inquiry.
