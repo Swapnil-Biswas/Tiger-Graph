@@ -1,4 +1,35 @@
-## Iteration 096: Interactive Web UI Executive Briefing & GraphQL Tabs | 2026-09-21 11:00 | commit iter-096
+## Iteration 097: Cross-Platform Automated Smoke & Sanity Runner | 2026-09-21 11:15 | commit iter-097
+- **Lens:** 14. Testing, evaluation & benchmarks, 15. Operational readiness & runbooks
+- **Goal / hypothesis:** Evaluation bots, hackathon judges, and DevOps engineers cloning the repository across Windows, Linux, and macOS require a lightweight, sub-5s smoke test script that verifies complete system health without external dependencies or long test runs:
+  1. **Cross-Platform Smoke Runner (`scripts/smoke_test.py`)**: Executes 13 multi-category health checks spanning runtime environment (Python >= 3.10, core imports), data/GraphStore integrity (`cases/*.json`, `graph_cache.pkl`), and in-process FastAPI endpoints (`/api/cases`, `/api/cases/HHG-001`, `/api/compliance/report`, `/api/cases/HHG-001/briefing/html`, `/api/cases/HHG-001/graph-diff`, `/graphql`, `/api/security/ratelimit/stats`, `/api/webhooks/dlq/stats`, `/metrics`).
+  2. **Multi-Mode Execution & Structured Output**: Supports full mode (2.7s), `--quick` mode (sub-second environment + data checks only), and `--json` machine-readable output.
+  3. **Convenience Shell Wrappers**: Provided `scripts/smoke.sh` (POSIX bash) and `scripts/smoke.ps1` (PowerShell) for frictionless one-command execution.
+  4. **Automated Verification**: Built `tests/test_smoke_runner.py` verifying full run, quick mode, check structure, and wrapper existence.
+- **Changes (files):**
+  - `scripts/smoke_test.py`: Implemented SmokeTestRunner, 13 health checks, ASCII report formatter, and CLI.
+  - `scripts/smoke.sh`: Added POSIX bash wrapper.
+  - `scripts/smoke.ps1`: Added PowerShell wrapper.
+  - `tests/test_smoke_runner.py`: Created 4 unit tests.
+  - `docs/METRICS.md`: Added Iteration 097 row.
+  - `docs/BACKLOG.md`: Marked item 97 as DONE.
+  - `docs/IMPROVEMENT_LOG.md`: Documented Iteration 097.
+- **Tests added/updated:**
+  - `tests/test_smoke_runner.py` (4 unit tests, all pass).
+  - Total unit test suite expanded from 393 to **397** tests across 78 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 393 -> **397** (100% pass rate across 78 test suites)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Extended Benchmark Answers Valid: 50/50 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 397 passed across 78 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
+## Iteration 096: Interactive Web UI Executive Briefing & GraphQL Tabs | 2026-09-21 11:00 | commit e165afa
 - **Lens:** 8. Explainability & human-in-the-loop, 10. Demo quality & presentation, 11. Agent architecture & engineering
 - **Goal / hypothesis:** Providing investigators, compliance officers, and hackathon judges with an intuitive, unified visual dashboard to inspect publication-grade executive briefings, statutory compliance audit certificates, graph temporal topology diffs, and arbitrary GraphQL queries elevates demo quality and operational trust:
   1. **Executive Briefing & Compliance Vault (`#view-briefing`)**: Integrated responsive tab in `ui/index.html` and `ui/app.js` with mode toggles (Printable HTML Dossier, Statutory Compliance Certificate, Raw Markdown), one-click `window.print()` PDF generation, and live compliance scorecards (FinCEN 31 CFR 1020, UK POCA, EU GDPR Art. 5, Rules R1-R10, FRE 902).
