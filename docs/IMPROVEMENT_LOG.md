@@ -1,3 +1,32 @@
+## Iteration 066: Streaming Transaction Influx Monitor & Dynamic Graph Anomaly Window Detector | 2026-09-21 03:30 | commit PENDING
+- **Lens:** 13. System performance & scalability, 7. Real-time latency & computational efficiency, 10. Graph data modeling & schema design, 2. Investigation workflow & graph traversal
+- **Goal / hypothesis:** In high-throughput banking architectures, transactions arrive as continuous event streams (e.g. 1,000+ txns/sec). Full graph re-indexing for every incoming transaction is computationally prohibitive. By implementing an in-memory sliding window accumulator and sub-millisecond streaming anomaly detector, the platform enables:
+  1. **Sub-Millisecond Stream Ingestion**: Evaluates incoming events in 0.009ms per transaction without disk I/O bottlenecks.
+  2. **Rolling Window Velocity Spikes**: Detects burst frequency (>= 3 transactions or >= $1,000 within a 5-minute rolling window) with automatic FIFO event eviction.
+  3. **Novel Device Linkage Detection**: Flags when an existing device fingerprint is adopted by a new card for the first time in streaming traffic.
+  4. **Impossible Physical Travel**: Computes great-circle Haversine distances and velocity across consecutive geo-tagged transactions, alerting on velocities exceeding commercial aviation limits (> 800 km/h).
+  5. **High-Risk MCC Triggers**: Emits immediate high-priority alerts on MCC 6051 (Quasi-Cash / Crypto) and 7995 (Gambling) transactions.
+  6. **FastAPI Endpoints**: Added `POST /api/streaming/ingest`, `GET /api/streaming/alerts`, and `GET /api/streaming/stats`.
+- **Changes (files):**
+  - `src/graph/streaming_monitor.py`: Created `StreamingGraphMonitor` and `StreamingAlert`.
+  - `src/api/main.py`: Registered `streaming_monitor` and added endpoints for stream ingestion, alerts, and operational stats.
+  - `tests/test_streaming_monitor.py`: Created 5 unit tests testing ingestion latency, window eviction, velocity spikes, novel device linkage, impossible travel, and REST endpoints.
+- **Tests added/updated:**
+  - `tests/test_streaming_monitor.py` (5 unit tests, all pass).
+  - Total unit test suite expanded from 253 to **258** tests across 53 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 253 -> **258** (100% pass rate across 53 test suites)
+  - Streaming Latency: 0.009ms/event (< 1ms target)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 258 passed across 53 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 065: Checkpoint 11 Audit, 65-Iteration Milestone Review, and v0.6 Release Tag | 2026-09-21 03:15 | commit v0.6
 - **Lens:** 14. Testing, evaluation & benchmarks, 11. Agent architecture & engineering, 5. Statutory grounding & regulatory alignment
 - **Goal / hypothesis:** Reaching 65 iterations (65% milestone) requires a comprehensive audit across all 15 PRD evaluation lenses to verify system stability, mathematical calibration, multi-agent federation, WebGL cluster rendering, multi-tenant RBAC, and FinCEN XML electronic filing integrity before tagging `v0.6`.

@@ -76,6 +76,10 @@ from src.auth.rbac import (
 from src.cases.sar_exporter import FinCENSARXMLPackager
 sar_packager = FinCENSARXMLPackager()
 
+# Streaming Transaction Monitor
+from src.graph.streaming_monitor import StreamingGraphMonitor, StreamingAlert
+streaming_monitor = StreamingGraphMonitor()
+
 # In-memory store for active cases & approvals
 active_cases: Dict[str, Dict[str, Any]] = {}
 pending_approvals: Dict[str, Dict[str, Any]] = {}
@@ -1248,6 +1252,41 @@ def validate_sar_xml_endpoint(req: ValidateSARXMLRequest):
     """Validates an uploaded FinCEN SAR XML document against 12 mandatory BSA E-Filing criteria."""
     report = sar_packager.validate_sar_xml(req.xml_content)
     return report.to_dict()
+
+
+class StreamingIngestRequest(BaseModel):
+    transaction: Optional[Dict[str, Any]] = None
+    transactions: Optional[List[Dict[str, Any]]] = None
+
+
+StreamingIngestRequest.model_rebuild()
+
+
+@app.post("/api/streaming/ingest")
+def ingest_streaming_transaction(req: StreamingIngestRequest):
+    """Ingests live streaming transactions and returns any triggered anomaly alerts."""
+    txns = req.transactions or ([req.transaction] if req.transaction else [])
+    alerts = []
+    for t in txns:
+        al = streaming_monitor.ingest_transaction(t)
+        alerts.extend(al)
+    return {
+        "processed": len(txns),
+        "alerts_triggered": len(alerts),
+        "alerts": [a.to_dict() for a in alerts],
+    }
+
+
+@app.get("/api/streaming/alerts")
+def get_streaming_alerts(severity: Optional[str] = None, limit: int = 50):
+    """Retrieves active streaming alerts filtered by optional severity."""
+    return {"alerts": streaming_monitor.get_alerts(severity=severity, limit=limit)}
+
+
+@app.get("/api/streaming/stats")
+def get_streaming_stats():
+    """Returns sliding window operational metrics."""
+    return streaming_monitor.get_stats()
 
 
 @app.post("/api/benchmark/run")

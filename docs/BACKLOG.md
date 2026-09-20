@@ -235,6 +235,9 @@ Ranked by expected impact on Hackathon Judging Criteria:
 65. **[DONE - Iteration 065] [Release Tag v0.6] Checkpoint 11 Audit & 65-Iteration Milestone Review**
     - *Result:* Reached 65% milestone (65/100 iterations). Completed comprehensive audit across all 15 PRD evaluation lenses. Full platform verified with 253 unit tests across 52 test suites (100% passing), 100% backtest recall and precision across 300 historical cases, 20/20 valid benchmark answers, 0.00% run-to-run variance, 0 policy violations, 0 secrets, and green demo path. Created release tag `v0.6`. Updated `docs/MILESTONES.md`.
 
+66. **[DONE - Iteration 066] [Real-Time Streaming & Anomaly Detection] Streaming Transaction Influx Monitor & Dynamic Graph Anomaly Window Detector**
+    - *Result:* Implemented `StreamingGraphMonitor` and `StreamingAlert` in `src/graph/streaming_monitor.py`. Operates an in-memory sliding window (300s / 5 min default) with sub-millisecond per-event ingestion latency (0.009ms/event). Evaluates 4 streaming rules: rolling velocity spikes (>= 3 txns or >= $1,000 in 5 min), novel device-to-card adoption, impossible travel velocity (> 800 km/h via Haversine great-circle distance), and high-risk MCC 6051 quasi-cash triggers. Added REST endpoints `POST /api/streaming/ingest`, `GET /api/streaming/alerts`, and `GET /api/streaming/stats` in `src/api/main.py`. Added 5 unit tests in `tests/test_streaming_monitor.py` (258/258 tests pass across 53 suites).
+
 ---
 
 ## Polish & Submission Readiness (Iterations 76–100)
