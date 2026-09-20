@@ -392,6 +392,26 @@ class GraphClient:
         return detector.detect_community(seed_id, entity_type=entity_type, as_of=as_of, max_hops=max_hops)
 
     # =========================================================================
+    # Q14: export_gnn_subgraph
+    # Topological Graph Embedding & GNN-Ready Adjacency Matrix Exporter
+    # =========================================================================
+    def export_gnn_subgraph(
+        self,
+        seed_id: str,
+        entity_type: str = "card",
+        as_of: Optional[Union[str, int]] = None,
+        k_hops: int = 2,
+        max_nodes: int = 50,
+    ) -> dict:
+        """
+        Q14: Extracts normalized node feature tensors (x), sparse edge index ([2, E]),
+        and edge attributes ([E, D]) compatible with PyTorch Geometric (PyG) and DGL.
+        """
+        from src.graph.embeddings import TopologicalGraphEmbeddingExporter
+        exporter = TopologicalGraphEmbeddingExporter(self)
+        return exporter.extract_gnn_subgraph(seed_id, entity_type=entity_type, as_of=as_of, k_hops=k_hops, max_nodes=max_nodes)
+
+    # =========================================================================
     # Q7: new_entity_check
     # First-time device, billing region, or email domain for customer
     # =========================================================================

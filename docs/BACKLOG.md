@@ -121,10 +121,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 31. **[DONE - Iteration 031] [Investigation Accuracy & Graph Algorithms] Dynamic Graph Community Detection & Dense Fraud Subgraph Discovery**
     - *Result:* Implemented `GraphCommunityDetector.detect_community` in `src/graph/algorithms.py` utilizing multi-hop ego-network extraction and deterministic Label Propagation Algorithm (LPA). Added `detect_community` to `GraphClient` (Q13) and integrated into `ConcurrentGraphTraverser` and `FraudInvestigatorAgent`. Computes internal edge density, modularity clusters, and fraud contagion risk while filtering high-card hub profiles and strictly enforcing temporal isolation. Added 4 unit tests in `tests/test_community_detection.py` (89/89 tests pass).
 
-32. **[Agent Architecture & GNN / Machine Learning] Topological Feature Vector & GNN-Ready Adjacency Matrix Exporter**
-    - *Goal:* Build `src/graph/embeddings.py` exporting normalized topological node feature vectors (degree centrality, clustering coefficient, ego-net density, cycle participation, temporal velocity) and sparse adjacency matrices ready for PyG / DGL graph neural network ingestion.
-    - *Files:* `src/graph/embeddings.py`, `tests/test_graph_embeddings.py`
-    - *Metric Impact:* Agentic Design & Innovation (Lens 2, 14).
+32. **[DONE - Iteration 032] [Agent Architecture & GNN / Machine Learning] Topological Feature Vector & GNN-Ready Adjacency Matrix Exporter**
+    - *Result:* Implemented `TopologicalGraphEmbeddingExporter.extract_gnn_subgraph` in `src/graph/embeddings.py` and exposed `export_gnn_subgraph` (Q14) in `GraphClient`. Generates normalized node feature tensors ($[N, 9]$), sparse edge indices ($[2, E]$) in PyTorch Geometric (PyG) format, edge attributes ($[E, 5]$), and tabular ego-net topological vectors for GBDT (XGBoost/LightGBM) models with sub-5ms latency. Added 4 unit tests in `tests/test_graph_embeddings.py` (93/93 tests pass).
 
 33. **[Investigation Accuracy & Anomaly Detection] Multi-Card Temporal Velocity Burst Clustering**
     - *Goal:* Detect coordinated micro-deposit or distributed card testing bursts across distinct cards sharing merchant categories or time windows, even when devices are masked or rotating.

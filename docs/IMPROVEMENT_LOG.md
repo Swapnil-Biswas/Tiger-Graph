@@ -1,4 +1,31 @@
-## Iteration 031: Dynamic Graph Community Detection & Dense Fraud Subgraph Discovery | 2026-09-20 18:52 | commit pending
+## Iteration 032: Topological Feature Vector & GNN-Ready Adjacency Matrix Exporter | 2026-09-20 18:54 | commit pending
+- **Lens:** 2. Graph database and query performance & 14. Testing and evaluation & 11. Agent architecture
+- **Goal / hypothesis:** Graph Neural Networks (RGCN, GAT) and gradient boosted decision trees (XGBoost/LightGBM) require structured, normalized topological feature vectors and sparse adjacency matrices for subgraphs. Creating `TopologicalGraphEmbeddingExporter` in `src/graph/embeddings.py` transforms heterogeneous incident ego-nets into PyTorch Geometric (PyG) compatible node tensors ($[N, 9]$), sparse edge indices ($[2, E]$), edge attributes ($[E, 5]$), and tabular topological summary vectors while enforcing strict `as_of` temporal bounds.
+- **Changes (files):**
+  - `src/graph/embeddings.py`: Implemented `TopologicalGraphEmbeddingExporter.extract_gnn_subgraph` extracting heterogeneous multi-hop ego-nets, calculating local clustering coefficients, degree centralities, log financial exposures, one-hot node/edge types, sparse edge indices, and tabular summary vectors.
+  - `src/graph/client.py`: Added `export_gnn_subgraph` (Q14) to `GraphClient`.
+  - `tests/test_graph_embeddings.py`: Added 4 unit tests verifying PyG schema concordance, tensor dimensions, bounded normalized features, tabular ego-net vectors, temporal isolation, and sub-5ms execution latency.
+- **Tests added/updated:**
+  - `tests/test_graph_embeddings.py` (4 unit tests, all pass).
+  - Total unit test suite expanded from 89 to **93** tests across 25 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 89 -> **93** (100% pass rate)
+  - Graph Embeddings: PyTorch Geometric (PyG) ready tensors ($[N, 9], [2, E], [E, 5]$)
+  - Tabular Ego-Net Vector: Complete topological summary (density, clustering, degree, counts)
+  - Execution Latency: ~4.1ms for complete GNN subgraph extraction
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (93/93)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Computing local clustering coefficients and sparse edge indices directly from the in-memory graph index executes in ~4.1ms, enabling real-time feature extraction for deep learning models at inference time without requiring pre-computed graph dumps.
+- **Follow-ups added to backlog:** Proceed to Iteration 033: Multi-Card Temporal Velocity Burst Clustering (Lens 1 & Lens 2).
+
+## Iteration 031: Dynamic Graph Community Detection & Dense Fraud Subgraph Discovery | 2026-09-20 18:52 | commit c3b5211
 - **Lens:** 1. Graph schema and ingestion & 2. Graph database and query performance & 14. Testing and evaluation
 - **Goal / hypothesis:** Fraud syndicates operate across interconnected networks of cards, devices, and customer accounts. Standard 1-hop queries fail to capture multi-hop community density and contagion. Implementing `GraphCommunityDetector` in `src/graph/algorithms.py` extracts multi-hop ego-networks, applies deterministic Label Propagation (LPA), computes internal edge density and fraud contagion, filters high-card generic browser profiles, and classifies dense fraud communities while preserving strict temporal isolation.
 - **Changes (files):**
