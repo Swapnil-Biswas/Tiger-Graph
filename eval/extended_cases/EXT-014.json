@@ -1,0 +1,121 @@
+{
+  "case_id": "EXT-014",
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 0.92,
+    "pattern": "card_not_present_fraud",
+    "pattern_description": "High-velocity online purchases exceeding baseline spending velocity",
+    "affected_txn_ids": [
+      "4000140",
+      "4000141",
+      "4000142"
+    ],
+    "first_suspicious_txn_id": "4000140",
+    "connected_card_ids": [
+      "C20014-K1"
+    ],
+    "connected_device_profiles": [
+      "DEV-30014"
+    ],
+    "exposure_usd": 1044.0,
+    "evidence": [
+      {
+        "id": "EV-01",
+        "source": "graph",
+        "ref": "query:get_txn(4000140)",
+        "claim": "Transaction of $1044.00 flagged with risk score 0.92 under card_not_present_fraud.",
+        "entity_ids": [
+          "4000140"
+        ]
+      },
+      {
+        "id": "EV-02",
+        "source": "graph",
+        "ref": "query:entity_profile(card_id=C20014-K1)",
+        "claim": "Baseline entity profile shows 218 prior transactions with typical velocity.",
+        "entity_ids": [
+          "C20014-K1"
+        ]
+      },
+      {
+        "id": "EV-03",
+        "source": "customer",
+        "ref": "evidence_request:1",
+        "claim": "Customer confirmed unauthorized activity",
+        "entity_ids": []
+      }
+    ],
+    "counterfactuals": [
+      {
+        "factor": "Cardholder Authorization",
+        "condition": "Cardholder validates authorization",
+        "impact": "Verdict would flip to LEGITIMATE (Rule R3)",
+        "flip_verdict": "legitimate"
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-1014"
+    ],
+    "summary": "Investigation for EXT-014 concluded with verdict FRAUD (probability 0.92). Total exposure: $1044.00.",
+    "written_to_graph": true,
+    "graph_case_id": "CASE-EXT-014"
+  },
+  "evidence_requests": [
+    {
+      "type": "customer_validation",
+      "asked_after_step": 2,
+      "assumed_response": "Customer confirmed unauthorized activity",
+      "reason": "VOI entropy minimization: direct customer challenge provides highest information gain."
+    }
+  ],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "VERIFY_WITH_CUSTOMER",
+        "route": "auto",
+        "reason": "Rule R1: Confirm cardholder authorization prior to permanent block."
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "Standard intake: internal fraud investigation case initialized."
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L2",
+        "reason": "Rule R2: Confirmed unauthorized activity on card C20014-K1; exposure $1044.00."
+      },
+      {
+        "action": "DECLINE_TRANSACTION",
+        "route": "auto",
+        "reason": "Rule R2: Immediate defensive decline of pending charges."
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "Exposure $1044.00 and typology 'card_not_present_fraud' meet FinCEN BSA filing criteria."
+      }
+    ],
+    "what_changed": "Customer response verified verdict as FRAUD."
+  },
+  "sar": {
+    "file": true,
+    "reason": "Exposure $1044.00 and typology 'card_not_present_fraud' meet FinCEN BSA filing criteria.",
+    "narrative": "Autonomous investigation of EXT-014 identified $1044.00 exposure under pattern card_not_present_fraud.",
+    "subjects": [
+      "C20014"
+    ],
+    "total_amount_usd": 1044.0,
+    "activity_dates": [
+      "2026-09-20"
+    ]
+  },
+  "stop_reason": "Customer confirmation and graph evidence established conclusive verdict.",
+  "context_brief": "=== EXTENDED BENCHMARK CASE EXT-014 ===\nTypology: card_not_present_fraud\nExposure: $1044.00",
+  "tool_calls": 5,
+  "tokens": 1800,
+  "latency_s": 0.008
+}

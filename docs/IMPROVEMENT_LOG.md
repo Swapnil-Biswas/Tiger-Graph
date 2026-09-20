@@ -1,3 +1,30 @@
+## Iteration 082: Extended 50-Case High-Stress Benchmark Suite | 2026-09-21 07:30 | commit pending
+- **Lens:** 14. Testing, evaluation & benchmarks, 11. Agent architecture & engineering, 3. Next best action & policy guidance
+- **Goal / hypothesis:** Beyond the 20 official benchmark cases, mission-critical fraud systems must prove robustness against diverse, synthetic edge cases (impossible travel, circular mule chains, dormant card bursts, sub-threshold BSA smurfing, quasi-cash crypto bursts) without overfitting or schema drift. Creating the extended 50-case benchmark suite delivers:
+  1. **50 Synthetic High-Stress Cases (`eval/extended_cases/EXT-001.json` - `EXT-050.json`)**: Synthesizes 50 edge-case scenarios covering 12 typologies, realistic exposure amounts ($15 to $2,500), multi-card linkages, counterfactuals, and dual-gate actions.
+  2. **100% Schema Conformance (50/50 Passed)**: Validated against strict PRD answer format specifications via `eval/extended_benchmark_evaluator.py`, verifying correct empty fields for legitimate cases (`affected_txn_ids: []`, `first_suspicious_txn_id: ""`) and action-to-SAR consistency (`FILE_REPORT` aligned with `sar.file`).
+  3. **High-Stress Operational Metrics**: Evaluates $39,586.50 total exposure, 38 fraud vs. 12 legitimate cases, and 29 automated SAR filings.
+- **Changes (files):**
+  - `eval/extended_benchmark_generator.py`: Implemented synthetic benchmark generator.
+  - `eval/extended_benchmark_evaluator.py`: Implemented evaluation and schema validation harness.
+  - `eval/extended_cases/`: Generated 50 benchmark cases (`EXT-001.json` to `EXT-050.json`).
+  - `tests/test_extended_benchmark.py`: Created 5 unit tests validating generation, evaluation, corruption detection, and JSON output.
+- **Tests added/updated:**
+  - `tests/test_extended_benchmark.py` (5 unit tests, all pass).
+  - Total unit test suite expanded from 317 to **322** tests across 66 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 317 -> **322** (100% pass rate across 66 test suites)
+  - Extended Benchmark Pass Rate: 50/50 (100.0%)
+  - Official Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 322 passed across 66 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 081: Interactive Video Script & Demo Asset Packager | 2026-09-21 07:15 | commit f8e199b
 - **Lens:** 10. Case summary, explanation & visual reporting, 8. Explainability & human-in-the-loop, 14. Testing, evaluation & benchmarks
 - **Goal / hypothesis:** Competition evaluation and enterprise stakeholder buy-in require high-polish presentation assets, including an exact timestamped video narration script and an automated bundle packager that creates a self-contained demo distribution with cryptographic checksums. Building `docs/DEMO_SCRIPT.md` and `scripts/package_demo_assets.py` delivers:

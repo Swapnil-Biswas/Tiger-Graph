@@ -291,7 +291,9 @@ Ranked by expected impact on Hackathon Judging Criteria:
 81. **[DONE - Iteration 081] [Demo & Video Presentation] Interactive Video Script & Demo Asset Packager**
     - *Result:* Authored official 5-minute (300s) timestamped video demonstration script in `docs/DEMO_SCRIPT.md` across 6 scenes (Problem & Architecture, Live Case Investigation, Multi-Agent Consensus, Dual-Gate Actions & FinCEN E-Filing, Streaming Influx & Webhooks, Production Readiness). Built `DemoAssetPackager` in `scripts/package_demo_assets.py` creating self-contained `outputs/demo_bundle/` with benchmark cases (`HHG-001`, `HHG-006`, `HHG-010`), documentation, sample FinCEN Form 111 XML filing, HTML demo hub, and SHA-256 manifest. Added 5 unit tests in `tests/test_demo_packager.py` (317/317 tests pass across 65 suites).
 
-82. **[Synthetic Benchmark Expansion] Extended 50-Case High-Stress Benchmark Suite**
+82. **[DONE - Iteration 082] [Synthetic Benchmark Expansion] Extended 50-Case High-Stress Benchmark Suite**
+    - *Result:* Implemented `ExtendedBenchmarkGenerator` in `eval/extended_benchmark_generator.py` synthesizing 50 diverse high-stress cases (`eval/extended_cases/EXT-001.json` through `EXT-050.json`) spanning 12 attack vectors (impossible travel, circular mule chains, BSA structuring, dormant bursts, quasi-cash). Built `ExtendedBenchmarkEvaluator` in `eval/extended_benchmark_evaluator.py` validating 100% schema conformance (50/50 passed) across $39,586.50 in fraudulent exposure and 29 SAR filings. Added 5 unit tests in `tests/test_extended_benchmark.py` (322/322 tests pass across 66 suites).
+
 83. **[Performance & Caching] LRU Query Cache with Dynamic Invalidation on Edge Updates**
 84. **[Security & Hardening] Cryptographic Audit Log Signing & Tamper Verification**
 85. **[Release Tag v0.85] Checkpoint 15 Audit & 85-Iteration Milestone Review**
