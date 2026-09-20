@@ -136,6 +136,22 @@ class SybilCheckRequest(BaseModel):
     as_of: Optional[str] = None
 
 
+class EdgeDecayRequest(BaseModel):
+    epoch_s: int
+    as_of: Optional[str] = None
+    edge_type: str = "TRANSACTION"
+    is_fraud: bool = False
+    risk_score: float = 0.0
+    half_life_days: float = 30.0
+
+
+class StreamingPruneRequest(BaseModel):
+    as_of: Optional[str] = None
+    sample_size: int = 50
+    half_life_days: float = 30.0
+    max_degree: int = 50
+
+
 StructuringCheckRequest.model_rebuild()
 ContagionCheckRequest.model_rebuild()
 PoolEmbeddingRequest.model_rebuild()
@@ -146,6 +162,8 @@ MCCCheckRequest.model_rebuild()
 MotifsCheckRequest.model_rebuild()
 EntityLinkageRequest.model_rebuild()
 SybilCheckRequest.model_rebuild()
+EdgeDecayRequest.model_rebuild()
+StreamingPruneRequest.model_rebuild()
 
 
 @app.get("/api/health")
@@ -592,6 +610,41 @@ def get_case_sybils(case_id: str):
 def run_sybil_check(req: SybilCheckRequest):
     """On-demand cardholder sybil identity discovery."""
     return agent.client.resolve_cardholder_sybils(card_id=req.card_id, as_of=req.as_of)
+
+
+@app.post("/api/graph/edge-decay")
+def run_edge_decay_check(req: EdgeDecayRequest):
+    """Calculates continuous exponential temporal decay weight for an edge."""
+    return agent.client.calculate_edge_decay(
+        epoch_s=req.epoch_s,
+        as_of=req.as_of,
+        edge_type=req.edge_type,
+        is_fraud=req.is_fraud,
+        risk_score=req.risk_score,
+        half_life_days=req.half_life_days,
+    )
+
+
+@app.post("/api/graph/streaming-prune")
+def run_streaming_prune(req: StreamingPruneRequest):
+    """Simulates streaming graph pruning across active cards and measures memory reduction."""
+    return agent.client.prune_streaming_graph(
+        as_of=req.as_of,
+        sample_size=req.sample_size,
+        half_life_days=req.half_life_days,
+        max_degree=req.max_degree,
+    )
+
+
+@app.get("/api/cards/{card_id}/pruned")
+def get_card_pruned_edges(card_id: str, as_of: Optional[str] = None, half_life_days: float = 30.0, max_degree: int = 50):
+    """Applies exponential temporal decay and bounded top-K degree pruning to card transactions."""
+    return agent.client.prune_card_edges(
+        card_id=card_id,
+        as_of=as_of,
+        half_life_days=half_life_days,
+        max_degree=max_degree,
+    )
 
 
 @app.get("/api/rules/mined")

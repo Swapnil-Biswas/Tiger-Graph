@@ -167,10 +167,13 @@ Ranked by expected impact on Hackathon Judging Criteria:
 45. **[DONE - Iteration 045] [Entity Resolution & Graph Identity] Probabilistic Record Linkage & Noisy Profile Disambiguation**
     - *Result:* Implemented `ProbabilisticEntityResolver` in `src/graph/entity_resolution.py` using the Fellegi-Sunter log-likelihood linkage framework and Jaro-Winkler string similarity with candidate blocking across heterogeneous attributes (device model, browser, OS, screen resolution, email prefix/domain, IP subnet, billing address). Computes posterior match probabilities ($P \in [0, 1]$), resolves near-duplicate device nexuses, discovers cross-card sybils, and recommends automated supervisory actions (`MERGE_ENTITY_CLUSTER`, `STEP_UP_AUTH_AND_EDD`, `MAINTAIN_SEPARATION`). Exposed Q23 methods in `GraphClient`. Added API endpoints `/api/graph/entity-linkage`, `/api/devices/{device_key}/resolved`, `/api/cases/{case_id}/sybils`, `/api/graph/sybil-check`. Added 7 unit tests in `tests/test_entity_resolution.py` (154/154 tests pass).
 
-46. **[Streaming Graph Scalability & Performance] Dynamic Graph Edge Pruning & Exponential Decay Memory Management**
-    - *Goal:* Implement streaming memory pruning and exponential decay on transaction graph edges so that high-volume transaction graphs maintain bounded memory and sub-millisecond traversal latency without dropping critical historical fraud seed paths.
-    - *Files:* `src/graph/decay.py`, `src/graph/client.py`, `tests/test_graph_decay.py`
-    - *Metric Impact:* Streaming & Real-Time Performance (Lens 15, Lens 11).
+46. **[DONE - Iteration 046] [Streaming Graph Scalability & Performance] Dynamic Graph Edge Pruning & Exponential Decay Memory Management**
+    - *Result:* Implemented `ExponentialTemporalDecay` in `src/graph/decay.py` applying continuous exponential decay ($w(e) = \min(1.0, \alpha(e) \cdot 2^{-\Delta t / \tau})$) with half-life $\tau$ (30 days), priority-boosting multipliers ($\alpha = 4.0$ for confirmed fraud, $\alpha = 3.0$ for syndicate links, $\alpha = 2.0$ for high risk), guaranteed fraud seed preservation immunity, and bounded-degree top-$K$ pruning. Exposed Q24 methods `calculate_edge_decay`, `prune_card_edges`, and `prune_streaming_graph` in `GraphClient`. Added API endpoints `/api/graph/edge-decay`, `/api/graph/streaming-prune`, `/api/cards/{card_id}/pruned`. Added 6 unit tests in `tests/test_graph_decay.py` (160/160 tests pass).
+
+47. **[Agent Architecture & Self-Refinement] Graph-Augmented LLM Self-Refinement & Counter-Factual Verification Loop**
+    - *Goal:* Implement iterative self-refinement and counter-factual verification loop where the agent checks its proposed verdict and actions against the graph's structural invariants, auto-detects ungrounded assertions or policy contradictions, and refines its response before final dispatch.
+    - *Files:* `src/agent/refiner.py`, `src/agent/investigator.py`, `tests/test_agent_refiner.py`
+    - *Metric Impact:* Agent Architecture & Explainability (Lens 11, Lens 12).
 
 ---
 

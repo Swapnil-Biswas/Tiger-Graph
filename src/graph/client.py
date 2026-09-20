@@ -1065,6 +1065,74 @@ class GraphClient:
         resolver = ProbabilisticEntityResolver(self)
         return resolver.resolve_cardholder_sybils(card_id=card_id, as_of=as_of)
 
+    # =========================================================================
+    # Q24: prune_streaming_graph & calculate_edge_decay
+    # Streaming Graph Edge Decay & Memory Management Engine
+    # =========================================================================
+    def calculate_edge_decay(
+        self,
+        epoch_s: int,
+        as_of: Optional[Union[str, int]] = None,
+        edge_type: str = "TRANSACTION",
+        is_fraud: bool = False,
+        risk_score: float = 0.0,
+        half_life_days: float = 30.0,
+    ) -> dict:
+        """
+        Q24: Calculates continuous exponential temporal decay weight for a graph edge.
+        """
+        from src.graph.decay import ExponentialTemporalDecay
+        from src.graph.client import parse_as_of_epoch
+        as_of_epoch = parse_as_of_epoch(as_of)
+        decay_engine = ExponentialTemporalDecay(half_life_days=half_life_days, client=self)
+        return decay_engine.calculate_edge_weight(
+            epoch_s=epoch_s,
+            as_of_epoch=as_of_epoch,
+            edge_type=edge_type,
+            is_fraud=is_fraud,
+            risk_score=risk_score,
+        )
+
+    def prune_card_edges(
+        self,
+        card_id: str,
+        as_of: Optional[Union[str, int]] = None,
+        half_life_days: float = 30.0,
+        max_degree: int = 50,
+    ) -> dict:
+        """
+        Applies exponential temporal decay and bounded top-K degree pruning to card transactions.
+        """
+        from src.graph.decay import ExponentialTemporalDecay
+        decay_engine = ExponentialTemporalDecay(
+            half_life_days=half_life_days,
+            max_degree_per_node=max_degree,
+            client=self,
+        )
+        return decay_engine.prune_card_subgraph(card_id=card_id, as_of=as_of, max_degree=max_degree)
+
+    def prune_streaming_graph(
+        self,
+        as_of: Optional[Union[str, int]] = None,
+        sample_size: int = 50,
+        half_life_days: float = 30.0,
+        max_degree: int = 50,
+    ) -> dict:
+        """
+        Simulates streaming graph pruning across active cards and measures memory reduction.
+        """
+        from src.graph.decay import ExponentialTemporalDecay
+        decay_engine = ExponentialTemporalDecay(
+            half_life_days=half_life_days,
+            max_degree_per_node=max_degree,
+            client=self,
+        )
+        return decay_engine.simulate_streaming_pruning(
+            as_of=as_of,
+            sample_size=sample_size,
+            max_degree=max_degree,
+        )
+
 
 
 

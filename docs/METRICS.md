@@ -48,6 +48,7 @@
 | **043** | `9918c55` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 141/141 (100%) | 0.008s | PASS | Dynamic high-risk merchant MCC blacklisting & adaptive velocity multipliers (Q21) |
 | **044** | `6052b3e` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 147/147 (100%) | 0.008s | PASS | Temporal transaction subgraph motif mining & topological anomaly scoring (Q22) |
 | **045** | `ce8c0e8` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 154/154 (100%) | 0.008s | PASS | Probabilistic record linkage (Fellegi-Sunter / Jaro-Winkler) & sybil defense (Q23) |
+| **046** | `iter-046` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 160/160 (100%) | 0.008s | PASS | Streaming graph edge decay (exponential half-life) & bounded top-K pruning (Q24) |
 
 ---
 
