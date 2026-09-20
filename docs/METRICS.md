@@ -44,7 +44,7 @@
 | **039** | `c235572` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 128/128 (100%) | 0.008s | PASS | Cross-border AML transaction bundling & correspondent banking risk (Q20) |
 | **040** | `12285c5` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 128/128 (100%) | 0.008s | PASS | Checkpoint 7 Audit, 40% Milestone Review, and v0.4 Release Tag |
 | **041** | `77d139b` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 134/134 (100%) | 0.008s | PASS | Cross-case syndicate expansion & shared merchant collusion tracking |
-| **042** | pending | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 135/135 (100%) | 0.008s | PASS | Decision boundary visualization & interactive sensitivity sliders in HTML dossier |
+| **042** | `023feca` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 135/135 (100%) | 0.008s | PASS | Decision boundary visualization & interactive sensitivity sliders in HTML dossier |
 
 ---
 

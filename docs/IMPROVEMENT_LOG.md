@@ -1,4 +1,4 @@
-## Iteration 042: Decision Boundary Visualization in HTML Incident Dossier | 2026-09-20 20:45 | commit pending
+## Iteration 042: Decision Boundary Visualization in HTML Incident Dossier | 2026-09-20 20:45 | commit 023feca
 - **Lens:** 9. Case summary and explainability & 10. Demo quality and UI/UX & 14. Testing and evaluation
 - **Goal / hypothesis:** Human fraud analysts and compliance auditors reviewing incident dossiers require clear visibility into why a decision was reached and how sensitive the verdict is to specific evidentiary changes. Static counterfactual tables describe thresholds in text but lack interactive intuition. Implementing interactive decision boundary gauges and real-time sensitivity sliders in `IncidentDossierExporter` renders a dynamic gradient decision boundary bar (Legitimate < 0.30, Review 0.30–0.70, Fraud > 0.70) with an interactive JavaScript simulator that recalculates simulated probabilities, flips verdicts, and updates action recommendations on-the-fly in standalone HTML reports.
 - **Changes (files):**
