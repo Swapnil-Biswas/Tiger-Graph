@@ -1,3 +1,31 @@
+## Iteration 045: Probabilistic Record Linkage & Noisy Profile Disambiguation | 2026-09-20 22:30 | commit iter-045
+- **Lens:** 1. Graph schema & modeling & 4. Device sharing and IP proxy detection & 11. Agent architecture & engineering
+- **Goal / hypothesis:** Cybercrime syndicates intentionally introduce minor permutations in device configurations (browser point-release updates, OS minor version increments) and email handles to evade exact-match deterministic graph traversals, leaving sybil clusters and multi-accounting rings fragmented into disjoint components. Implementing `ProbabilisticEntityResolver` using the Fellegi-Sunter log-likelihood linkage framework and Jaro-Winkler string similarity with candidate blocking resolves noisy near-duplicate profiles across heterogeneous attributes (device model, browser, OS, screen resolution, email prefix/domain, IP subnet, billing address), computes posterior match probabilities ($P \in [0, 1]$), uncovers hidden sybil cards, evaluates sybil risk scores, and recommends automated supervisory actions (`MERGE_ENTITY_CLUSTER`, `STEP_UP_AUTH_AND_EDD`, `MAINTAIN_SEPARATION`).
+- **Changes (files):**
+  - `src/graph/entity_resolution.py`: Implemented `jaro_similarity`, `jaro_winkler_similarity`, `parse_device_profile_key`, and `ProbabilisticEntityResolver` with precomputed Fellegi-Sunter log-likelihood weights, sub-millisecond candidate blocking, fuzzy device nexus resolution, and cross-card sybil account discovery.
+  - `src/graph/client.py`: Added Q23 methods `resolve_entity_linkage`, `resolve_device_nexus`, and `resolve_cardholder_sybils` to `GraphClient`.
+  - `src/api/main.py`: Added `EntityLinkageRequest`, `SybilCheckRequest` with `model_rebuild()`, and endpoints `POST /api/graph/entity-linkage`, `GET /api/devices/{device_key}/resolved`, `GET /api/cases/{case_id}/sybils`, `POST /api/graph/sybil-check`.
+  - `tests/test_entity_resolution.py`: Created 7 unit tests covering Jaro-Winkler string similarity, Fellegi-Sunter identical profiles, fuzzy browser updates, probable sybils, distinct profiles, candidate blocking & API endpoints, and temporal activity isolation.
+- **Tests added/updated:**
+  - `tests/test_entity_resolution.py` (7 unit tests, all pass).
+  - Total unit test suite expanded from 147 to **154** tests across 36 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 147 -> **154** (100% pass rate across 36 test suites)
+  - Entity Resolution: Fellegi-Sunter log-likelihood record linkage & Jaro-Winkler string similarity
+  - Sybil Defense: Fuzzy device nexus resolution and cross-card sybil account discovery
+  - Query Library: Expanded to Q23 (`resolve_entity_linkage`, `resolve_cardholder_sybils`)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (154/154)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** In candidate blocking for device resolution, prioritizing device model prefix matches before screen resolution matches prevents broad screen resolution categories (e.g. 2048x1536) from crowding out genuine near-duplicate hardware profiles within candidate evaluation budgets.
+- **Follow-ups added to backlog:** Proceed to Iteration 046: Dynamic Graph Edge Pruning & Exponential Decay for Streaming Real-Time Scalability (Lens 15 & Lens 11).
+
 ## Iteration 044: Temporal Transaction Subgraph Motif Mining | 2026-09-20 20:30 | commit 6052b3e
 - **Lens:** 1. Graph schema & modeling & 6. Transaction velocity & burst & 11. Agent architecture & engineering
 - **Goal / hypothesis:** Fraud syndicates and automated card-cracking bots exhibit distinct temporal subgraph motifs that cannot be captured by static degree counts or single-edge queries alone. By mining higher-order temporal transaction motifs across continuous rolling windows (fan-out stars, fan-in hubs, bipartite meshes, temporal chains, and sharing triangles), the agent can quantify complex coordinated behavioral topology, evaluate anomaly scores, and assign threat levels (critical, high, elevated, low, none).

@@ -1022,6 +1022,49 @@ class GraphClient:
             window_hours=window_hours,
         )
 
+    # =========================================================================
+    # Q23: resolve_entity_linkage & resolve_cardholder_sybils
+    # Probabilistic Record Linkage & Noisy Profile Disambiguation (Fellegi-Sunter)
+    # =========================================================================
+    def resolve_entity_linkage(self, profile_a: dict, profile_b: dict) -> dict:
+        """
+        Q23: Compares two entity profiles using Fellegi-Sunter log-likelihood weights
+        and Jaro-Winkler string similarity to compute posterior match probability.
+        """
+        from src.graph.entity_resolution import ProbabilisticEntityResolver
+        resolver = ProbabilisticEntityResolver(self)
+        return resolver.compare_profiles(profile_a, profile_b)
+
+    def resolve_device_nexus(
+        self,
+        device_key: str,
+        as_of: Optional[Union[str, int]] = None,
+        similarity_threshold: float = 0.75,
+    ) -> dict:
+        """
+        Resolves fuzzy near-duplicate device profiles across the graph using candidate blocking.
+        """
+        from src.graph.entity_resolution import ProbabilisticEntityResolver
+        resolver = ProbabilisticEntityResolver(self)
+        return resolver.resolve_device_nexus(
+            device_key=device_key,
+            as_of=as_of,
+            similarity_threshold=similarity_threshold,
+        )
+
+    def resolve_cardholder_sybils(
+        self,
+        card_id: str,
+        as_of: Optional[Union[str, int]] = None,
+    ) -> dict:
+        """
+        Discovers hidden sybil and synthetic identity cards linked to card_id via
+        probabilistic device and profile linkage.
+        """
+        from src.graph.entity_resolution import ProbabilisticEntityResolver
+        resolver = ProbabilisticEntityResolver(self)
+        return resolver.resolve_cardholder_sybils(card_id=card_id, as_of=as_of)
+
 
 
 

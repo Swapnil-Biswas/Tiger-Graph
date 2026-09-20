@@ -126,6 +126,16 @@ class MotifsCheckRequest(BaseModel):
     window_hours: float = 72.0
 
 
+class EntityLinkageRequest(BaseModel):
+    profile_a: Dict[str, Any]
+    profile_b: Dict[str, Any]
+
+
+class SybilCheckRequest(BaseModel):
+    card_id: str
+    as_of: Optional[str] = None
+
+
 StructuringCheckRequest.model_rebuild()
 ContagionCheckRequest.model_rebuild()
 PoolEmbeddingRequest.model_rebuild()
@@ -134,6 +144,8 @@ EvaluateRulesRequest.model_rebuild()
 CrossBorderCheckRequest.model_rebuild()
 MCCCheckRequest.model_rebuild()
 MotifsCheckRequest.model_rebuild()
+EntityLinkageRequest.model_rebuild()
+SybilCheckRequest.model_rebuild()
 
 
 @app.get("/api/health")
@@ -541,6 +553,45 @@ def run_motifs_check(req: MotifsCheckRequest):
         as_of=req.as_of,
         window_hours=req.window_hours,
     )
+
+
+@app.post("/api/graph/entity-linkage")
+def run_entity_linkage(req: EntityLinkageRequest):
+    """Calculates Fellegi-Sunter probabilistic match probability between two entity profiles."""
+    return agent.client.resolve_entity_linkage(req.profile_a, req.profile_b)
+
+
+@app.get("/api/devices/{device_key:path}/resolved")
+def get_resolved_device_nexus(device_key: str, as_of: Optional[str] = None, similarity_threshold: float = 0.75):
+    """Resolves fuzzy near-duplicate device profiles across the graph."""
+    return agent.client.resolve_device_nexus(
+        device_key=device_key,
+        as_of=as_of,
+        similarity_threshold=similarity_threshold,
+    )
+
+
+@app.get("/api/cases/{case_id}/sybils")
+def get_case_sybils(case_id: str):
+    """Discovers probabilistic sybil identities and synthetic cards for a case."""
+    if case_id not in active_cases:
+        if case_id in agent.client.store.case_pack:
+            res = agent.investigate_case(case_id)
+            active_cases[case_id] = res
+            case_manager.write_case_to_graph(res)
+        else:
+            raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
+
+    case_data = active_cases[case_id]
+    card_id = case_data.get("case", {}).get("card_id")
+    as_of = case_data.get("case", {}).get("as_of")
+    return agent.client.resolve_cardholder_sybils(card_id=card_id, as_of=as_of)
+
+
+@app.post("/api/graph/sybil-check")
+def run_sybil_check(req: SybilCheckRequest):
+    """On-demand cardholder sybil identity discovery."""
+    return agent.client.resolve_cardholder_sybils(card_id=req.card_id, as_of=req.as_of)
 
 
 @app.get("/api/rules/mined")

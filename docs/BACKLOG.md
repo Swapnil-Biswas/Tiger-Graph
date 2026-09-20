@@ -164,10 +164,13 @@ Ranked by expected impact on Hackathon Judging Criteria:
 44. **[DONE - Iteration 044] [Graph Analytics & Pattern Discovery] Temporal Transaction Subgraph Motif Mining**
     - *Result:* Implemented `TemporalSubgraphMotifMiner` in `src/graph/algorithms.py` and exposed `mine_subgraph_motifs` (Q22) in `GraphClient`. Mines 5 topological motifs (fan-out stars, fan-in hubs, bipartite meshes, temporal chains, sharing triangles) over rolling temporal windows with normalized anomaly scoring ($[0.0, 1.0]$), dominant motif classification, and threat level categorization. Enhanced `parse_as_of_epoch` in `src/graph/client.py` for numeric string timestamps. Added API endpoints `/api/cases/{case_id}/motifs` and `/api/graph/motifs-check`. Added 6 unit tests in `tests/test_graph_motifs.py` (147/147 tests pass).
 
-45. **[Entity Resolution & Graph Identity] Probabilistic Record Linkage & Noisy Profile Disambiguation**
-    - *Goal:* Implement Fellegi-Sunter / Jaro-Winkler probabilistic entity resolution for ambiguous/noisy device, email, and IP profiles across disparate cardholders and cases to detect hidden sybil identities and synthetic identities.
-    - *Files:* `src/graph/entity_resolution.py`, `src/graph/client.py`, `tests/test_entity_resolution.py`
-    - *Metric Impact:* Entity Resolution & Syndicate Defense (Lens 1, Lens 4).
+45. **[DONE - Iteration 045] [Entity Resolution & Graph Identity] Probabilistic Record Linkage & Noisy Profile Disambiguation**
+    - *Result:* Implemented `ProbabilisticEntityResolver` in `src/graph/entity_resolution.py` using the Fellegi-Sunter log-likelihood linkage framework and Jaro-Winkler string similarity with candidate blocking across heterogeneous attributes (device model, browser, OS, screen resolution, email prefix/domain, IP subnet, billing address). Computes posterior match probabilities ($P \in [0, 1]$), resolves near-duplicate device nexuses, discovers cross-card sybils, and recommends automated supervisory actions (`MERGE_ENTITY_CLUSTER`, `STEP_UP_AUTH_AND_EDD`, `MAINTAIN_SEPARATION`). Exposed Q23 methods in `GraphClient`. Added API endpoints `/api/graph/entity-linkage`, `/api/devices/{device_key}/resolved`, `/api/cases/{case_id}/sybils`, `/api/graph/sybil-check`. Added 7 unit tests in `tests/test_entity_resolution.py` (154/154 tests pass).
+
+46. **[Streaming Graph Scalability & Performance] Dynamic Graph Edge Pruning & Exponential Decay Memory Management**
+    - *Goal:* Implement streaming memory pruning and exponential decay on transaction graph edges so that high-volume transaction graphs maintain bounded memory and sub-millisecond traversal latency without dropping critical historical fraud seed paths.
+    - *Files:* `src/graph/decay.py`, `src/graph/client.py`, `tests/test_graph_decay.py`
+    - *Metric Impact:* Streaming & Real-Time Performance (Lens 15, Lens 11).
 
 ---
 
