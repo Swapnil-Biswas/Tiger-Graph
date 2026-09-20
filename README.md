@@ -1,216 +1,200 @@
 # TigerGraph Autonomous Fraud Investigator & Next-Best-Action Agent
 
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com)
-[![TigerGraph](https://img.shields.io/badge/TigerGraph-Native%20GSQL-FF6600.svg)](https://www.tigergraph.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Release](https://img.shields.io/badge/release-v0.85-brightgreen.svg)](https://github.com/Swapnil-Biswas/Tiger-Graph/releases/tag/v0.85)
+[![Tests](https://img.shields.io/badge/tests-334%20passed%20%7C%2068%20suites-brightgreen.svg)](tests/)
+[![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.14-blue.svg)](https://www.python.org/)
+[![TigerGraph](https://img.shields.io/badge/TigerGraph-Native%20GSQL%20(Q1--Q26)-FF6600.svg)](https://www.tigergraph.com/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.140+-009688.svg)](https://fastapi.tiangolo.com)
+[![Docker](https://img.shields.io/badge/Docker-Multi--Stage%20Non--Root-2496ED.svg)](Dockerfile)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-Helm%20v3%20%2B%20HPA-326CE5.svg)](deploy/helm/tigergraph-agent/)
+[![Prometheus](https://img.shields.io/badge/Prometheus-OpenMetrics%20RFC%200.0.4-E6522C.svg)](deploy/prometheus.yml)
+[![Compliance](https://img.shields.io/badge/Compliance-FinCEN%20%7C%20FRE%20902%20%7C%20GDPR-purple.svg)](src/policy/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> **Autonomous, explainable AI Fraud Investigation and Next-Best-Action System built with TigerGraph, GraphRAG Memory, and Deterministic Policy Guardrails for the Hacker House Goa (HHGOA IEEE-CIS) challenge.**
-
----
-
-## 1. System Architecture
-
-The TigerGraph Autonomous Fraud Investigator replaces slow, fragmented manual fraud queues with a sub-second, auditable, and regulatory-compliant agentic workflow.
-
-```mermaid
-flowchart TD
-    subgraph TriggerLayer ["1. Trigger Ingestion"]
-        T1["Real-Time Risk Score Alert"] --> AG["Agent State Machine"]
-        T2["Customer Dispute Report"] --> AG
-    end
-
-    subgraph GraphLayer ["2. TigerGraph Native Analytics (Q1-Q12)"]
-        AG --> Q1["Q1: Entity & Card Baseline"]
-        AG --> Q4["Q4: Velocity Bursts"]
-        AG --> Q5["Q5: 2-Hop Shared Device / Region Rings"]
-        AG --> Q6["Q6: Card Testing Spikes"]
-        AG --> Q9["Q9: Proxy / ASN Rotation (Pattern 6)"]
-        Q1 & Q4 & Q5 & Q6 & Q9 --> EV["Auditable Graph Evidence Store"]
-    end
-
-    subgraph MemoryLayer ["3. GraphRAG Episodic Memory"]
-        AG --> RET["GraphRAG Hybrid Retriever"]
-        RET --> MEM["5,565 Historical Closed Cases (Months 1-4)"]
-        MEM --> POL["Dynamic Precedent & Policy Assembly"]
-    end
-
-    subgraph PolicyLayer ["4. Deterministic Policy Engine (R1-R10)"]
-        EV & POL --> EVAL["Uncertainty & Regret Assessor"]
-        EVAL --> PRE["Initial Next-Best-Actions"]
-        EVAL --> SIM{"Uncertainty > Threshold?"}
-        SIM -- Yes --> SIM_OUT["Simulated Customer Outreach / Step-Up Auth"]
-        SIM_OUT --> POST["Recommendation Evolution (Final Actions)"]
-        SIM -- No --> POST
-        POST --> PE["Deterministic Policy Rules (R1-R10)"]
-        PE --> ROUTE["Approval Router: auto | L1 | L2"]
-        PE --> SAR["SAR Generator (FinCEN 6-W Narrative)"]
-    end
-
-    subgraph PersistenceLayer ["5. Graph Persistence & Human-in-the-Loop"]
-        POST & SAR --> GW["Case Vertex & Finding Edges Written to TigerGraph"]
-        ROUTE --> UI["Real-Time Cytoscape Graph UI (SSE Streaming)"]
-        UI --> ACT["Mock Actions API Execution"]
-    end
-```
+> **Enterprise-grade, autonomous fraud investigation platform combining TigerGraph massive-scale graph traversal, multi-agent collaborative consensus, dual-gate deterministic policy guardrails (R1–R10), real-time streaming anomaly detection, and FinCEN BSA electronic filing for the IEEE-CIS Fraud Detection challenge.**
 
 ---
 
-## 2. Key Capabilities & Innovations
+## Quickstart in 30 Seconds
 
-1. **Sub-Second End-to-End Investigation:** Investigates full graph topology across 590,742 transactions, 13,770 cards, and 5,565 closed cases in **< 20 milliseconds per case** (reducing historical resolution from **3.09 days to 0.019s**).
-2. **Deterministic Policy Airbag (R1–R10):** Prevents rogue LLM actions. Rule R1 strictly blocks premature single-signal card blocks; Rule R10 forbids unauthorized portfolio shutdowns.
-3. **Recommendation Evolution (Pre vs Post Evidence):** Dynamically updates risk assessments and action plans based on simulated cardholder validation and step-up auth responses.
-4. **Automated Regulatory SAR Generation:** Produces strict FinCEN-compliant Suspicious Activity Reports detailing **Who, What, When, Where, How, and Why** for all qualifying exposures (> $1,000 USD, syndicates, or undocumented rings).
-5. **Interactive Graph Explorer:** Real-time web UI powered by Cytoscape.js, streaming investigation logs and decision nodes live via Server-Sent Events (SSE).
-6. **Novel Fraud Discovery:** Discovered and formalized **Pattern 6: Multi-Card Proxy Rotation (`multi_card_proxy_rotation`)** where syndicates rotate device fingerprints across shared proxies to evade single-card velocity filters.
-
----
-
-## 3. Benchmark Results (20/20 Passed)
-
-Evaluated against the official benchmark pack (`HHG-001` through `HHG-020`). All 20 generated answer files achieve **100% schema conformance** against `docs/answer_format.md`.
-
-| Case ID | Verdict | Fraud Prob | Detected Pattern | SAR Filed | Actions | Exposure ($) | Latency |
-|:---:|:---:|:---:|:---|:---:|:---:|---:|:---:|
-| **HHG-001** | `LEGITIMATE` | 0.05 | `none` | `NO` | 2 | $0.00 | 0.00s |
-| **HHG-002** | `LEGITIMATE` | 0.05 | `none` | `NO` | 2 | $0.00 | 0.02s |
-| **HHG-003** | `FRAUD` | 1.00 | `card_not_present_fraud` | `NO` | 2 | $49.00 | 0.00s |
-| **HHG-004** | `FRAUD` | 1.00 | `card_not_present_new_device` | `YES` | 4 | $128.33 | 0.03s |
-| **HHG-005** | `FRAUD` | 0.98 | `card_not_present_new_device` | `YES` | 4 | $100.07 | 0.00s |
-| **HHG-006** | `FRAUD` | 1.00 | `card_not_present_new_device` | `YES` | 4 | $482.12 | 0.00s |
-| **HHG-007** | `LEGITIMATE` | 0.05 | `none` | `NO` | 2 | $0.00 | 0.05s |
-| **HHG-008** | `FRAUD` | 1.00 | `card_not_present_fraud` | `YES` | 4 | $55.68 | 0.05s |
-| **HHG-009** | `FRAUD` | 1.00 | `card_not_present_fraud` | `YES` | 4 | $30.02 | 0.01s |
-| **HHG-010** | `FRAUD` | 1.00 | `card_not_present_new_device` | `YES` | 4 | $1,000.03 | 0.00s |
-| **HHG-011** | `FRAUD` | 1.00 | `card_testing` | `YES` | 4 | $131.30 | 0.13s |
-| **HHG-012** | `LEGITIMATE` | 0.05 | `none` | `NO` | 2 | $0.00 | 0.01s |
-| **HHG-013** | `FRAUD` | 1.00 | `card_not_present_new_device` | `YES` | 4 | $35.66 | 0.00s |
-| **HHG-014** | `LEGITIMATE` | 0.00 | `none` | `NO` | 2 | $0.00 | 0.00s |
-| **HHG-015** | `FRAUD` | 1.00 | `card_not_present_new_device` | `YES` | 4 | $599.94 | 0.01s |
-| **HHG-016** | `FRAUD` | 1.00 | `card_not_present_new_device` | `YES` | 4 | $59.67 | 0.03s |
-| **HHG-017** | `FRAUD` | 1.00 | `card_not_present_fraud` | `YES` | 4 | $100.09 | 0.01s |
-| **HHG-018** | `FRAUD` | 1.00 | `card_not_present_fraud` | `NO` | 2 | $39.08 | 0.09s |
-| **HHG-019** | `FRAUD` | 1.00 | `card_not_present_new_device` | `YES` | 4 | $99.92 | 0.00s |
-| **HHG-020** | `FRAUD` | 0.97 | `card_not_present_new_device` | `YES` | 4 | $125.08 | 0.00s |
-
----
-
-## 4. Historical Backtest & Ablation Studies
-
-### A. Backtest Performance (Months 1–4, N=5,565)
-Evaluated across stratified historical closed cases to ensure zero look-ahead bias:
-- **Precision:** **100.00%** (Zero false alarms on cleared accounts)
-- **Detection Rate (Recall):** **49.40%** at strict 100% precision threshold
-- **Turnaround Reduction:** **>99.99%** (From 3.09 days manual review to 19.4 milliseconds)
-- **Cost-to-Serve Optimization:** **71.12% auto-routed** without human touch
-- **Policy Compliance:** **100.00%** compliance with Rules R1–R10
-
-### B. Ablation Study Summary
-| Configuration | Precision | False Positive Rate | Policy Violations (R1/R10) | Notes |
-|---|---|---|---|---|
-| **Full System (Ours)** | **100.0%** | **0.0%** | **0** | Graph topology + Memory + Policy |
-| **Graph Signals OFF** | 83.3% | 100.0% | 150 | Single-signal alerts cause massive FP explosion |
-| **GraphRAG Memory OFF** | 100.0% | 0.0% | 0 | Higher analyst uncertainty on recurring charges |
-| **Policy Engine OFF** | 100.0% | 0.0% | 6 | Rogue card blocks violating bank policies |
-
----
-
-## 5. Action Catalog & Approval Hierarchy
-
-The system operates strictly within 14 discrete actions across 3 approval routes:
-
-| Action | Route | Trigger Condition | Customer Impact |
-|---|---|---|---|
-| `ALLOW_TRANSACTION` | `auto` | Assessed fraud prob low, customer confirms | None |
-| `CLOSE_NO_FRAUD` | `auto` | False alert cleared, legitimate baseline | None |
-| `VERIFY_WITH_CUSTOMER` | `auto` | Weak signal / single signal / probability < 0.70 | Low |
-| `STEP_UP_AUTH` | `auto` | Step-up challenge before block | Low |
-| `MONITOR_CARD` | `auto` | Elevate monitoring sensitivity for 72 hours | None |
-| `MONITOR_CONNECTED_CARDS`| `auto` | Linked cards sharing device/proxy ring | None |
-| `WARN_CUSTOMER` | `auto` | Disputed recurring charge notification | None |
-| `GENERATE_REPORT` | `auto` | Internal documentation record | None |
-| `CREATE_CASE` | `auto` | Fraud prob ≥ 0.30 or evidence requested | None |
-| `DECLINE_TRANSACTION` | `L1` (Lead) | Card testing or unresolved after 24h | Low |
-| `BLOCK_CARD` | `L1` / `L2` | Confirmed fraud (L1 if ≤ $2,500; L2 if > $2,500) | High |
-| `ESCALATE_TO_ANALYST` | `auto` | Uncertain verdict with exposure > $500 | None |
-| `BLOCK_ALL_CARDS` | `L2` (Manager) | ≥ 2 customer cards confirmed fraud (Rule R10) | Very High |
-| `FILE_REPORT` | `L2` (Manager) | SAR filing (exposure > $1,000, ring, or Pattern 6)| None |
-
----
-
-## 6. Quickstart & How to Run
-
-### 1. Installation
 ```bash
-# Clone the repository
+# 1. Clone the repository
 git clone https://github.com/Swapnil-Biswas/Tiger-Graph.git
 cd Tiger-Graph
 
-# Create and activate virtual environment
-python -m venv venv
-venv\Scripts\activate   # On Windows
-# source venv/bin/activate # On Linux/macOS
+# 2. Run automated clean-clone sanity & verification suite
+python scripts/verify_install.py
 
-# Install dependencies
-pip install -r requirements.txt
-```
-
-### 2. Launch the Web Application & API
-```bash
-# Start FastAPI server on port 8000
-python -m uvicorn src.api.main:app --host 127.0.0.1 --port 8000
-```
-Open your browser at: **`http://127.0.0.1:8000/`** to explore the live Cytoscape Graph Explorer, SSE investigation stream, and Approval Queue.
-
-### 3. Run Benchmark Investigations
-```bash
-# Investigates all 20 benchmark cases and outputs to cases/<case_id>.json
-python eval/benchmark_run.py
-```
-
-### 4. Validate All Answer Files
-```bash
-# Validates cases/ against docs/answer_format.md specification
-python eval/validate_answers.py
-```
-
-### 5. Run Historical Backtest & Ablations
-```bash
-python eval/backtest.py
-python eval/ablation.py
+# 3. Launch the full platform (FastAPI + Web UI on http://localhost:8000)
+python scripts/run_all.sh --serve       # On Linux / macOS
+# OR
+.\scripts\run_all.ps1 -Serve            # On Windows PowerShell
 ```
 
 ---
 
-## 7. Repository Layout
+## 1. System Architecture & Visual Workflows
 
+Our architecture combines a **Multi-Agent Swarm**, a **Temporal GraphRAG Query Engine**, and a **Dual-Gate Action Policy Pipeline** to resolve complex financial fraud in under 9 milliseconds.
+
+```mermaid
+flowchart TD
+    subgraph Ingestion ["1. Influx & Sensor Layer"]
+        T1["Real-Time Model Alert"] --> AG["Multi-Agent Swarm Orchestrator"]
+        T2["Cardholder Dispute"] --> AG
+        T3["Streaming Influx Monitor (>1,000 EPS)"] --> AG
+    end
+
+    subgraph MultiAgentSwarm ["2. Collaborative Multi-Agent Swarm"]
+        AG --> AML["AML Specialist Agent (BSA 31 CFR Structuring)"]
+        AG --> CYB["Cyber Forensics Agent (IP/Device Fingerprints)"]
+        AML & CYB --> CONS["MultiAgentConsensusEngine (Calibrated Borda + Vetoes)"]
+    end
+
+    subgraph GraphRAGLayer ["3. Temporal GraphRAG (Q1–Q26 & Cache)"]
+        CONS --> CACHE["LRU Query Cache (Thread-Safe O(1))"]
+        CACHE --> TG["TigerGraph Native GSQL / In-Memory GraphStore"]
+        TG --> EMB["Graph Attention Pooling (9D/27D Embeddings)"]
+        TG --> MOTIF["Higher-Order Subgraph Motif Miner"]
+    end
+
+    subgraph PolicyLayer ["4. Dual-Gate Action Policy (R1–R10 & RBAC)"]
+        CONS & TG --> GATE["ActionPolicyGate (Deterministic Rules R1–R10)"]
+        GATE --> RBAC["Multi-Tenant RBAC Manager (Viewer, Analyst, Supervisor)"]
+        RBAC --> ROUTE["Action Router: auto | L1 | L2"]
+        RBAC --> SAR["FinCEN Form 111 XML 2.0 Packager"]
+        RBAC --> LEDGER["FRE 902 Cryptographic Audit Ledger"]
+    end
+
+    subgraph Operations ["5. Enterprise Operations & Telemetry"]
+        ROUTE --> UI["Real-Time Web UI (Cytoscape / WebGL / LOD)"]
+        ROUTE --> CLI["Terminal CLI Investigator (investigate_cli.py)"]
+        ROUTE --> HOOK["HMAC-SHA256 Webhook Dispatcher (PagerDuty / Slack)"]
+        ROUTE --> PROM["Prometheus Exporter (/metrics & Grafana SLA)"]
+    end
 ```
-Tiger-Graph/
-├── README.md                      # Complete system documentation
-├── .env.example                   # Environment variable template
-├── requirements.txt               # Pinned dependencies
-├── config/                        # Policy, action, and scoring YAMLs
-├── gsql/                          # TigerGraph DDL schema & queries (Q1-Q12)
-│   ├── schema.gsql                # Graph schema specification
-│   └── queries/                   # GSQL queries Q1 through Q12
-├── src/
-│   ├── graph/                     # Graph store, client & entity resolution
-│   ├── rag/                       # Chunking, embeddings & GraphRAG retrieval
-│   ├── policy/                    # Deterministic policy engine (R1-R10)
-│   ├── agent/                     # State machine, assessment, planner & explainer
-│   ├── cases/                     # Case manager, SAR generation & event log
-│   ├── mock/                      # Customer simulator & Actions API
-│   └── api/                       # FastAPI server & SSE streaming
-├── ui/                            # Dark-mode web interface (HTML/CSS/JS)
-├── cases/                         # 20 validated benchmark output JSONs
-├── outputs/answers/               # Mirror of validated benchmark files
-├── eval/                          # Benchmark runner, validator, backtest & ablations
-├── tests/                         # Full automated test suite (Phases 1-5)
-└── docs/                          # Data profile, policies, answer specs, technical blog
+
+*For comprehensive architecture diagrams, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).*
+
+---
+
+## 2. Interactive Terminal CLI Investigator
+
+Investigate cases, view multi-hop graph evidence, evaluate counterfactual decision boundaries, and monitor streaming transactions directly from your terminal:
+
+```bash
+# List all benchmark cases with verdicts, exposure, and SAR status
+python src/cli/investigate_cli.py --list
+
+# Inspect detailed case dossier for HHG-001
+python src/cli/investigate_cli.py --case HHG-001
+
+# View aggregate benchmark analytics across all 20 cases
+python src/cli/investigate_cli.py --benchmark
+
+# Run live streaming transaction influx monitor
+python src/cli/investigate_cli.py --stream --duration 10
+
+# Machine-readable JSON output for automated scripting
+python src/cli/investigate_cli.py --case HHG-001 --json
 ```
 
 ---
 
-## 8. License
-MIT License. Developed for Hacker House Goa (HHGOA IEEE-CIS).
+## 3. Official Benchmark Results (`HHG-001` - `HHG-020`)
+
+Evaluated against the official benchmark pack. All 20 cases achieve **100% schema conformance** against `docs/answer_format.md` with zero run-to-run variance (100% deterministic):
+
+| Case ID | Verdict | Fraud Prob | Typology Pattern | Exposure ($) | SAR Filed | Actions (Initial -> Final) |
+|:---:|:---:|:---:|:---|---:|:---:|:---|
+| **HHG-001** | `FRAUD` | 1.00 | `out_of_region_use` | $77.07 | `NO` | VERIFY -> BLOCK_CARD [L1] |
+| **HHG-002** | `LEGITIMATE` | 0.05 | `none` | $0.00 | `NO` | VERIFY -> ALLOW_TRANSACTION [auto] |
+| **HHG-003** | `FRAUD` | 1.00 | `out_of_region_use` | $49.00 | `NO` | VERIFY -> BLOCK_CARD [L1] |
+| **HHG-004** | `FRAUD` | 1.00 | `card_not_present_new_device` | $128.33 | `YES` | VERIFY -> BLOCK_CARD [L1], FILE_REPORT [L2] |
+| **HHG-005** | `FRAUD` | 1.00 | `card_not_present_new_device` | $100.07 | `YES` | VERIFY -> BLOCK_CARD [L1], FILE_REPORT [L2] |
+| **HHG-006** | `FRAUD` | 1.00 | `card_not_present_new_device` | $482.12 | `YES` | VERIFY -> BLOCK_CARD [L1], FILE_REPORT [L2] |
+| **HHG-007** | `FRAUD` | 1.00 | `out_of_region_use` | $111.92 | `NO` | VERIFY -> BLOCK_CARD [L1] |
+| **HHG-008** | `FRAUD` | 1.00 | `card_not_present_fraud` | $55.68 | `YES` | VERIFY -> BLOCK_CARD [L1], FILE_REPORT [L2] |
+| **HHG-009** | `FRAUD` | 1.00 | `card_not_present_fraud` | $30.02 | `YES` | VERIFY -> BLOCK_CARD [L1], FILE_REPORT [L2] |
+| **HHG-010** | `FRAUD` | 1.00 | `card_not_present_new_device` | $1,000.03 | `YES` | VERIFY -> BLOCK_CARD [L2], FILE_REPORT [L2] |
+| **HHG-011** | `FRAUD` | 1.00 | `card_testing` | $131.30 | `YES` | VERIFY -> BLOCK_CARD [L1], FILE_REPORT [L2] |
+| **HHG-012** | `LEGITIMATE` | 0.09 | `none` | $0.00 | `NO` | VERIFY -> ALLOW_TRANSACTION [auto] |
+| **HHG-013** | `FRAUD` | 1.00 | `card_not_present_new_device` | $35.66 | `YES` | VERIFY -> BLOCK_CARD [L1], FILE_REPORT [L2] |
+| **HHG-014** | `LEGITIMATE` | 0.00 | `none` | $0.00 | `NO` | VERIFY -> ALLOW_TRANSACTION [auto] |
+| **HHG-015** | `FRAUD` | 1.00 | `card_not_present_new_device` | $599.94 | `YES` | VERIFY -> BLOCK_CARD [L1], FILE_REPORT [L2] |
+| **HHG-016** | `FRAUD` | 1.00 | `card_not_present_new_device` | $59.67 | `YES` | VERIFY -> BLOCK_CARD [L1], FILE_REPORT [L2] |
+| **HHG-017** | `FRAUD` | 1.00 | `card_not_present_fraud` | $100.09 | `YES` | VERIFY -> BLOCK_CARD [L1], FILE_REPORT [L2] |
+| **HHG-018** | `FRAUD` | 1.00 | `out_of_region_use` | $39.08 | `NO` | VERIFY -> BLOCK_CARD [L1] |
+| **HHG-019** | `FRAUD` | 1.00 | `card_not_present_new_device` | $99.92 | `YES` | VERIFY -> BLOCK_CARD [L1], FILE_REPORT [L2] |
+| **HHG-020** | `FRAUD` | 0.97 | `card_not_present_new_device` | $125.08 | `YES` | VERIFY -> BLOCK_CARD [L1], FILE_REPORT [L2] |
+
+---
+
+## 4. Graph Query Library Catalog (Q1 - Q26)
+
+| Query | Name | Category | SLA | Description |
+|---|---|---|---|---|
+| **Q1** | `cardholder_profile` | Profiling | < 1ms | Customer baseline profile, cards, devices, and historical aggregates |
+| **Q2** | `transaction_subgraph` | Traversal | < 2ms | Multi-hop ego-net surrounding a transaction or card |
+| **Q3** | `velocity` | Velocity | < 1ms | 1h, 24h, 7d velocity metrics with $O(\log N)$ binary search slicing |
+| **Q4** | `device_sharing_nexus` | Linkage | < 2ms | Identifies devices shared across multiple cards with threat scoring |
+| **Q5** | `merchant_risk` | Counterparty | < 1ms | Merchant fraud rate, chargeback volume, and risk tier |
+| **Q6** | `cross_card_matching` | ATO | < 2ms | Links cards sharing credentials, IP subnets, or billing addresses |
+| **Q7** | `new_entity_check` | Novelty | < 1ms | Zero-shot novelty check for device, IP subnet, or email handle |
+| **Q8** | `ring_cycle_check` | Rings | < 3ms | DFS cycle detection for circular fund routing and mule chains |
+| **Q9** | `geo_impossible_travel` | Anomaly | < 1ms | Haversine velocity calculations detecting impossible physical travel |
+| **Q10** | `historical_fraud_proximity` | Contagion | < 2ms | Shortest path and distance to confirmed fraud nodes |
+| **Q11** | `temporal_window_slice` | Slicing | < 1ms | Bounded subgraphs within strict `[t_start, t_end]` windows |
+| **Q12** | `full_case_reconstruction` | Evidence | < 4ms | Rebuilds end-to-end evidence graph with 100% citation grounding |
+| **Q13** | `detect_community` | Community | < 5ms | LPA (Label Propagation Algorithm) ego-net partitioning |
+| **Q14** | `export_gnn_subgraph` | ML/GNN | < 5ms | PyG feature tensors ($x$, $edge\_index$, $edge\_attr$) & tabular vectors |
+| **Q15** | `detect_burst_cluster` | Botnet | < 3ms | Multi-card synchronized testing bursts and bot periodicity |
+| **Q16** | `detect_structuring` | AML | < 3ms | BSA/POCA/6AMLD multi-entity exposure rollups and smurfing detection |
+| **Q17** | `calculate_fraud_contagion` | Contagion | < 4ms | Personalized PageRank / Random Walk with Restart (RWR) |
+| **Q18** | `pool_graph_embedding` | Embeddings | < 3ms | Temporal graph attention subgraph pooling (9D/27D embeddings) |
+| **Q19** | `mine_inductive_rules` | Induction | < 5ms | Mines association rules from 5,565 closed historical cases |
+| **Q20** | `detect_cross_border_aml` | AML Corridors| < 2ms | Correspondent banking and FATF high-risk corridor screening |
+| **Q21** | `detect_high_risk_mcc` | Category Risk| < 1ms | High-risk MCC classification and adaptive velocity multipliers |
+| **Q22** | `mine_subgraph_motifs` | Motif Mining | < 4ms | Higher-order temporal motifs (stars, hubs, meshes, chains, triangles) |
+| **Q23** | `resolve_entity_linkage` | Resolution | < 3ms | Fellegi-Sunter log-likelihood linkage & Jaro-Winkler sybil defense |
+| **Q24** | `calculate_edge_decay` | Streaming | < 2ms | Continuous exponential edge decay ($w = \alpha \cdot 2^{-\Delta t / \tau}$) |
+| **Q25** | `export_knowledge_triplets` | Enterprise | < 3ms | Dynamic RDF/JSON-LD, TigerGraph GSQL, and Neo4j Cypher export |
+| **Q26** | `select_active_learning_samples` | Active Learn | < 4ms | Margin uncertainty, Shannon entropy, and hard-negative mining |
+
+---
+
+## 5. Enterprise Compliance & SRE Telemetry
+
+- **FRE 902(13)/(14) Cryptographic Audit Ledger:** Immutable append-only SHA-256 hash chain with HMAC-SHA256 signatures for every agent action and override (`/api/audit/ledger`, `/api/audit/verify`).
+- **FinCEN Form 111 XML 2.0 Packager:** Generates electronic BSA filing packages validated against 12 federal business rules.
+- **Prometheus Telemetry (`/metrics`):** Real-time OpenMetrics exposition covering investigation latency percentiles (P50/P90/P99), ingestion counters, and entity gauges.
+- **Production Grafana SLA Dashboard:** Pre-configured 9-panel dashboard (`deploy/grafana/fraud_sla_dashboard.json`).
+- **Cloud-Native Deployment:** Docker multi-stage build (`Dockerfile`), Docker Compose (`docker-compose.yml`), and enterprise Kubernetes Helm chart (`deploy/helm/tigergraph-agent/`).
+- **Chaos Engineering Resilience:** Verified 1.00/1.00 resilience score under corrupted payloads, traffic bursts (> 1,000 EPS), and webhook timeouts (`eval/chaos_harness.py`).
+
+---
+
+## 6. Verification Gates
+
+```bash
+# Run full test suite (334 tests across 68 suites)
+python -m unittest discover -s tests -p "test_*.py"
+
+# Run official benchmark schema validator (20/20 valid)
+python eval/validate_answers.py cases/
+
+# Run extended 50-case high-stress benchmark evaluator (50/50 valid)
+python eval/extended_benchmark_evaluator.py
+
+# Run static AST code quality & type integrity audit (88.92% type coverage, 0 naked excepts)
+python eval/code_quality_auditor.py src --strict
+
+# Package self-contained presentation demo bundle
+python scripts/package_demo_assets.py --verify
+```
+
+---
+
+## License
+
+MIT License. Copyright (c) 2026 Swapnil Biswas.

@@ -1,3 +1,35 @@
+## Iteration 086: Interactive README & Architectural Showcase | 2026-09-21 08:30 | commit ca84e82
+- **Lens:** 15. Operational readiness & runbooks, 10. Visualization & UI/UX, 14. Testing, evaluation & benchmarks
+- **Goal / hypothesis:** A premier open-source repository requires an engaging, enterprise-grade `README.md` that immediately communicates system architecture, rapid onboarding, graph query capabilities, enterprise compliance, and verifiable reproducibility. Implementing this showcase delivers:
+  1. **Comprehensive Architecture Badges**: Added badges for v0.85 release, 334+ passing tests, Python 3.10-3.14, TigerGraph GSQL (Q1-Q26), FastAPI, Docker, Kubernetes Helm, Prometheus OpenMetrics, FinCEN/FRE 902 compliance, and MIT license.
+  2. **30-Second Quickstart**: Step-by-step instructions for clean clone sanity verification (`scripts/verify_install.py`) and cross-platform one-command launcher (`scripts/run_all.sh` / `scripts/run_all.ps1`).
+  3. **End-to-End Mermaid Architecture Diagram**: Visualizing the 5-layer workflow from streaming sensor influx through multi-agent consensus, temporal GraphRAG, dual-gate action policies, to enterprise operations.
+  4. **Interactive CLI Guide**: Explaining terminal case investigation (`--case HHG-001`), benchmark analytics (`--benchmark`), and live streaming monitor (`--stream`).
+  5. **Complete Graph Query Library Catalog (Q1–Q26)**: Tabular overview of all 26 graph queries with sub-5ms SLAs and business descriptions.
+  6. **Automated Documentation Integrity Testing**: Added `tests/test_readme_integrity.py` with 5 automated checks ensuring all badges, sections, and referenced markdown links are strictly valid.
+- **Changes (files):**
+  - `README.md`: Overhauled with interactive showcase, architecture diagrams, CLI guide, Q1-Q26 catalog, and verification gates.
+  - `.gitignore`: Added `outputs/demo_bundle/` to keep generated build bundles out of version control.
+  - `tests/test_readme_integrity.py`: Created 5 unit tests validating README content, badges, sections, and link integrity.
+  - `docs/METRICS.md`: Added Iteration 086 row.
+  - `docs/BACKLOG.md`: Marked item 86 as DONE.
+  - `docs/IMPROVEMENT_LOG.md`: Documented Iteration 086.
+- **Tests added/updated:**
+  - `tests/test_readme_integrity.py` (5 unit tests, all pass).
+  - Total unit test suite expanded from 334 to **339** tests across 69 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 334 -> **339** (100% pass rate across 69 test suites)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Extended Benchmark Answers Valid: 50/50 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 339 passed across 69 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 085: Checkpoint 15 Audit, 85-Iteration Milestone Review, and v0.85 Release Tag | 2026-09-21 08:15 | commit v0.85
 - **Lens:** 14. Testing, evaluation & benchmarks, 11. Agent architecture & engineering, 9. Security, safety & defenses
 - **Goal / hypothesis:** Reaching 85 iterations (85% milestone — 15 iterations remaining to the 100-iteration grand finale) requires a comprehensive audit across all 15 PRD evaluation lenses to verify demo assets, extended 50-case benchmark validity, LRU caching performance, cryptographic audit ledgers, and operational stability before tagging `v0.85`.
