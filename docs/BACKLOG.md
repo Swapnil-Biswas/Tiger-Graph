@@ -294,6 +294,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 82. **[DONE - Iteration 082] [Synthetic Benchmark Expansion] Extended 50-Case High-Stress Benchmark Suite**
     - *Result:* Implemented `ExtendedBenchmarkGenerator` in `eval/extended_benchmark_generator.py` synthesizing 50 diverse high-stress cases (`eval/extended_cases/EXT-001.json` through `EXT-050.json`) spanning 12 attack vectors (impossible travel, circular mule chains, BSA structuring, dormant bursts, quasi-cash). Built `ExtendedBenchmarkEvaluator` in `eval/extended_benchmark_evaluator.py` validating 100% schema conformance (50/50 passed) across $39,586.50 in fraudulent exposure and 29 SAR filings. Added 5 unit tests in `tests/test_extended_benchmark.py` (322/322 tests pass across 66 suites).
 
-83. **[Performance & Caching] LRU Query Cache with Dynamic Invalidation on Edge Updates**
+83. **[DONE - Iteration 083] [Performance & Caching] LRU Query Cache with Dynamic Invalidation on Edge Updates**
+    - *Result:* Implemented `LRUQueryCache` in `src/graph/cache.py` featuring thread-safe operations (`threading.RLock`), $O(1)$ LRU eviction, TTL expiration, and dynamic tag-based invalidation (`invalidate_by_tag`). Integrated directly into `GraphClient` (`entity_profile`, `device_sharing`, `invalidate_entity_cache`), caching repetitive subgraphs and eliminating redundant traversals during concurrent multi-agent investigations. Added 6 unit tests in `tests/test_graph_cache.py` (328/328 tests pass across 67 suites).
+
 84. **[Security & Hardening] Cryptographic Audit Log Signing & Tamper Verification**
 85. **[Release Tag v0.85] Checkpoint 15 Audit & 85-Iteration Milestone Review**

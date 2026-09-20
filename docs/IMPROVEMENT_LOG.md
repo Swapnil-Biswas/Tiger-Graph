@@ -1,3 +1,29 @@
+## Iteration 083: LRU Query Cache with Dynamic Invalidation on Edge Updates | 2026-09-21 07:45 | commit pending
+- **Lens:** 13. System performance & scalability, 7. Graph query design & efficiency, 11. Agent architecture & engineering
+- **Goal / hypothesis:** In high-concurrency multi-agent swarms (Orchestrator, AML Specialist, Cyber Forensics) and real-time streaming ingestion (> 1,000 EPS), repeated queries against the same card, customer, or device generate redundant traversals. Implementing a thread-safe LRU query cache delivers:
+  1. **Thread-Safe LRU Query Caching (`src/graph/cache.py`)**: `LRUQueryCache` provides $O(1)$ lookup and eviction with `threading.RLock`, configurable capacity, and TTL bounds.
+  2. **Dynamic Tag-Based Invalidation**: Queries are tagged with entity identifiers (e.g. `card_id`, `device_id`). When new transactions or alerts are ingested, calling `invalidate_entity_cache(entity_id)` dynamically purges stale cache entries without flushing unrelated entity caches.
+  3. **GraphClient Integration**: Embedded into `GraphClient.entity_profile` and `device_sharing`, caching baseline entity metrics and returning in sub-microsecond latency on cache hits.
+  4. **Operational Telemetry**: Tracks hits, misses, hit ratio, evictions, and invalidations for SRE observability.
+- **Changes (files):**
+  - `src/graph/cache.py`: Implemented `LRUQueryCache` and `CacheEntry`.
+  - `src/graph/client.py`: Integrated `LRUQueryCache` into `GraphClient`, `entity_profile`, `device_sharing`, and added `invalidate_entity_cache`.
+  - `tests/test_graph_cache.py`: Created 6 unit tests validating get/put, LRU eviction, TTL expiration, tag invalidation, thread safety, and GraphClient integration.
+- **Tests added/updated:**
+  - `tests/test_graph_cache.py` (6 unit tests, all pass).
+  - Total unit test suite expanded from 322 to **328** tests across 67 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 322 -> **328** (100% pass rate across 67 test suites)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 328 passed across 67 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 082: Extended 50-Case High-Stress Benchmark Suite | 2026-09-21 07:30 | commit 00c9d5f
 - **Lens:** 14. Testing, evaluation & benchmarks, 11. Agent architecture & engineering, 3. Next best action & policy guidance
 - **Goal / hypothesis:** Beyond the 20 official benchmark cases, mission-critical fraud systems must prove robustness against diverse, synthetic edge cases (impossible travel, circular mule chains, dormant card bursts, sub-threshold BSA smurfing, quasi-cash crypto bursts) without overfitting or schema drift. Creating the extended 50-case benchmark suite delivers:

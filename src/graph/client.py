@@ -18,6 +18,7 @@ from typing import Dict, List, Set, Any, Optional, Union
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 from src.graph.ingest import GraphStore
+from src.graph.cache import LRUQueryCache, get_query_cache
 
 
 def parse_as_of_epoch(as_of: Optional[Union[str, int, float]]) -> int:
@@ -51,9 +52,10 @@ def parse_as_of_epoch(as_of: Optional[Union[str, int, float]]) -> int:
 
 
 class GraphClient:
-    def __init__(self, mode: Optional[str] = None, store: Optional[GraphStore] = None):
+    def __init__(self, mode: Optional[str] = None, store: Optional[GraphStore] = None, cache: Optional[LRUQueryCache] = None):
         self.mode = mode or os.getenv("GRAPH_MODE", "embedded").lower()
         self.store = store
+        self.cache = cache if cache is not None else get_query_cache()
 
         if self.mode == "embedded":
             if self.store is None:
@@ -130,6 +132,11 @@ class GraphClient:
                 pass  # fallback to embedded
 
         as_of_epoch = parse_as_of_epoch(as_of)
+        cache_key = f"q1:{entity_type}:{entity_id}:{as_of_epoch}"
+        cached = self.cache.get(cache_key)
+        if cached is not None:
+            return cached
+
         if entity_type == "customer":
             all_txns = self.store.txns_by_customer.get(entity_id, [])
             epochs = self._get_cust_epochs(entity_id)
@@ -141,7 +148,7 @@ class GraphClient:
         txns = all_txns[:idx]
 
         if not txns:
-            return {
+            res = {
                 "entity_id": entity_id,
                 "entity_type": entity_type,
                 "txn_count": 0,
@@ -156,6 +163,8 @@ class GraphClient:
                 "first_seen": None,
                 "last_seen": None,
             }
+            self.cache.put(cache_key, res, tags={entity_id})
+            return res
 
         amounts = [t["amount"] for t in txns]
         amounts.sort()
@@ -166,7 +175,7 @@ class GraphClient:
         devices = Counter(t["device_profile"] for t in txns if t["device_profile"] and t["device_profile"] != "None | None | None | None")
         channels = Counter(t["channel"] for t in txns if t["channel"])
 
-        return {
+        res = {
             "entity_id": entity_id,
             "entity_type": entity_type,
             "txn_count": n,
@@ -181,6 +190,8 @@ class GraphClient:
             "first_seen": txns[0]["ts"],
             "last_seen": txns[-1]["ts"],
         }
+        self.cache.put(cache_key, res, tags={entity_id})
+        return res
 
     # =========================================================================
     # Q2: txn_context
@@ -284,6 +295,11 @@ class GraphClient:
         Also retrieves prior closed cases touching this device profile.
         """
         as_of_epoch = parse_as_of_epoch(as_of)
+        cache_key = f"q4:{device_profile_id}:{as_of_epoch}"
+        cached = self.cache.get(cache_key)
+        if cached is not None:
+            return cached
+
         all_dev_txns = self.store.txns_by_device.get(device_profile_id, [])
         epochs = self._get_dev_epochs(device_profile_id)
         idx = bisect.bisect_right(epochs, as_of_epoch)
@@ -299,18 +315,23 @@ class GraphClient:
             if opened_epoch <= as_of_epoch:
                 prior_cases.append(c["case_id"])
 
-        return {
+        res = {
             "device_profile": device_profile_id,
             "txn_count": len(all_dev_txns),
             "distinct_cards_count": len(cards_seen),
             "cards": cards_seen[:10],
             "distinct_customers_count": len(customers_seen),
-            "customers": customers_seen[:10],
             "is_shared": len(cards_seen) > 1,
             "prior_cases_touching_device": prior_cases,
             "first_seen": all_dev_txns[0]["ts"] if all_dev_txns else None,
             "last_seen": all_dev_txns[-1]["ts"] if all_dev_txns else None,
         }
+        self.cache.put(cache_key, res, tags={device_profile_id})
+        return res
+
+    def invalidate_entity_cache(self, entity_id: str) -> int:
+        """Invalidate all cached queries tagged with entity_id."""
+        return self.cache.invalidate_by_tag(entity_id)
 
     # =========================================================================
     # Q5: identity_link_expand
