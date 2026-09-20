@@ -29,6 +29,7 @@ from src.agent.counterfactual import CounterfactualExplainer
 from src.cases.sar_generator import SARNarrativeGenerator
 from src.graph.algorithms import UndocumentedPatternDetector
 from src.agent.security import InputSanitizer
+from src.cases.memory import BayesianCaseMemoryPrior
 
 
 class FraudInvestigatorAgent:
@@ -36,6 +37,7 @@ class FraudInvestigatorAgent:
         self.client = client or GraphClient(mode="embedded")
         self.retriever = GraphRAGRetriever(client=self.client)
         self.undocumented_detector = UndocumentedPatternDetector(self.client)
+        self.memory_prior_engine = BayesianCaseMemoryPrior(self.client)
         self.mock_api = MockActionsAPI()
 
     def investigate_case(
@@ -196,6 +198,21 @@ class FraudInvestigatorAgent:
                 prior_case_ids[:3],
             )
 
+        # (h) Dynamic Empirical Bayes Case Memory Prior
+        mem_prior = self.memory_prior_engine.compute_prior(
+            card_id=card_id,
+            customer_id=cust_id,
+            device_profile=dev_profile,
+            as_of=as_of,
+        )
+        if mem_prior.get("has_history"):
+            add_evidence(
+                "graph",
+                f"query:empirical_bayes_prior(card={card_id})",
+                f"Historical memory prior: {mem_prior['total_prior_cases']} precedent case(s) ({mem_prior['confirmed_fraud_count']} confirmed fraud, {mem_prior['cleared_count']} cleared) yielding posterior fraud risk rate of {mem_prior['posterior_fraud_rate']:.3f}.",
+                mem_prior.get("prior_cases_cited", []),
+            )
+
         # Compile Graph Evidence Bundle
         graph_evidence = {
             "profile": profile,
@@ -206,6 +223,7 @@ class FraudInvestigatorAgent:
             "ring": self.client.ring_detection(card_id, as_of=as_of),
             "geo": self.client.geo_impossible(card_id, as_of=as_of),
             "similar_cases": similar_cases_res,
+            "memory_prior": mem_prior,
             "pattern_match": pat_res,
             "undocumented_anomaly": self.undocumented_detector.detect_anomalies(flagged_txn, as_of=as_of) if flagged_txn else {},
         }

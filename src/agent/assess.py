@@ -74,8 +74,12 @@ class UncertaintyAssessmentEngine:
         if ring.get("is_ring_candidate"):
             risk_points += 15.0
 
-        # Prior fraud cases touching entity
-        if similar.get("similar_cases_count", 0) > 0:
+        # Prior fraud cases touching entity & Empirical Bayes adjustment
+        mem_prior = graph_evidence.get("memory_prior")
+        if mem_prior is not None:
+            if mem_prior.get("risk_delta", 0.0) != 0.0:
+                risk_points += mem_prior["risk_delta"]
+        elif similar.get("similar_cases_count", 0) > 0:
             risk_points += 10.0
 
         # Customer habits dampener (only if NO customer report)

@@ -56,10 +56,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 12. **[DONE - Iteration 012] [Security & Safety] Prompt Injection Defenses & Adversarial Input Sanitization**
     - *Result:* Built `src/agent/security.py` detecting and defanging direct instruction overrides, jailbreak phrases, delimiter injections, and zero-width control characters. Integrated into `FraudInvestigatorAgent`. Added 4 unit tests in `tests/test_security.py` (31 tests, 100% pass).
 
-13. **[Case Memory] Dynamic Prior-Based Bayesian Adjustment Loop**
-    - *Goal:* Formally condition the fraud prior on historical closed-case outcomes for identical merchants/regions without leaking post-hoc ground truth.
-    - *Files:* `src/cases/memory.py`, `src/agent/assess.py`
-    - *Metric Impact:* Case Memory (Lens 8) & Uncertainty Calibration (Lens 3).
+13. **[DONE - Iteration 013] [Case Memory] Dynamic Prior-Based Bayesian Adjustment Loop**
+    - *Result:* Built `src/cases/memory.py` implementing `BayesianCaseMemoryPrior` with Beta-Binomial smoothing ($\alpha=1.0, \beta=10.0$), strict temporal isolation (`opened_at < as_of`), device-level compromise detection, and calibrated risk scaling. Integrated into `UncertaintyAssessmentEngine` and `FraudInvestigatorAgent`. Added 5 unit tests in `tests/test_case_memory.py` (36 tests, 100% pass).
 
 14. **[Policy & Permissions] Automated Permission Bypass Penetration Tests**
     - *Goal:* Implement exhaustive fuzzing verifying that unauthorized actions (e.g. attempting to block card on single low-confidence signal) can never execute through PolicyEngine.

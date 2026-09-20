@@ -14,7 +14,8 @@
 | **009** | `30f7f73` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 25/25 (100%) | 0.022s | PASS | Cytoscape visual glyphs, neighborhood highlight, and HUD inspector |
 | **010** | `0c4ae80` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 25/25 (100%) | 0.019s | PASS | Checkpoint 2 Audit, State of the Project, and v0.1 Release Tag |
 | **011** | `4b20b51` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 27/27 (100%) | 0.021s | PASS | Undocumented pattern discovery & multi-card syndicate anomaly detector |
-| **012** | `pending` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 31/31 (100%) | 0.020s | PASS | InputSanitizer prompt-injection shield & adversarial defanging |
+| **012** | `70e6e24` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 31/31 (100%) | 0.020s | PASS | InputSanitizer prompt-injection shield & adversarial defanging |
+| **013** | `70a4b2d` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 36/36 (100%) | 0.021s | PASS | Bayesian case memory prior adjustment & temporal isolation |
 
 ---
 

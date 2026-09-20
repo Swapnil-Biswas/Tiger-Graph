@@ -5,7 +5,7 @@ and reconstructing full case records directly from graph vertices and edges.
 """
 
 from typing import Dict, List, Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from src.graph.client import GraphClient
 
 
@@ -42,7 +42,7 @@ class CaseManager:
             "exposure_usd": c_data["exposure_usd"],
             "first_suspicious_txn_id": c_data.get("first_suspicious_txn_id", ""),
             "summary": c_data["summary"],
-            "written_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+            "written_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
             "evidence_ids": [],
             "action_ids": [],
             "finding_ids": [],
