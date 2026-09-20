@@ -1,4 +1,4 @@
-## Iteration 048: Dynamic Knowledge Graph Triplet Export & Multi-Dialect Enterprise Synchronizer | 2026-09-20 23:00 | commit TBD_COMMIT
+## Iteration 048: Dynamic Knowledge Graph Triplet Export & Multi-Dialect Enterprise Synchronizer | 2026-09-20 23:00 | commit 79beebc
 - **Lens:** 1. Graph schema & modeling & 14. Performance, scale & production readiness & 11. Agent architecture & engineering
 - **Goal / hypothesis:** In enterprise financial crime operations, investigations conducted in memory must be synchronized losslessly to external distributed graph databases (TigerGraph clusters, Neo4j) and semantic ontologies (W3C RDF, JSON-LD) for cross-system federated analytics and immutable regulatory archiving. Implementing `KnowledgeGraphTripletExporter` in `src/graph/triplets.py` extracts canonical semantic triplets (`Subject`, `Predicate`, `Object`, `properties`, `temporal_epoch`, `provenance_case`) from multi-hop incident subgraphs and compiles them into 4 distinct enterprise database dialects:
   1. **TigerGraph GSQL DML**: Syntactically valid vertex and edge insertion statements (`USE GRAPH`, `INSERT INTO <Vertex>`, `INSERT INTO <Edge> (FROM, TO, ...)`).
