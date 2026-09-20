@@ -161,10 +161,13 @@ Ranked by expected impact on Hackathon Judging Criteria:
 43. **[DONE - Iteration 043] [Policy & Compliance] Dynamic High-Risk Merchant MCC Blacklisting & Adaptive Velocity Multipliers**
     - *Result:* Implemented `HighRiskMCCRiskEngine` in `src/policy/jurisdiction.py` and exposed `detect_high_risk_mcc` (Q21) in `GraphClient`. Classifies high-risk MCCs (6051 quasi-cash/crypto, 4829 wire transfers, 7995 gambling/casinos, 5944 precious metals) and compounds adaptive velocity multipliers (up to 3.75x) on rapid bursts. Enforces automated restrictions (`RESTRICT_QUASI_CASH`, `STEP_UP_AUTH`) and triggers `FILE_SAR_HIGH_RISK_MCC` on cumulative spend >= thresholds. Integrated into `JurisdictionComplianceRouter.generate_dispatch_bundle`. Added API endpoints `/api/cases/{case_id}/mcc-risk` and `/api/regulatory/mcc-check`. Added 6 unit tests in `tests/test_mcc_risk.py` (141/141 tests pass).
 
-44. **[Graph Analytics & Pattern Discovery] Temporal Transaction Subgraph Motif Mining**
-    - *Goal:* Implement network motif mining to discover recurrent topological subgraphs (bipartite stars, cycles, fan-in/fan-out testing hubs) across multi-card clusters.
-    - *Files:* `src/graph/algorithms.py`, `src/graph/client.py`, `tests/test_graph_motifs.py`
-    - *Metric Impact:* Graph Algorithms & Innovation (Lens 1, 20).
+44. **[DONE - Iteration 044] [Graph Analytics & Pattern Discovery] Temporal Transaction Subgraph Motif Mining**
+    - *Result:* Implemented `TemporalSubgraphMotifMiner` in `src/graph/algorithms.py` and exposed `mine_subgraph_motifs` (Q22) in `GraphClient`. Mines 5 topological motifs (fan-out stars, fan-in hubs, bipartite meshes, temporal chains, sharing triangles) over rolling temporal windows with normalized anomaly scoring ($[0.0, 1.0]$), dominant motif classification, and threat level categorization. Enhanced `parse_as_of_epoch` in `src/graph/client.py` for numeric string timestamps. Added API endpoints `/api/cases/{case_id}/motifs` and `/api/graph/motifs-check`. Added 6 unit tests in `tests/test_graph_motifs.py` (147/147 tests pass).
+
+45. **[Entity Resolution & Graph Identity] Probabilistic Record Linkage & Noisy Profile Disambiguation**
+    - *Goal:* Implement Fellegi-Sunter / Jaro-Winkler probabilistic entity resolution for ambiguous/noisy device, email, and IP profiles across disparate cardholders and cases to detect hidden sybil identities and synthetic identities.
+    - *Files:* `src/graph/entity_resolution.py`, `src/graph/client.py`, `tests/test_entity_resolution.py`
+    - *Metric Impact:* Entity Resolution & Syndicate Defense (Lens 1, Lens 4).
 
 ---
 

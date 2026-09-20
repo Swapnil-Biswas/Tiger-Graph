@@ -31,6 +31,12 @@ def parse_as_of_epoch(as_of: Optional[Union[str, int, float]]) -> int:
     if not as_of_str:
         return 9999999999
     try:
+        f_val = float(as_of_str)
+        val = int(f_val)
+        return val // 1000 if val > 20_000_000 else val
+    except ValueError:
+        pass
+    try:
         # Check standard datetime format
         dt = datetime.strptime(as_of_str, "%Y-%m-%d %H:%M:%S")
         val = int(dt.timestamp())
@@ -989,6 +995,30 @@ class GraphClient:
             transactions=transactions,
             as_of=as_of,
             client=self,
+            window_hours=window_hours,
+        )
+
+    # =========================================================================
+    # Q22: mine_subgraph_motifs
+    # Temporal Transaction Subgraph Motif Mining
+    # =========================================================================
+    def mine_subgraph_motifs(
+        self,
+        seed_id: str,
+        entity_type: str = "card",
+        as_of: Optional[Union[str, int]] = None,
+        window_hours: float = 72.0,
+    ) -> dict:
+        """
+        Q22: Mines topological transaction motifs (fan-out stars, fan-in hubs, bipartite meshes,
+        temporal chains, sharing triangles) over a rolling temporal window.
+        """
+        from src.graph.algorithms import TemporalSubgraphMotifMiner
+        miner = TemporalSubgraphMotifMiner(self)
+        return miner.mine_motifs(
+            seed_id=seed_id,
+            entity_type=entity_type,
+            as_of=as_of,
             window_hours=window_hours,
         )
 

@@ -724,3 +724,275 @@ class FraudContagionPageRank:
             "description": description,
         }
 
+
+class TemporalSubgraphMotifMiner:
+    """
+    Temporal Transaction Subgraph Motif Mining Engine (Q22).
+    Discovers higher-order topological graph motifs over continuous rolling time windows:
+      1. Fan-out Star: Single card dispersing across >= 4 merchants in a rolling window.
+      2. Fan-in Hub: Single merchant receiving payments from >= 3 distinct cards in local subgraph.
+      3. Bipartite Mesh: Dense testing core where >= 2 cards share >= 2 merchants.
+      4. Temporal Chain: Rapid sequential transactions (>= 3) with interval <= 7200s (2 hrs).
+      5. Sharing Triangle: 2 cards sharing a device profile, both transacting at the same merchant.
+    Computes motif counts, normalized anomaly score [0.0, 1.0], dominant motif, and threat categorization.
+    """
+
+    def __init__(self, client):
+        self.client = client
+
+    @staticmethod
+    def _extract_merchant(txn: dict) -> str:
+        m = txn.get("merchant_id") or txn.get("merchant")
+        if m:
+            return str(m).strip()
+        addr1 = txn.get("addr1", "NA")
+        prod = txn.get("product_code", "NA")
+        return f"MERCH-{addr1}-{prod}"
+
+    def mine_motifs(
+        self,
+        seed_id: str,
+        entity_type: str = "card",
+        as_of: Optional[Union[str, int]] = None,
+        window_hours: float = 72.0,
+    ) -> Dict[str, Any]:
+        """
+        Extracts temporal transaction subgraph around seed_id up to as_of,
+        and mines topological transaction motifs.
+        """
+        import time
+        from src.graph.client import parse_as_of_epoch
+
+        t0 = time.perf_counter()
+        as_of_epoch = parse_as_of_epoch(as_of)
+
+        # 1. Resolve target card
+        if entity_type == "card":
+            card_id = seed_id
+        elif entity_type == "customer":
+            cust_txns = self.client.store.txns_by_customer.get(seed_id, [])
+            card_id = cust_txns[0]["card_id"] if cust_txns else seed_id
+        elif entity_type == "transaction":
+            txn = self.client.store.transactions.get(seed_id, {})
+            card_id = txn.get("card_id", seed_id)
+        else:
+            card_id = seed_id
+
+        all_target_txns = self.client.store.txns_by_card.get(card_id, [])
+
+        if as_of is None or as_of_epoch >= 9999999999:
+            effective_as_of = max((t.get("epoch_s", 0) for t in all_target_txns), default=int(time.time()))
+        else:
+            effective_as_of = as_of_epoch
+
+        window_seconds = int(window_hours * 3600)
+        window_start = effective_as_of - window_seconds
+
+        # 2. Extract immediate neighborhood cards
+        devices = self.client.store.devices_by_card.get(card_id, set())
+        peer_cards: Set[str] = set()
+        for dev in devices:
+            peer_cards.update(self.client.store.cards_by_device.get(dev, set()))
+
+        for t in all_target_txns:
+            cust_id = t.get("customer_id")
+            if cust_id:
+                for ct in self.client.store.txns_by_customer.get(cust_id, []):
+                    c_card = ct.get("card_id")
+                    if c_card:
+                        peer_cards.add(c_card)
+
+        all_subgraph_cards = {card_id} | peer_cards
+
+        # Gather transactions within [window_start, effective_as_of]
+        txns_by_c: Dict[str, List[dict]] = defaultdict(list)
+        subgraph_txns: List[dict] = []
+        for cid in all_subgraph_cards:
+            c_txns = [
+                t for t in self.client.store.txns_by_card.get(cid, [])
+                if window_start <= t.get("epoch_s", 0) <= effective_as_of
+            ]
+            txns_by_c[cid] = sorted(c_txns, key=lambda x: x.get("epoch_s", 0))
+            subgraph_txns.extend(c_txns)
+
+        motifs_detected: Dict[str, List[Dict[str, Any]]] = {
+            "fan_out_star": [],
+            "fan_in_hub": [],
+            "bipartite_mesh": [],
+            "temporal_chain": [],
+            "sharing_triangle": [],
+        }
+
+        # Motif 1: Fan-out Star (Card dispersing to >= 4 merchants)
+        for cid in all_subgraph_cards:
+            c_tx = txns_by_c[cid]
+            merchants = set(self._extract_merchant(t) for t in c_tx)
+            if len(merchants) >= 4:
+                tot_amt = sum(float(t.get("amount", 0.0)) for t in c_tx)
+                t_ids = [str(t.get("transaction_id", "")) for t in c_tx if t.get("transaction_id")]
+                motifs_detected["fan_out_star"].append({
+                    "card_id": cid,
+                    "merchant_count": len(merchants),
+                    "merchants": sorted(list(merchants)),
+                    "transaction_count": len(c_tx),
+                    "transaction_ids": t_ids,
+                    "total_amount": round(tot_amt, 2),
+                    "window_hours": window_hours,
+                })
+
+        # Motif 2: Fan-in Hub (Merchant receiving from >= 3 distinct cards)
+        merchant_txns: Dict[str, List[Tuple[str, dict]]] = defaultdict(list)
+        for t in subgraph_txns:
+            m = self._extract_merchant(t)
+            c = t.get("card_id", "")
+            merchant_txns[m].append((c, t))
+
+        for m, records in merchant_txns.items():
+            distinct_cards = sorted(list(set(c for c, _ in records if c)))
+            if len(distinct_cards) >= 3:
+                tot_amt = sum(float(tx.get("amount", 0.0)) for _, tx in records)
+                t_ids = [str(tx.get("transaction_id", "")) for _, tx in records if tx.get("transaction_id")]
+                motifs_detected["fan_in_hub"].append({
+                    "merchant_id": m,
+                    "card_count": len(distinct_cards),
+                    "cards": distinct_cards,
+                    "transaction_count": len(records),
+                    "transaction_ids": t_ids,
+                    "total_amount": round(tot_amt, 2),
+                    "window_hours": window_hours,
+                })
+
+        # Motif 3: Bipartite Mesh (>= 2 cards sharing >= 2 merchants)
+        card_merchant_sets = {
+            cid: set(self._extract_merchant(t) for t in txns_by_c[cid])
+            for cid in all_subgraph_cards
+            if len(txns_by_c[cid]) >= 2
+        }
+        sorted_cards = sorted(list(card_merchant_sets.keys()))
+        for i in range(len(sorted_cards)):
+            for j in range(i + 1, len(sorted_cards)):
+                c1 = sorted_cards[i]
+                c2 = sorted_cards[j]
+                shared = card_merchant_sets[c1].intersection(card_merchant_sets[c2])
+                if len(shared) >= 2:
+                    motifs_detected["bipartite_mesh"].append({
+                        "cards": [c1, c2],
+                        "shared_merchants": sorted(list(shared)),
+                        "card_count": 2,
+                        "merchant_count": len(shared),
+                        "window_hours": window_hours,
+                    })
+
+        # Motif 4: Temporal Chain (>= 3 sequential transactions with delta_t <= 7200s)
+        for cid in all_subgraph_cards:
+            c_tx = txns_by_c[cid]
+            if len(c_tx) < 3:
+                continue
+            current_chain: List[dict] = []
+            for t in c_tx:
+                if not current_chain:
+                    current_chain.append(t)
+                else:
+                    prev = current_chain[-1]
+                    dt = t.get("epoch_s", 0) - prev.get("epoch_s", 0)
+                    if 0 <= dt <= 7200:
+                        current_chain.append(t)
+                    else:
+                        if len(current_chain) >= 3:
+                            motifs_detected["temporal_chain"].append({
+                                "card_id": cid,
+                                "chain_length": len(current_chain),
+                                "start_epoch": current_chain[0].get("epoch_s", 0),
+                                "end_epoch": current_chain[-1].get("epoch_s", 0),
+                                "duration_seconds": current_chain[-1].get("epoch_s", 0) - current_chain[0].get("epoch_s", 0),
+                                "transaction_ids": [str(x.get("transaction_id", "")) for x in current_chain if x.get("transaction_id")],
+                                "merchants": sorted(list(set(self._extract_merchant(x) for x in current_chain))),
+                                "total_amount": round(sum(float(x.get("amount", 0.0)) for x in current_chain), 2),
+                            })
+                        current_chain = [t]
+            if len(current_chain) >= 3:
+                motifs_detected["temporal_chain"].append({
+                    "card_id": cid,
+                    "chain_length": len(current_chain),
+                    "start_epoch": current_chain[0].get("epoch_s", 0),
+                    "end_epoch": current_chain[-1].get("epoch_s", 0),
+                    "duration_seconds": current_chain[-1].get("epoch_s", 0) - current_chain[0].get("epoch_s", 0),
+                    "transaction_ids": [str(x.get("transaction_id", "")) for x in current_chain if x.get("transaction_id")],
+                    "merchants": sorted(list(set(self._extract_merchant(x) for x in current_chain))),
+                    "total_amount": round(sum(float(x.get("amount", 0.0)) for x in current_chain), 2),
+                })
+
+        # Motif 5: Sharing Triangle (2 cards sharing a device profile, both transacting at the same merchant)
+        for dev in sorted(list(devices)):
+            dev_cards = sorted(list(self.client.store.cards_by_device.get(dev, set()).intersection(all_subgraph_cards)))
+            for i in range(len(dev_cards)):
+                for j in range(i + 1, len(dev_cards)):
+                    ca = dev_cards[i]
+                    cb = dev_cards[j]
+                    ma = set(self._extract_merchant(t) for t in txns_by_c[ca])
+                    mb = set(self._extract_merchant(t) for t in txns_by_c[cb])
+                    shared_m = sorted(list(ma.intersection(mb)))
+                    for sm in shared_m:
+                        motifs_detected["sharing_triangle"].append({
+                            "card_a": ca,
+                            "card_b": cb,
+                            "device_id": dev,
+                            "merchant_id": sm,
+                            "window_hours": window_hours,
+                        })
+
+        motif_counts = {k: len(v) for k, v in motifs_detected.items()}
+        total_motifs = sum(motif_counts.values())
+
+        # Anomaly scoring
+        raw_score = (
+            min(0.40, motif_counts["fan_out_star"] * 0.20)
+            + min(0.50, motif_counts["fan_in_hub"] * 0.25)
+            + min(0.60, motif_counts["bipartite_mesh"] * 0.30)
+            + min(0.40, motif_counts["temporal_chain"] * 0.20)
+            + min(0.50, motif_counts["sharing_triangle"] * 0.25)
+        )
+        anomaly_score = min(1.0, round(raw_score, 4))
+
+        if anomaly_score >= 0.70:
+            threat_level = "critical"
+        elif anomaly_score >= 0.40:
+            threat_level = "high"
+        elif anomaly_score >= 0.20:
+            threat_level = "elevated"
+        elif anomaly_score > 0.0:
+            threat_level = "low"
+        else:
+            threat_level = "none"
+
+        dominant_motif = "none"
+        if total_motifs > 0:
+            dominant_motif = max(motif_counts.items(), key=lambda x: x[1])[0]
+
+        elapsed_ms = round((time.perf_counter() - t0) * 1000.0, 2)
+
+        description = (
+            f"Temporal Subgraph Motif Analysis: Found {total_motifs} motif(s) across {len(all_subgraph_cards)} card(s) "
+            f"and {len(subgraph_txns)} transaction(s) in {window_hours}h window. "
+            f"Dominant motif: {dominant_motif}. Anomaly score: {anomaly_score:.2f} (threat level: {threat_level})."
+        )
+
+        return {
+            "seed_id": seed_id,
+            "target_card": card_id,
+            "entity_type": entity_type,
+            "as_of": as_of,
+            "effective_as_of": effective_as_of,
+            "window_hours": window_hours,
+            "subgraph_cards_count": len(all_subgraph_cards),
+            "subgraph_transactions_count": len(subgraph_txns),
+            "total_motifs_count": total_motifs,
+            "motif_counts": motif_counts,
+            "motifs": motifs_detected,
+            "dominant_motif": dominant_motif,
+            "anomaly_score": anomaly_score,
+            "threat_level": threat_level,
+            "elapsed_ms": elapsed_ms,
+            "description": description,
+        }
+

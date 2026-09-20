@@ -119,6 +119,13 @@ class MCCCheckRequest(BaseModel):
     window_hours: float = 48.0
 
 
+class MotifsCheckRequest(BaseModel):
+    seed_id: str
+    entity_type: str = "card"
+    as_of: Optional[str] = None
+    window_hours: float = 72.0
+
+
 StructuringCheckRequest.model_rebuild()
 ContagionCheckRequest.model_rebuild()
 PoolEmbeddingRequest.model_rebuild()
@@ -126,6 +133,7 @@ MineRulesRequest.model_rebuild()
 EvaluateRulesRequest.model_rebuild()
 CrossBorderCheckRequest.model_rebuild()
 MCCCheckRequest.model_rebuild()
+MotifsCheckRequest.model_rebuild()
 
 
 @app.get("/api/health")
@@ -498,6 +506,40 @@ def run_pool_embedding(req: PoolEmbeddingRequest):
         k_hops=req.k_hops,
         max_nodes=req.max_nodes,
         decay_lambda=req.decay_lambda,
+    )
+
+
+@app.get("/api/cases/{case_id}/motifs")
+def get_case_motifs(case_id: str, window_hours: float = 72.0):
+    """Mines topological transaction subgraph motifs for a case."""
+    if case_id not in active_cases:
+        if case_id in agent.client.store.case_pack:
+            res = agent.investigate_case(case_id)
+            active_cases[case_id] = res
+            case_manager.write_case_to_graph(res)
+        else:
+            raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
+
+    case_data = active_cases[case_id]
+    card_id = case_data.get("case", {}).get("card_id")
+    as_of = case_data.get("case", {}).get("as_of")
+    motifs = agent.client.mine_subgraph_motifs(
+        seed_id=card_id,
+        entity_type="card",
+        as_of=as_of,
+        window_hours=window_hours,
+    )
+    return {"case_id": case_id, "motifs": motifs}
+
+
+@app.post("/api/graph/motifs-check")
+def run_motifs_check(req: MotifsCheckRequest):
+    """On-demand temporal transaction subgraph motif mining."""
+    return agent.client.mine_subgraph_motifs(
+        seed_id=req.seed_id,
+        entity_type=req.entity_type,
+        as_of=req.as_of,
+        window_hours=req.window_hours,
     )
 
 

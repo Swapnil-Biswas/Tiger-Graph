@@ -46,6 +46,7 @@
 | **041** | `77d139b` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 134/134 (100%) | 0.008s | PASS | Cross-case syndicate expansion & shared merchant collusion tracking |
 | **042** | `023feca` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 135/135 (100%) | 0.008s | PASS | Decision boundary visualization & interactive sensitivity sliders in HTML dossier |
 | **043** | `9918c55` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 141/141 (100%) | 0.008s | PASS | Dynamic high-risk merchant MCC blacklisting & adaptive velocity multipliers (Q21) |
+| **044** | `iter-044` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 147/147 (100%) | 0.008s | PASS | Temporal transaction subgraph motif mining & topological anomaly scoring (Q22) |
 
 ---
 

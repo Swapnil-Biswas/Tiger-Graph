@@ -291,7 +291,7 @@ Decision Sensitivity (Counterfactual Boundaries):
         <strong>Deterministic Audit Trail Certified</strong> — 0 Hallucinations, Faithfulness: 1.00/1.00
       </div>
       <div style="color: var(--text-muted);">
-        Generated: 2026-09-20 14:28:50 UTC
+        Generated: 2026-09-20 14:41:20 UTC
       </div>
     </div>
   </div>
@@ -340,7 +340,7 @@ Decision Sensitivity (Counterfactual Boundaries):
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-      const elements = {"nodes": [{"data": {"id": "CASE-HHG-001", "label": "Case: HHG-001", "type": "Case", "color": "#8b5cf6"}}, {"data": {"id": "CARD-HHG-001", "label": "Card", "type": "Card", "color": "#00f0ff"}}, {"data": {"id": "TXN-3513814", "label": "Txn 3513814", "type": "Transaction", "color": "#ef4444"}}, {"data": {"id": "TXN-3514030", "label": "Txn 3514030", "type": "Transaction", "color": "#ef4444"}}, {"data": {"id": "TXN-3511596", "label": "Txn 3511596", "type": "Transaction", "color": "#ef4444"}}, {"data": {"id": "TXN-3512936", "label": "Txn 3512936", "type": "Transaction", "color": "#ef4444"}}], "edges": [{"data": {"source": "CASE-HHG-001", "target": "CARD-HHG-001", "label": "SUBJECT_CARD"}}, {"data": {"source": "CARD-HHG-001", "target": "TXN-3513814", "label": "EXPOSURE"}}, {"data": {"source": "CARD-HHG-001", "target": "TXN-3514030", "label": "EXPOSURE"}}, {"data": {"source": "CARD-HHG-001", "target": "TXN-3511596", "label": "EXPOSURE"}}, {"data": {"source": "CARD-HHG-001", "target": "TXN-3512936", "label": "EXPOSURE"}}]};
+      const elements = {"nodes": [{"data": {"id": "CASE-HHG-001", "label": "Case: HHG-001", "type": "Case", "color": "#8b5cf6"}}, {"data": {"id": "CARD-HHG-001", "label": "Card", "type": "Card", "color": "#00f0ff"}}, {"data": {"id": "TXN-3513814", "label": "Txn 3513814", "type": "Transaction", "color": "#ef4444"}}, {"data": {"id": "TXN-3512936", "label": "Txn 3512936", "type": "Transaction", "color": "#ef4444"}}, {"data": {"id": "TXN-3514030", "label": "Txn 3514030", "type": "Transaction", "color": "#ef4444"}}, {"data": {"id": "TXN-3511596", "label": "Txn 3511596", "type": "Transaction", "color": "#ef4444"}}], "edges": [{"data": {"source": "CASE-HHG-001", "target": "CARD-HHG-001", "label": "SUBJECT_CARD"}}, {"data": {"source": "CARD-HHG-001", "target": "TXN-3513814", "label": "EXPOSURE"}}, {"data": {"source": "CARD-HHG-001", "target": "TXN-3512936", "label": "EXPOSURE"}}, {"data": {"source": "CARD-HHG-001", "target": "TXN-3514030", "label": "EXPOSURE"}}, {"data": {"source": "CARD-HHG-001", "target": "TXN-3511596", "label": "EXPOSURE"}}]};
       cytoscape({
         container: document.getElementById('cy-container'),
         elements: elements,

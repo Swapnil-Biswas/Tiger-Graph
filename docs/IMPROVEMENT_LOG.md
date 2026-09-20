@@ -1,3 +1,30 @@
+## Iteration 044: Temporal Transaction Subgraph Motif Mining | 2026-09-20 20:30 | commit iter-044
+- **Lens:** 1. Graph schema & modeling & 6. Transaction velocity & burst & 11. Agent architecture & engineering
+- **Goal / hypothesis:** Fraud syndicates and automated card-cracking bots exhibit distinct temporal subgraph motifs that cannot be captured by static degree counts or single-edge queries alone. By mining higher-order temporal transaction motifs across continuous rolling windows (fan-out stars, fan-in hubs, bipartite meshes, temporal chains, and sharing triangles), the agent can quantify complex coordinated behavioral topology, evaluate anomaly scores, and assign threat levels (critical, high, elevated, low, none).
+- **Changes (files):**
+  - `src/graph/algorithms.py`: Implemented `TemporalSubgraphMotifMiner` detecting 5 higher-order graph motifs (`fan_out_star`, `fan_in_hub`, `bipartite_mesh`, `temporal_chain`, `sharing_triangle`), computing normalized anomaly scores ($[0.0, 1.0]$), identifying dominant motifs, and generating threat level categorizations.
+  - `src/graph/client.py`: Enhanced `parse_as_of_epoch` to support numeric string/float timestamp inputs, and added `mine_subgraph_motifs` (Q22) to `GraphClient`.
+  - `src/api/main.py`: Added `MotifsCheckRequest` with `model_rebuild()` and endpoints `GET /api/cases/{case_id}/motifs` and `POST /api/graph/motifs-check`.
+  - `tests/test_graph_motifs.py`: Created 6 unit tests covering isolated baseline, fan-out star, fan-in hub, bipartite mesh, temporal chain & sharing triangle, temporal isolation, and API endpoints.
+- **Tests added/updated:**
+  - `tests/test_graph_motifs.py` (6 unit tests, all pass).
+  - Total unit test suite expanded from 141 to **147** tests across 35 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 141 -> **147** (100% pass rate across 35 test suites)
+  - Graph Motif Mining: 5 topological motifs (fan-out star, fan-in hub, bipartite mesh, temporal chain, sharing triangle) with anomaly scoring
+  - Query Library: Expanded to Q22 (`mine_subgraph_motifs`)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (147/147)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Numeric strings passed via REST query or JSON payloads to `parse_as_of_epoch` require direct numeric string conversion before datetime parsing to avoid falling through to infinity.
+- **Follow-ups added to backlog:** Proceed to Iteration 045: Cross-Case Entity Resolution via Probabilistic Record Linkage (Lens 1 & Lens 4).
+
 ## Iteration 043: Dynamic High-Risk Merchant MCC Blacklisting & Adaptive Velocity Multipliers | 2026-09-20 21:00 | commit 9918c55
 - **Lens:** 6. Fraud detection accuracy & 8. Policy engine and regulatory compliance & 14. Testing and evaluation
 - **Goal / hypothesis:** High-risk Merchant Category Codes (MCC 6051 quasi-cash/cryptocurrency, 4829 wire transfers, 7995 gambling/casinos, 5944 precious metals) are disproportionately exploited by cashout rings and money mules. Static velocity thresholds fail to account for high-risk MCC compounding. Implementing `HighRiskMCCRiskEngine` in `src/policy/jurisdiction.py` detects high-risk MCC transactions, computes adaptive velocity multipliers (up to 3.75x for rapid gambling or crypto bursts), mandates supervisory restrictions (`RESTRICT_QUASI_CASH`, `RESTRICT_OUTBOUND_WIRES`, `STEP_UP_AUTH`), triggers `FILE_SAR_HIGH_RISK_MCC` on cumulative exposure >= thresholds, and connects into `JurisdictionComplianceRouter.generate_dispatch_bundle` and `GraphClient` (Q21).
