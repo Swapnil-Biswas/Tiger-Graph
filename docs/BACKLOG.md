@@ -93,10 +93,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 23. **[DONE - Iteration 023] [Uncertainty Calibration] Reliability Curve & Expected Calibration Error (ECE) Backtest Analyzer**
     - *Result:* Built `eval/calibration_curve.py` and `tests/test_calibration.py`. Verified ECE 0.0116 (target < 0.08), MCE 0.0500 (target < 0.15), and Brier score 0.0006 (target < 0.12). Generated 10-bin reliability diagram in `docs/calibration_results.md`. Total tests: 69/69 passing.
 
-24. **[Policy & Approvals] Interactive Human-in-the-Loop Analyst Override & Audit Trail**
-    - *Goal:* Implement analyst override endpoint `/api/cases/{case_id}/override` allowing human fraud analysts to override verdicts, record structured justifications, and append immutable audit log entries to the case record in the graph.
-    - *Files:* `src/cases/manager.py`, `src/api/routes.py`, `tests/test_analyst_override.py`
-    - *Metric Impact:* Policy & Permissions (Lens 6) & Case Management (Lens 10).
+24. **[DONE - Iteration 024] [Policy & Approvals] Interactive Human-in-the-Loop Analyst Override & Audit Trail**
+    - *Result:* Implemented `record_analyst_override` and `get_case_audit_trail` in `src/cases/manager.py`, added `POST /api/cases/{case_id}/override` and `GET /api/cases/{case_id}/audit` endpoints in `src/api/main.py`. Enforces role-based policy gates on high exposure (> $2,500) and writes immutable audit records to graph. Added 4 unit tests in `tests/test_analyst_override.py` (73/73 tests pass).
 
 25. **[Checkpoint 4 & Release Tag v0.25] Quarter-Way Milestone Review**
     - *Goal:* Review all system components against PRD Section 25, verify 0 regressions across all suites, and create annotated release tag `v0.25`.

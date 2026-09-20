@@ -166,13 +166,14 @@ class CaseManager:
         c_id = f"CASE-{case_id}" if not case_id.startswith("CASE-") else case_id
         links = []
         for edge in getattr(self.store, "graph_case_edges", []):
-            if edge["from_case"] == c_id or edge["to_case"] == c_id:
-                other = edge["to_case"] if edge["from_case"] == c_id else edge["from_case"]
-                links.append({
-                    "connected_case_id": other,
-                    "via_nexus": edge["via_nexus"],
-                    "established_at": edge["established_at"],
-                })
+            if edge.get("type") == "CROSS_CASE_LINK":
+                if edge.get("from_case") == c_id or edge.get("to_case") == c_id:
+                    other = edge["to_case"] if edge["from_case"] == c_id else edge["from_case"]
+                    links.append({
+                        "connected_case_id": other,
+                        "via_nexus": edge.get("via_nexus"),
+                        "established_at": edge.get("established_at"),
+                    })
         return links
 
     def reconstruct_case_from_graph(self, case_id: str) -> Dict[str, Any]:
@@ -226,4 +227,110 @@ class CaseManager:
             "evidence": evidence_list,
             "actions": action_list,
             "summary": c_vertex["summary"],
+            "is_overridden": c_vertex.get("is_overridden", False),
+            "audit_trail": c_vertex.get("audit_trail", []),
         }
+
+    def record_analyst_override(
+        self,
+        case_id: str,
+        analyst_id: str,
+        analyst_role: str,
+        new_verdict: str,
+        justification: str,
+        new_actions: Optional[List[Dict[str, Any]]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Records a human analyst override with structured justification, policy validation,
+        and immutable audit trail appending to the graph case.
+        """
+        if not justification or len(justification.strip()) < 10:
+            raise ValueError("Analyst override requires a structured justification of at least 10 characters.")
+
+        valid_verdicts = ["fraud", "legitimate", "uncertain"]
+        if new_verdict not in valid_verdicts:
+            raise ValueError(f"Invalid verdict '{new_verdict}'. Must be one of {valid_verdicts}.")
+
+        graph_case_id = f"CASE-{case_id}" if not case_id.startswith("CASE-") else case_id
+        c_vertex = self.store.graph_cases.get(graph_case_id)
+        if not c_vertex:
+            raise KeyError(f"Case vertex {graph_case_id} not found in graph.")
+
+        exposure_usd = float(c_vertex.get("exposure_usd", 0.0))
+        role = analyst_role.upper().strip()
+
+        # Policy Gate on Overrides:
+        # Overriding a fraud verdict to legitimate on high exposure (> $2,500) requires L2_LEAD or COMPLIANCE_OFFICER
+        if c_vertex["verdict"] == "fraud" and new_verdict == "legitimate" and exposure_usd > 2500.0:
+            if role not in ["L2_LEAD", "COMPLIANCE_OFFICER", "FRAUD_MANAGER"]:
+                raise PermissionError(
+                    f"Overriding high-exposure (${exposure_usd:.2f}) fraud to legitimate requires L2_LEAD or COMPLIANCE_OFFICER role."
+                )
+
+        import hashlib
+        now_dt = datetime.now(timezone.utc)
+        now_str = now_dt.strftime("%Y-%m-%d %H:%M:%S")
+        override_hash = hashlib.md5(f"{graph_case_id}:{analyst_id}:{now_str}".encode("utf-8")).hexdigest()[:8]
+        override_id = f"OVR-{override_hash.upper()}"
+
+        prev_verdict = c_vertex["verdict"]
+        prev_status = c_vertex["status"]
+
+        # Determine new status
+        if new_verdict == "fraud":
+            new_status = "closed_fraud"
+        elif new_verdict == "legitimate":
+            new_status = "closed_legitimate"
+        else:
+            new_status = "escalated"
+
+        override_record = {
+            "override_id": override_id,
+            "case_id": graph_case_id,
+            "analyst_id": analyst_id,
+            "analyst_role": role,
+            "previous_verdict": prev_verdict,
+            "previous_status": prev_status,
+            "new_verdict": new_verdict,
+            "new_status": new_status,
+            "justification": justification.strip(),
+            "timestamp": now_str,
+            "new_actions": new_actions or [],
+        }
+
+        # Update case vertex
+        c_vertex["verdict"] = new_verdict
+        c_vertex["status"] = new_status
+        c_vertex["is_overridden"] = True
+        c_vertex["latest_override"] = override_record
+
+        if "audit_trail" not in c_vertex:
+            c_vertex["audit_trail"] = []
+        c_vertex["audit_trail"].append(override_record)
+
+        # Store in graph_overrides
+        if not hasattr(self.store, "graph_overrides"):
+            self.store.graph_overrides = {}
+        self.store.graph_overrides[override_id] = override_record
+
+        # Store edge in graph_case_edges
+        edge = {
+            "from_case": graph_case_id,
+            "to_override": override_id,
+            "type": "OVERRIDDEN_BY",
+            "analyst_id": analyst_id,
+            "timestamp": now_str,
+        }
+        self.store.graph_case_edges.append(edge)
+
+        return override_record
+
+    def get_case_audit_trail(self, case_id: str) -> List[Dict[str, Any]]:
+        """
+        Retrieves the immutable audit trail for a case from graph vertices.
+        """
+        graph_case_id = f"CASE-{case_id}" if not case_id.startswith("CASE-") else case_id
+        c_vertex = self.store.graph_cases.get(graph_case_id)
+        if not c_vertex:
+            return []
+        return c_vertex.get("audit_trail", [])

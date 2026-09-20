@@ -554,3 +554,46 @@ window.handleApproval = async function(approvalId, decision) {
     alert("Approval error: " + e.message);
   }
 };
+
+window.submitAnalystOverride = async function(caseId, newVerdict, justification, role = "L1_ANALYST") {
+  try {
+    const res = await fetch(`/api/cases/${caseId}/override`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        analyst_id: "ANALYST-HUMAN",
+        analyst_role: role,
+        new_verdict: newVerdict,
+        justification: justification
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || "Override failed");
+    }
+    const data = await res.json();
+    alert(`Verdict successfully overridden to: ${newVerdict.toUpperCase()} (Audit ID: ${data.override.override_id})`);
+    
+    // Refresh case view
+    const vBadge = document.getElementById("verdict-badge");
+    if (vBadge) {
+      vBadge.className = `verdict-badge verdict-${newVerdict}`;
+      vBadge.textContent = `${newVerdict.toUpperCase()} (OVERRIDDEN)`;
+    }
+    loadCaseAuditTrail(caseId);
+  } catch (e) {
+    alert("Override error: " + e.message);
+  }
+};
+
+window.loadCaseAuditTrail = async function(caseId) {
+  try {
+    const res = await fetch(`/api/cases/${caseId}/audit`);
+    const data = await res.json();
+    const trail = data.audit_trail || [];
+    console.log(`Audit trail for ${caseId}:`, trail);
+  } catch (e) {
+    console.error("Failed to load audit trail:", e);
+  }
+};
+

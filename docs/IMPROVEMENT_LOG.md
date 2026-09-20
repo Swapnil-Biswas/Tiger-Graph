@@ -1,4 +1,31 @@
-## Iteration 023: Reliability Curve & Expected Calibration Error (ECE) Backtest Analyzer | 2026-09-20 18:13 | commit pending
+## Iteration 024: Interactive Human-in-the-Loop Analyst Override & Graph Audit Trail | 2026-09-20 18:17 | commit pending
+- **Lens:** 6. Policy and permissions & 10. Case management & 15. UI/UX
+- **Goal / hypothesis:** Autonomous agent verdicts require human-in-the-loop escalation paths for operational resilience. Implementing an analyst override mechanism in `src/cases/manager.py` and `src/api/main.py` allows fraud analysts to override verdicts, enforce role-based policy gates (e.g. requiring L2_LEAD or COMPLIANCE_OFFICER authorization to clear high-exposure cases > $2,500), enforce mandatory structured justifications, and persist immutable audit trail entries as graph vertices and edges.
+- **Changes (files):**
+  - `src/cases/manager.py`: Implemented `record_analyst_override`, `get_case_audit_trail`, and updated `reconstruct_case_from_graph` to record `is_overridden` and `audit_trail` directly in graph vertices and link via `OVERRIDDEN_BY` edges. Fixed `get_cross_case_links` to filter by edge type `CROSS_CASE_LINK`.
+  - `src/api/main.py`: Added `CaseOverrideRequest` model, `POST /api/cases/{case_id}/override` endpoint, and `GET /api/cases/{case_id}/audit` endpoint.
+  - `ui/app.js`: Added `submitAnalystOverride` and `loadCaseAuditTrail` functions for interactive analyst interventions.
+  - `tests/test_analyst_override.py`: Added 4 comprehensive unit tests verifying override persistence, high-exposure role permission gates, justification validation, and API endpoint operation.
+- **Tests added/updated:**
+  - `tests/test_analyst_override.py` (4 unit tests, all pass).
+  - Total unit test suite expanded from 69 to **73** tests across 19 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 69 -> **73** (100% pass rate)
+  - Human-in-the-Loop Override: Full graph persistence & immutable audit trail
+  - Role-Based Policy Gates: Enforced on high-exposure overrides (> $2,500)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (73/73)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Storing analyst overrides as first-class vertices and edges in the graph (`OVERRIDDEN_BY`) provides complete provenance, enabling post-incident regulatory audits and dispute tracking without needing external relational databases.
+- **Follow-ups added to backlog:** Proceed to Iteration 025: Checkpoint 4 & Release Tag v0.25 (Lens 17: Documentation and deliverables).
+
+## Iteration 023: Reliability Curve & Expected Calibration Error (ECE) Backtest Analyzer | 2026-09-20 18:13 | commit 1c726d0
 - **Lens:** 3. Uncertainty calibration & 14. Testing and evaluation
 - **Goal / hypothesis:** PRD Section 11 and Section 14 mandate that predicted fraud probabilities match empirical frequencies across score bands (Expected Calibration Error ECE < 0.08, Maximum Calibration Error MCE < 0.15, Brier score < 0.12). Building `eval/calibration_curve.py` and `tests/test_calibration.py` provides automated empirical frequency reliability verification, reliability diagram generation, and mathematical validation across historical closed cases and benchmark scenarios.
 - **Changes (files):**

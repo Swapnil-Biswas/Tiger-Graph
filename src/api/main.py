@@ -57,6 +57,14 @@ class ApprovalDecision(BaseModel):
     notes: Optional[str] = ""
 
 
+class CaseOverrideRequest(BaseModel):
+    analyst_id: str
+    analyst_role: Optional[str] = "L1_ANALYST"  # "L1_ANALYST" | "L2_LEAD" | "COMPLIANCE_OFFICER"
+    new_verdict: str  # "fraud" | "legitimate" | "uncertain"
+    justification: str
+    new_actions: Optional[list] = None
+
+
 @app.get("/api/health")
 def health_check():
     return {
@@ -165,6 +173,60 @@ def process_approval(approval_id: str, decision: ApprovalDecision):
     pending_approvals[approval_id]["status"] = decision.decision
     pending_approvals[approval_id]["notes"] = decision.notes
     return {"status": "success", "approval": pending_approvals[approval_id]}
+
+
+@app.post("/api/cases/{case_id}/override")
+def override_case_verdict(case_id: str, req: CaseOverrideRequest):
+    """
+    Human analyst override endpoint.
+    Allows fraud analysts to override an agent verdict with structured justification,
+    policy role validation, and immutable graph audit logging.
+    """
+    # Ensure case is loaded in graph/active_cases
+    if case_id not in active_cases and f"CASE-{case_id}" not in case_manager.store.graph_cases:
+        if case_id in agent.client.store.case_pack:
+            res = agent.investigate_case(case_id)
+            active_cases[case_id] = res
+            case_manager.write_case_to_graph(res)
+        else:
+            raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
+
+    try:
+        override_rec = case_manager.record_analyst_override(
+            case_id=case_id,
+            analyst_id=req.analyst_id,
+            analyst_role=req.analyst_role,
+            new_verdict=req.new_verdict,
+            justification=req.justification,
+            new_actions=req.new_actions,
+        )
+    except PermissionError as pe:
+        raise HTTPException(status_code=403, detail=str(pe))
+    except (ValueError, KeyError) as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+
+    # Synchronize active_cases cache if present
+    if case_id in active_cases:
+        active_cases[case_id]["case"]["verdict"] = req.new_verdict
+        active_cases[case_id]["case"]["status"] = override_rec["new_status"]
+        active_cases[case_id]["case"]["is_overridden"] = True
+        active_cases[case_id]["case"]["latest_override"] = override_rec
+        if req.new_actions:
+            active_cases[case_id]["next_best_actions"]["final"] = req.new_actions
+
+    return {
+        "status": "success",
+        "case_id": case_id,
+        "override": override_rec,
+        "case": active_cases.get(case_id) or case_manager.reconstruct_case_from_graph(case_id),
+    }
+
+
+@app.get("/api/cases/{case_id}/audit")
+def get_case_audit_trail(case_id: str):
+    """Retrieves immutable audit trail and analyst overrides for a case."""
+    audit_trail = case_manager.get_case_audit_trail(case_id)
+    return {"case_id": case_id, "audit_trail": audit_trail}
 
 
 @app.get("/api/memory/similar")
