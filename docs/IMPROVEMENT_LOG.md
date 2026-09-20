@@ -1,3 +1,31 @@
+## Iteration 085: Checkpoint 15 Audit, 85-Iteration Milestone Review, and v0.85 Release Tag | 2026-09-21 08:15 | commit v0.85
+- **Lens:** 14. Testing, evaluation & benchmarks, 11. Agent architecture & engineering, 9. Security, safety & defenses
+- **Goal / hypothesis:** Reaching 85 iterations (85% milestone — 15 iterations remaining to the 100-iteration grand finale) requires a comprehensive audit across all 15 PRD evaluation lenses to verify demo assets, extended 50-case benchmark validity, LRU caching performance, cryptographic audit ledgers, and operational stability before tagging `v0.85`.
+  1. **Audit Scope**: Verified all 334 unit tests across 68 test suites passing at 100%.
+  2. **Mandatory Gates**: Verified 20/20 valid official benchmark answers, 50/50 valid extended benchmark cases, green demo path (`tests/test_phase4.py`), 0.00% run-to-run variance, 0 policy violations, and 0 secrets staged.
+  3. **Milestone Documentation**: Updated `docs/MILESTONES.md` with Section 3.6 detailing the architecture, metrics, and production readiness at 85 iterations.
+  4. **Release Tag**: Created and pushed Git tag `v0.85`.
+- **Changes (files):**
+  - `docs/MILESTONES.md`: Added Section 3.6 (Checkpoint 15 Audit & 85-Iteration Review) and updated release tag catalog with `v0.85`.
+  - `docs/METRICS.md`: Added row 085 with tag `v0.85`.
+  - `docs/BACKLOG.md`: Marked item 85 as DONE and scheduled Iterations 86–90.
+  - `docs/IMPROVEMENT_LOG.md`: Documented Iteration 085.
+- **Tests added/updated:**
+  - Full suite verified: 334/334 tests pass across 68 suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 334/334 tests pass (100% across 68 suites)
+  - Milestone: 85% completed (85/100 iterations), Release Tag `v0.85`
+  - Official Benchmark Answers Valid: 20/20 (100%)
+  - Extended Benchmark Answers Valid: 50/50 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 334 passed across 68 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 084: Cryptographic Audit Log Signing & Tamper Verification | 2026-09-21 08:00 | commit c5f5a5b
 - **Lens:** 9. Security, safety & defenses, 5. Regulatory compliance & SAR narrative, 12. Audit trail & anti-hallucination, 8. Explainability & human-in-the-loop
 - **Goal / hypothesis:** Regulatory standards (FRE 902(13)/(14), FinCEN 31 CFR 1020.320, SOC 2 Type II) require that every autonomous action, next-best-action routing, SAR filing, and human override produce an immutable, tamper-evident audit record. Implementing a cryptographic audit ledger delivers:

@@ -87,6 +87,7 @@
 | **082** | `00c9d5f` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 322/322 (100%) | 0.008s | PASS | Extended 50-case high-stress benchmark suite, generator and evaluator (50/50 schema pass) |
 | **083** | `45aaf26` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 328/328 (100%) | 0.008s | PASS | Thread-safe LRU query cache with dynamic tag invalidation and GraphClient integration |
 | **084** | `c5f5a5b` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 334/334 (100%) | 0.008s | PASS | Cryptographic tamper-evident audit ledger with HMAC-SHA256 signatures and chain verification |
+| **085** | `v0.85` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 334/334 (100%) | 0.008s | PASS | Checkpoint 15 Audit, 85-Iteration Milestone Review, and v0.85 Release Tag |
 
 ---
 
