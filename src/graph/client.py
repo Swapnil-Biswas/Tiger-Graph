@@ -499,6 +499,7 @@ class GraphClient:
                         "pattern": c.get("pattern"),
                         "exposure_usd": float(c.get("exposure_usd", 0.0)),
                         "analyst_notes": c.get("analyst_notes", ""),
+                        "opened_at": c.get("opened_at", ""),
                     })
 
         # 2. Matches on devices used by this card
@@ -513,6 +514,7 @@ class GraphClient:
                         "pattern": c.get("pattern"),
                         "exposure_usd": float(c.get("exposure_usd", 0.0)),
                         "analyst_notes": c.get("analyst_notes", ""),
+                        "opened_at": c.get("opened_at", ""),
                     })
 
         # Deduplicate matches by case_id

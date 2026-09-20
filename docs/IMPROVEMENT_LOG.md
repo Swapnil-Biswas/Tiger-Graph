@@ -1,4 +1,29 @@
-## Iteration 025: Checkpoint 4 & Release Tag v0.25 (Quarter-Way Milestone Review) | 2026-09-20 18:22 | commit pending
+## Iteration 026: Temporal Recency-Weighted Case Retrieval in GraphRAG | 2026-09-20 18:25 | commit pending
+- **Lens:** 4. GraphRAG & context assembly & 8. Case memory & dynamic context
+- **Goal / hypothesis:** Fraud syndicate modii operandi evolve dynamically over weeks; treating a 120-day-old precedent with equal weight to an incident from 5 days ago dilutes context relevance. Implementing exponential recency decay weighting ($\text{Decay}(\Delta t) = \exp(-\lambda \Delta t)$ with half-life $t_{1/2} = 30$ days and a $0.20$ retention floor) in `src/rag/retrieve.py` ranks active campaign precedents higher while preserving long-term structural links and strict `as_of` temporal isolation.
+- **Changes (files):**
+  - `src/rag/retrieve.py`: Enhanced `retrieve_similar_cases` with exponential decay weighting, computing `relevance_score`, `recency_decay`, and `days_prior`, and sorting results descending by dynamic relevance.
+  - `src/graph/client.py`: Updated `similar_cases` to propagate `opened_at` timestamps in match records.
+  - `tests/test_temporal_retrieval.py`: Added 3 unit tests validating decay mathematical bounds, descending relevance ranking with temporal metadata, and zero-leak temporal isolation.
+- **Tests added/updated:**
+  - `tests/test_temporal_retrieval.py` (3 unit tests, all pass).
+  - Total unit test suite expanded from 73 to **76** tests across 20 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 73 -> **76** (100% pass rate)
+  - Case Retrieval: Exponential recency-decay weighted ranking ($t_{1/2} = 30$ days)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (76/76)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Exponential decay naturally suppresses stale single-card disputes while keeping active syndicate bursts at the top of the agent's context brief, improving context relevance without increasing prompt token size.
+- **Follow-ups added to backlog:** Proceed to Iteration 027: Automated Multi-Jurisdiction Regulatory Routing (Lens 6 & Lens 7).
+
+## Iteration 025: Checkpoint 4 & Release Tag v0.25 (Quarter-Way Milestone Review) | 2026-09-20 18:22 | commit db724ad
 - **Lens:** 17. Documentation and deliverables & All Lenses 1-16
 - **Goal / hypothesis:** Conduct the comprehensive Quarter-Way Milestone Review (Iteration 25/100) evaluating all system components against PRD Section 25 deliverables, verifying 0 regressions across all 19 unit test suites, certifying all 20 benchmark case schemas, validating uncertainty calibration, and generating release tag `v0.25`.
 - **Changes (files):**

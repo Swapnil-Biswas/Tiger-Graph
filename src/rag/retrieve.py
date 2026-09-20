@@ -62,19 +62,33 @@ class GraphRAGRetriever:
         customer_id: Optional[str] = None,
         as_of: Optional[str] = None,
         top_k: int = 3,
+        decay_half_life_days: float = 30.0,
     ) -> List[Dict[str, Any]]:
         """
-        Combines semantic similarity over case summaries with structural graph lookups.
-        Enforces as_of temporal isolation: never returns cases opened after as_of.
+        Combines semantic similarity over case summaries with structural graph lookups,
+        ranked by match relevance modulated by exponential temporal recency decay:
+            decay = exp(-ln(2) * delta_days / half_life)
+            score = match_score * (alpha + (1 - alpha) * decay)
+        Enforces strict as_of temporal isolation: never returns cases opened after as_of.
         """
+        import math
         as_of_epoch = parse_as_of_epoch(as_of)
         hits = {}
+        lambda_decay = math.log(2) / max(1.0, decay_half_life_days)
+        alpha = 0.20  # Base relevance retention floor for strong historical precedents
 
         # 1. Structural graph hits (Q10)
         if card_id:
             struct_res = self.client.similar_cases(card_id, customer_id=customer_id, as_of=as_of)
             for m in struct_res.get("similar_cases", []):
                 cid = m["case_id"]
+                opened_str = m.get("opened_at") or self.store.closed_cases.get(cid, {}).get("opened_at", "")
+                opened_epoch = parse_as_of_epoch(opened_str)
+                delta_days = max(0.0, (as_of_epoch - opened_epoch) / 86400.0)
+                decay = math.exp(-lambda_decay * delta_days)
+                match_weight = 1.0 if m.get("match_type") == "same_card" else 0.75
+                relevance = match_weight * (alpha + (1.0 - alpha) * decay)
+
                 hits[cid] = {
                     "case_id": cid,
                     "match_type": f"structural_{m['match_type']}",
@@ -82,13 +96,24 @@ class GraphRAGRetriever:
                     "pattern": m.get("pattern"),
                     "exposure_usd": m.get("exposure_usd", 0.0),
                     "analyst_notes": m.get("analyst_notes", ""),
+                    "opened_at": opened_str,
+                    "days_prior": round(delta_days, 1),
+                    "recency_decay": round(decay, 4),
+                    "relevance_score": round(relevance, 4),
                 }
 
         # 2. Semantic search hits
-        semantic_hits = self.case_index.search(query, top_k=top_k * 2)
+        semantic_hits = self.case_index.search(query, top_k=top_k * 3)
         for doc, score in semantic_hits:
             cid = doc["id"]
-            if parse_as_of_epoch(doc.get("opened_at")) <= as_of_epoch:
+            opened_str = doc.get("opened_at", "")
+            opened_epoch = parse_as_of_epoch(opened_str)
+            if opened_epoch <= as_of_epoch:
+                delta_days = max(0.0, (as_of_epoch - opened_epoch) / 86400.0)
+                decay = math.exp(-lambda_decay * delta_days)
+                norm_score = min(0.9, max(0.4, float(score) / 10.0 if score > 1.0 else float(score)))
+                relevance = norm_score * (alpha + (1.0 - alpha) * decay)
+
                 if cid not in hits:
                     hits[cid] = {
                         "case_id": cid,
@@ -97,9 +122,19 @@ class GraphRAGRetriever:
                         "pattern": doc.get("pattern"),
                         "exposure_usd": doc.get("exposure_usd", 0.0),
                         "analyst_notes": doc.get("analyst_notes", ""),
+                        "opened_at": opened_str,
+                        "days_prior": round(delta_days, 1),
+                        "recency_decay": round(decay, 4),
+                        "relevance_score": round(relevance, 4),
                     }
+                else:
+                    # Hybrid boost if matched both structurally and semantically
+                    hits[cid]["relevance_score"] = round(hits[cid]["relevance_score"] * 1.25, 4)
+                    hits[cid]["match_type"] = f"{hits[cid]['match_type']}_plus_semantic"
 
-        return list(hits.values())[:top_k]
+        # Sort descending by relevance score
+        sorted_hits = sorted(hits.values(), key=lambda x: x["relevance_score"], reverse=True)
+        return sorted_hits[:top_k]
 
     def evaluate_policy_retrieval_mrr(
         self,

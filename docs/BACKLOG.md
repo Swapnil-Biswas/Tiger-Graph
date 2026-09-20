@@ -99,10 +99,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 25. **[DONE - Iteration 025] [Checkpoint 4 & Release Tag v0.25] Quarter-Way Milestone Review**
     - *Result:* Comprehensive PRD Section 25 audit completed. All 6 mandatory gates passed (73/73 unit tests across 19 suites, 100% backtest recall/precision, 0.00% benchmark variance, 1.0000 policy retrieval MRR, 1.00 audit faithfulness, 20/20 valid benchmark answers, ECE 0.0116, 0 secrets, demo path green). Tagged and pushed `v0.25`.
 
-26. **[Autonomous Agent & Memory] Temporal Recency-Weighted Case Retrieval in GraphRAG**
-    - *Goal:* Implement exponential decay weighting ($\lambda = 0.01$/day) on historical case similarity retrieval, prioritizing recent fraud MO patterns over stale cases.
-    - *Files:* `src/rag/retrieve.py`, `tests/test_temporal_retrieval.py`
-    - *Metric Impact:* GraphRAG & Context Assembly (Lens 4) & Case Memory (Lens 8).
+26. **[DONE - Iteration 026] [Autonomous Agent & Memory] Temporal Recency-Weighted Case Retrieval in GraphRAG**
+    - *Result:* Implemented exponential recency decay weighting ($t_{1/2} = 30$ days) with $0.20$ retention floor in `src/rag/retrieve.py` and updated `src/graph/client.py`. Dynamically ranks active campaign precedents higher while strictly preserving temporal isolation. Added 3 unit tests in `tests/test_temporal_retrieval.py` (76/76 tests pass).
 
 27. **[Policy & Compliance] Automated Multi-Jurisdiction Regulatory Routing (FinCEN, GDPR, FCA)**
     - *Goal:* Implement multi-jurisdiction compliance dispatcher supporting US FinCEN SARs, UK FCA STRs, and EU GDPR data privacy constraints on cross-border evidence sharing.
