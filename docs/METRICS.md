@@ -6,7 +6,8 @@
 | **001** | `984040d` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 14/14 (100%) | 0.063s | PASS | Expanded ATO, out-of-region, and trigger resolution |
 | **002** | `7306d42` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 17/17 (100%) | 0.063s | PASS | Complete evidence response matrix (R4, R5, R7) |
 | **003** | `2ca2604` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 19/19 (100%) | 0.063s | PASS | Graph-native counterfactual decision explainer |
-| **004** | `pending` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 21/21 (100%) | 0.063s | PASS | Evidence Value of Information (VOI) entropy ranking |
+| **004** | `13ca7dd` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 21/21 (100%) | 0.063s | PASS | Evidence Value of Information (VOI) entropy ranking |
+| **005** | `pending` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 21/21 (100%) | 0.063s | PASS | 1-Click Interactive Demo Presets in web UI |
 
 ---
 

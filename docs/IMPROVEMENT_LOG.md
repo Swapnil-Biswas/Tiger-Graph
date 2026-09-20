@@ -1,4 +1,30 @@
-## Iteration 004: Evidence Value-of-Information (VOI) Ranking Engine | 2026-09-20 16:41 | commit pending
+## Iteration 005: 1-Click Interactive Demo Presets & PRD Checkpoint | 2026-09-20 16:44 | commit pending
+- **Lens:** 15. UI/UX & 16. Demo and storytelling
+- **Goal / hypothesis:** Reviewers evaluating live demos need instant 1-click access to the four critical agentic investigation personas: Clear-Cut Syndicate (`HHG-004`), Ambiguous Recommendation Evolution (`HHG-001`), Card Testing Sequence (`HHG-011`), and Disputed Recurring Subscription (`HHG-007`). Adding dedicated visual preset chips with instant auto-execution streamlines presentation flow.
+- **Changes (files):**
+  - `ui/index.html`: Added `.demo-presets-bar` with 4 scenario buttons and color-coded persona badges.
+  - `ui/app.js`: Added click handler to `.preset-btn` updating active case, setting simulated customer scenario, and initiating investigation and subgraph render.
+  - `ui/style.css`: Styled `.demo-presets-bar`, `.preset-btn`, `.preset-tag`, and `.active-preset` with modern glassmorphism glow.
+  - `docs/PRD.md`: Re-read and confirmed all required deliverables in Section 25 remain actively tracked.
+- **Tests added/updated:**
+  - Automated API test verified HTML, CSS, and JS serve 200 OK with `demo-presets-bar` and `preset-btn` active.
+  - Full unit test suite passed (21/21 tests, 100%).
+  - Answer validation passed (20/20 cases).
+- **Metrics before -> after:**
+  - Test Count: 21 (100% pass rate)
+  - Demo Replayability: 1-Click execution for all 4 key demonstration scenarios
+  - Valid Benchmark Answers: 20/20 (100%)
+  - Policy Violations: 0
+  - PRD Checkpoint 1 (Iteration 5): 100% requirements accounted for and intact
+- **Verification gates:**
+  - Unit tests: PASS (21/21)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Preset scenario buttons reduce presentation friction to zero; a judge or presenter can toggle between a complex multi-card syndicate and a subtle subscription dispute in under two seconds without touching a dropdown.
+- **Follow-ups added to backlog:** Iterations 6–10 checkpoint towards v0.1: Build `eval/benchmark_consistency.py` to formally verify 0% run-to-run recommendation variance across repeated runs.
+
+## Iteration 004: Evidence Value-of-Information (VOI) Ranking Engine | 2026-09-20 16:41 | commit 13ca7dd
 - **Lens:** 20. Innovation, 4. Next-best-action quality & 5. Evidence-request design
 - **Goal / hypothesis:** Requesting evidence imposes customer friction and operational cost ($0.05 SMS, $0.10 OTP, $2.50 human review). Implementing a Shannon entropy reduction model ($H_{prior} - E[H_{post}]$) per unit cost provides a mathematically principled Value of Information (VOI) ranking engine, optimizing inquiry selection and raising Agentic Design & Innovation scores.
 - **Changes (files):**

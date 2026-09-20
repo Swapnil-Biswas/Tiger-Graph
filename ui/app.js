@@ -193,6 +193,23 @@ function setupEventListeners() {
     window.open(`/api/export/${currentCaseId}`, '_blank');
   });
 
+  // 1-Click Interactive Demo Preset Buttons
+  document.querySelectorAll(".preset-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const cid = btn.dataset.case;
+      const scenario = btn.dataset.scenario;
+      document.getElementById("select-case").value = cid;
+      document.getElementById("select-scenario").value = scenario;
+      currentCaseId = cid;
+      loadSubgraph(currentCaseId);
+      runInvestigation(cid);
+
+      // Visual pulse on active preset button
+      document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("active-preset"));
+      btn.classList.add("active-preset");
+    });
+  });
+
   const btnRunAll = document.getElementById("btn-run-all-benchmark");
   if (btnRunAll) {
     btnRunAll.addEventListener("click", async () => {

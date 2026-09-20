@@ -24,14 +24,34 @@ Ranked by expected impact on Hackathon Judging Criteria:
 4. **[DONE - Iteration 004] [Innovation] Evidence Value-of-Information (VOI) Ranking**
    - *Result:* Implemented `ValueOfInformationEngine` utilizing Shannon entropy reduction per unit cost to mathematically optimize inquiry selection. Added 2 unit tests, expanding test suite to 21 tests (100% pass).
 
-5. **[UI/UX] 1-Click Interactive Preset Scenarios in Web Dashboard**
-   - *Goal:* Add pre-configured 1-click demo buttons in UI for key personas (`Clear-Cut Syndicate HHG-004`, `Ambiguous Evolution HHG-001`, `Card Testing HHG-011`, `Disputed Recurring HHG-007`).
-   - *Files:* `ui/index.html`, `ui/app.js`, `ui/style.css`
-   - *Metric Impact:* Demo quality (10%).
+5. **[DONE - Iteration 005] [UI/UX] 1-Click Interactive Preset Scenarios in Web Dashboard**
+   - *Result:* Implemented 1-click interactive demo scenarios bar in `ui/index.html`, `ui/app.js`, and `ui/style.css` covering key personas (Syndicate HHG-004, Ambiguity Evolution HHG-001, Card Testing HHG-011, Recurring Dispute HHG-007).
 
 ---
 
-## Medium Priority (Iterations 26–60)
+## Next Priority (Iterations 6–10 Checkpoint to v0.1)
+
+6. **[Testing & Engineering] Benchmark Run-to-Run Self-Consistency Harness**
+   - *Goal:* Build `eval/benchmark_consistency.py` testing recommendation variance across 3 repeated runs of the 20 benchmark cases (target: 0% variance).
+   - *Files:* `eval/benchmark_consistency.py`
+   - *Metric Impact:* Engineering robustness & Scoreboard consistency metric.
+
+7. **[GraphRAG] Enhanced Topological Expansion in Context Brief**
+   - *Goal:* Incorporate 2-hop community subgraph statistics and PageRank centrality into the assembled LLM brief.
+   - *Files:* `src/rag/assemble.py`, `src/rag/retrieve.py`
+   - *Metric Impact:* GraphRAG quality & retrieval relevance.
+
+8. **[Case Management] Enhanced FinCEN SAR Narrative Generator with Structured Sections**
+   - *Goal:* Structure SAR narratives with formal regulatory sections: Subject Demographics, Suspicious Activity Timeline, Topology Matrix, Regulatory Impact.
+   - *Files:* `src/cases/manager.py`, `src/agent/graph.py`
+   - *Metric Impact:* Explainability & Case Management score.
+
+9. **[UI/UX] Cytoscape Custom Node Glyphs & Interactive Subgraph Expansion**
+   - *Goal:* Add distinct SVG icon glyphs for Card, Customer, Device, Transaction, and Case vertices with on-click node expansion.
+   - *Files:* `ui/app.js`, `ui/style.css`
+   - *Metric Impact:* Demo Quality (10%).
+
+10. **[Release Tag v0.1] Submission-Ready Checkpoint at Iteration 10**
 
 6. **[Testing] Benchmark Run-to-Run Self-Consistency Harness**
    - *Goal:* Verify 0% recommendation variance across repeated runs of all 20 benchmark cases.
