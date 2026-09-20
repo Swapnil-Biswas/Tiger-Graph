@@ -1,4 +1,4 @@
-## Iteration 077: Clean Clone Automated Sanity & Validation Scripts | 2026-09-21 06:15 | commit pending
+## Iteration 077: Clean Clone Automated Sanity & Validation Scripts | 2026-09-21 06:15 | commit d430132
 - **Lens:** 14. Testing, evaluation & benchmarks, 11. Agent architecture & engineering, 13. System performance & scalability
 - **Goal / hypothesis:** For evaluators, competition judges, and operational engineers cloning the repository for the first time, an automated, cross-platform sanity suite is essential to verify environment readiness, package dependencies, graph assets, benchmark cases, and demo execution in a single command. Creating `scripts/verify_install.py`, `scripts/run_all.sh`, and `scripts/run_all.ps1` delivers:
   1. **Automated Verification**: Checks Python >= 3.10, imports core dependencies, checks filesystem structure, validates all 20 benchmark case schemas, and runs the Phase 4 demo path.
