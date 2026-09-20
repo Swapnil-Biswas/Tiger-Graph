@@ -73,21 +73,25 @@ def get_all_cases():
     """Returns all benchmark and investigated cases for the Case Board."""
     cases_list = []
     # Benchmark cases
+    import pandas as pd
     for cid, c_data in agent.client.store.case_pack.items():
         inv = active_cases.get(cid)
+        raw_score = c_data.get("risk_score")
+        score_val = float(raw_score) if (raw_score is not None and pd.notna(raw_score) and str(raw_score).strip() != "") else None
         cases_list.append({
             "case_id": cid,
-            "opened_at": c_data.get("opened_at"),
-            "trigger_type": c_data.get("trigger_type"),
-            "trigger_text": c_data.get("trigger_text"),
-            "card_id": c_data.get("card_id"),
-            "customer_id": c_data.get("customer_id"),
-            "risk_score": c_data.get("risk_score"),
+            "opened_at": str(c_data.get("opened_at", "")),
+            "trigger_type": str(c_data.get("trigger_type", "")),
+            "trigger_text": str(c_data.get("trigger_text", "")),
+            "card_id": str(c_data.get("card_id", "")),
+            "customer_id": str(c_data.get("customer_id", "")),
+            "risk_score": score_val,
             "status": inv["case"]["status"] if inv else "NEW",
             "verdict": inv["case"]["verdict"] if inv else "pending",
             "fraud_probability": inv["case"]["fraud_probability"] if inv else None,
             "is_investigated": inv is not None,
         })
+
     return {"cases": cases_list}
 
 

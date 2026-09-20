@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TigerGraph Fraud Investigator — Autonomous Agentic Defense</title>
+  <meta name="description" content="AI Fraud Investigation & Next-Best-Action Agent powered by TigerGraph, GraphRAG, and deterministic policy enforcement.">
+  
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Cytoscape for Interactive Graph Explorer -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient background glow -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo-mark">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <h1>TigerGraph <span>Investigator</span></h1>
+        <p class="subtitle">Autonomous Agentic Fraud & Next-Best-Action Defense</p>
+      </div>
+    </div>
+
+    <!-- Live System Stats Pill -->
+    <div class="system-stats">
+      <div class="stat-pill"><span class="pulse-dot"></span> Graph: <strong id="stat-txns">590,742</strong> txns</div>
+      <div class="stat-pill">Memory: <strong id="stat-cases">5,565</strong> closed cases</div>
+      <div class="stat-pill">Engine: <span class="badge-engine">GSQL + GraphRAG</span></div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="nav-btn active" data-tab="investigate" id="tab-investigate">Investigation View</button>
+      <button class="nav-btn" data-tab="board" id="tab-board">Case Board (20)</button>
+      <button class="nav-btn" data-tab="approvals" id="tab-approvals">Approvals Queue <span class="badge" id="badge-approvals">0</span></button>
+      <button class="nav-btn" data-tab="memory" id="tab-memory">Graph Memory & Typologies</button>
+    </nav>
+  </header>
+
+  <!-- Main Container -->
+  <main class="app-main">
+
+    <!-- 1. HERO INVESTIGATION VIEW -->
+    <section id="view-investigate" class="tab-view active">
+      <!-- Quick Case Selector Bar -->
+      <div class="case-selector-bar glass-card">
+        <div class="selector-group">
+          <label for="select-case">Active Case:</label>
+          <select id="select-case" class="custom-select">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <div class="selector-group">
+          <label for="select-scenario">Simulated Cardholder Response:</label>
+          <select id="select-scenario" class="custom-select">
+            <option value="denies">Denies Transaction (Unauthorized)</option>
+            <option value="recognizes">Confirms Transaction (Legitimate/Travel)</option>
+            <option value="step_up_fail">Step-Up Auth Challenge Failed</option>
+            <option value="step_up_pass">Step-Up Auth Challenge Succeeded</option>
+            <option value="no_response">No Response within 24h</option>
+          </select>
+        </div>
+
+        <button id="btn-run-investigation" class="btn btn-primary glow-button">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          Run Autonomous Investigation
+        </button>
+
+        <button id="btn-export-json" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Export Case JSON
+        </button>
+      </div>
+
+      <!-- Investigation Content Grid -->
+      <div class="investigation-grid">
+        <!-- Column 1: Live Timeline & Agent Progression -->
+        <div class="grid-col col-timeline">
+          <div class="glass-card full-height">
+            <div class="card-header">
+              <h3>Agent Orchestrator Timeline</h3>
+              <span id="investigation-status-badge" class="status-badge badge-idle">Ready</span>
+            </div>
+            
+            <div class="timeline-container" id="timeline-stream">
+              <!-- Live Streamed Steps Inserted Here -->
+              <div class="timeline-step step-init">
+                <div class="step-icon">⚡</div>
+                <div class="step-content">
+                  <h4>Investigation Initialized</h4>
+                  <p>Select a benchmark case and trigger the autonomous multi-tool agent loop.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2: Uncertainty Gauges & Recommendations -->
+        <div class="grid-col col-analysis">
+          <!-- Uncertainty & Sufficiency Card -->
+          <div class="glass-card mb-4">
+            <div class="card-header">
+              <h3>Uncertainty & Risk Assessment</h3>
+              <span id="verdict-badge" class="verdict-badge verdict-pending">PENDING</span>
+            </div>
+            
+            <div class="gauges-row">
+              <!-- Risk Gauge -->
+              <div class="gauge-box">
+                <div class="gauge-circle">
+                  <svg viewBox="0 0 36 36" class="circular-chart" id="svg-risk-gauge">
+                    <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                    <path class="circle circle-risk" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                  </svg>
+                  <div class="gauge-value" id="val-risk-score">--</div>
+                </div>
+                <span class="gauge-label">Risk Score (R)</span>
+              </div>
+
+              <!-- Confidence Gauge -->
+              <div class="gauge-box">
+                <div class="gauge-circle">
+                  <svg viewBox="0 0 36 36" class="circular-chart" id="svg-conf-gauge">
+                    <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                    <path class="circle circle-conf" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                  </svg>
+                  <div class="gauge-value" id="val-confidence">--</div>
+                </div>
+                <span class="gauge-label">Confidence (C)</span>
+              </div>
+
+              <!-- Case Key Stats -->
+              <div class="stats-summary">
+                <div class="summary-item">
+                  <span class="lbl">Assessed Typology:</span>
+                  <strong id="val-pattern">--</strong>
+                </div>
+                <div class="summary-item">
+                  <span class="lbl">Identified Exposure:</span>
+                  <strong id="val-exposure" class="highlight-usd">$0.00</strong>
+                </div>
+                <div class="summary-item">
+                  <span class="lbl">Sufficiency Gate:</span>
+                  <span id="val-sufficiency" class="badge-sufficient">Pending</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recommendation Evolution Diff -->
+          <div class="glass-card">
+            <div class="card-header">
+              <h3>Next-Best-Action Evolution</h3>
+              <span class="badge-policy">Policy R1 - R10 Guardrails</span>
+            </div>
+
+            <div class="evolution-diff-grid">
+              <!-- Initial Recommendation -->
+              <div class="recom-box initial-box">
+                <div class="box-tag">PRE-EVIDENCE RECOMMENDATION</div>
+                <div id="initial-actions-list" class="actions-list">
+                  <p class="placeholder-text">Awaiting assessment...</p>
+                </div>
+              </div>
+
+              <!-- Final Recommendation -->
+              <div class="recom-box final-box">
+                <div class="box-tag">POST-EVIDENCE RECOMMENDATION</div>
+                <div id="final-actions-list" class="actions-list">
+                  <p class="placeholder-text">Awaiting evidence...</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- What Changed Callout -->
+            <div class="what-changed-callout" id="what-changed-box">
+              <strong>What Changed:</strong> <span id="what-changed-text">No changes recorded yet.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 3: Graph Explorer & Evidence -->
+        <div class="grid-col col-graph">
+          <div class="glass-card mb-4">
+            <div class="card-header">
+              <h3>Case Subgraph Explorer</h3>
+              <span class="badge-graph">Cytoscape.js</span>
+            </div>
+            <div id="cy-container" class="graph-canvas"></div>
+          </div>
+
+          <!-- Evidence Citations -->
+          <div class="glass-card">
+            <div class="card-header">
+              <h3>Grounding Evidence & Findings</h3>
+              <span class="evidence-count" id="evidence-count-badge">0 items</span>
+            </div>
+            <div class="evidence-scroll-container" id="evidence-list-container">
+              <p class="placeholder-text">No evidence items gathered yet.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. CASE BOARD (20 BENCHMARK CASES) -->
+    <section id="view-board" class="tab-view">
+      <div class="glass-card">
+        <div class="card-header">
+          <div>
+            <h2>Benchmark Case Board (20 Exam Cases)</h2>
+            <p class="subtitle">Evaluates all 20 standardized cases from Months 5-6.</p>
+          </div>
+          <button id="btn-run-all-benchmark" class="btn btn-primary glow-button">
+            ⚡ Run Full Benchmark (20 Cases)
+          </button>
+        </div>
+
+        <div class="table-container">
+          <table class="cases-table">
+            <thead>
+              <tr>
+                <th>Case ID</th>
+                <th>Opened Date</th>
+                <th>Trigger Type</th>
+                <th>Subject Card</th>
+                <th>Customer</th>
+                <th>Bank Risk Score</th>
+                <th>Status</th>
+                <th>Verdict</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="case-board-tbody">
+              <!-- Populated dynamically via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. APPROVALS QUEUE -->
+    <section id="view-approvals" class="tab-view">
+      <div class="glass-card">
+        <div class="card-header">
+          <div>
+            <h2>Human-in-the-Loop Approvals Queue</h2>
+            <p class="subtitle">Gated high-impact actions (L1 Team Lead / L2 Fraud Manager) awaiting human approval.</p>
+          </div>
+        </div>
+        <div id="approvals-list-container" class="approvals-grid">
+          <p class="placeholder-text">No pending actions requiring approval.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. GRAPH MEMORY & TYPOLOGIES -->
+    <section id="view-memory" class="tab-view">
+      <div class="memory-grid">
+        <div class="glass-card">
+          <div class="card-header">
+            <h3>Discovered Pattern: Multi-Card Proxy Rotation</h3>
+            <span class="badge-discovered">ORIGIN: DISCOVERED</span>
+          </div>
+          <div class="discovered-card-content">
+            <p><strong>Identified from Months 1-4 Analysis:</strong> Multiple independent cardholders compromised from identical device builds (<code>SAMSUNG SM-G935F | Android 7.0 | Chrome</code>) using anonymous proxy tunneling within 30-day windows.</p>
+            <div class="rule-box">
+              <strong>Mandated Response under Rule R6 & R9:</strong>
+              <ul>
+                <li>Recommend <code>CREATE_CASE</code> and <code>FILE_REPORT</code> (SAR)</li>
+                <li>Recommend <code>BLOCK_CARD</code> for affected account</li>
+                <li>Recommend <code>MONITOR_CONNECTED_CARDS</code> across the entire device cluster</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div class="card-header">
+            <h3>The Five Documented Typologies</h3>
+          </div>
+          <ul class="typologies-list">
+            <li><strong>1. Card testing:</strong> Rapid micro-authorizations (<$5) in 1 hour followed by larger purchase. (Policy R5)</li>
+            <li><strong>2. Card-not-present fraud:</strong> Online purchase burst inconsistent with historical merchants. (Policy R1-R4)</li>
+            <li><strong>3. CNP from new device:</strong> Online purchase with <code>id_15 == New</code> and proxy indicators.</li>
+            <li><strong>4. Out-of-region use:</strong> Card-present activity in unfamiliar billing regions while home activity continues.</li>
+            <li><strong>5. Account takeover:</strong> Mixed-channel credential compromise and account attribute changes.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

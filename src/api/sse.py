@@ -46,8 +46,10 @@ async def stream_investigation_events(
     # 7. Event: Evidence Request (if applicable)
     if evidence_reqs:
         req = evidence_reqs[0]
-        yield f"data: {json.dumps({'step': 'REQUEST_EVIDENCE', 'status': 'in_progress', 'request_type': req['type'], 'assumed_response': req['assumed_response'], 'message': f'Inquiring cardholder: {req[\"assumed_response\"]}'})}\n\n"
+        resp_msg = req['assumed_response']
+        yield f"data: {json.dumps({'step': 'REQUEST_EVIDENCE', 'status': 'in_progress', 'request_type': req['type'], 'assumed_response': req['assumed_response'], 'message': f'Inquiring cardholder: {resp_msg}'})}\n\n"
         await asyncio.sleep(0.6)
+
 
     # 8. Event: Final Recommendation & Actions
     yield f"data: {json.dumps({'step': 'DECIDE_ACTIONS', 'status': 'complete', 'final_actions': result['next_best_actions']['final'], 'what_changed': result['next_best_actions']['what_changed'], 'sar': result['sar']['file'], 'message': 'Final actions determined under Bank Fraud Policy.'})}\n\n"
