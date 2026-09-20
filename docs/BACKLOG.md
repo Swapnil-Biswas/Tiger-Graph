@@ -130,15 +130,33 @@ Ranked by expected impact on Hackathon Judging Criteria:
 34. **[DONE - Iteration 034] [Policy & Compliance] Regulatory Structuring Alerts & Dynamic Multi-Entity Exposure Rollup**
     - *Result:* Implemented `RegulatoryStructuringDetector` in `src/policy/jurisdiction.py` performing dynamic multi-entity exposure rollup across cards, customer accounts, and shared devices within 24h rolling windows. Flags BSA 31 CFR 1010.314 structuring evasion, sub-threshold smurfing ($8,000-$9,999), multi-card dispersion, and rapid velocity bursts under US BSA ($10,000 CTR), UK POCA (£2,500), and EU 6AMLD (€2,000). Exposed `detect_structuring` (Q16) in `GraphClient`, integrated into `ConcurrentGraphTraverser`, `AdaptiveGraphBudgeter`, and `JurisdictionComplianceRouter`. Added API endpoints `/api/cases/{case_id}/structuring` and `/api/regulatory/structuring-check`. Added 6 unit tests in `tests/test_structuring_detection.py` (103/103 tests pass).
 
-35. **[Checkpoint 6 & Release Tag v0.35] Milestone Review & System Calibration Re-Check**
-    - *Goal:* Audit across all 35 iterations, re-evaluate ECE/reliability, verify 0 regressions across all 103 unit tests, update documentation scoreboard, and create release tag `v0.35`.
-    - *Files:* `docs/IMPROVEMENT_LOG.md`, `docs/METRICS.md`, git tag `v0.35`
-    - *Metric Impact:* Documentation & Deliverables (Lens 17).
+35. **[DONE - Iteration 035] [Checkpoint 6 & Release Tag v0.35] Milestone Review & System Calibration Re-Check**
+    - *Result:* Comprehensive PRD Section 25 audit completed. All 6 mandatory gates passed (103/103 unit tests across 28 suites, 100% backtest recall/precision, 0.00% benchmark variance, 1.0000 policy retrieval MRR, 1.00 audit faithfulness, 20/20 valid benchmark answers, ECE 0.0116, Brier 0.0006, 0 secrets, demo path green). Tagged and pushed `v0.35`.
 
 36. **[Graph Analytics & Contagion Scoring] Personalized PageRank / Random Walk with Restart for Fraud Contagion**
-    - *Goal:* Implement personalized PageRank / Random Walk with Restart (RWR) from confirmed fraud seeds to calculate continuous fraud contagion scores across entire graph neighborhoods.
-    - *Files:* `src/graph/algorithms.py`, `src/graph/client.py`, `tests/test_pagerank_contagion.py`
+    - *Goal:* Implement personalized PageRank / Random Walk with Restart (RWR) from confirmed fraud seeds to calculate continuous fraud contagion scores across entire heterogeneous graph neighborhoods.
+    - *Files:* `src/graph/algorithms.py`, `src/graph/client.py`, `src/graph/traverser.py`, `src/agent/budgeter.py`, `src/agent/graph.py`, `tests/test_pagerank_contagion.py`
     - *Metric Impact:* Investigation Accuracy & Graph Algorithms (Lens 1, 2).
+
+37. **[Graph Analytics & Machine Learning] Temporal Graph Attention Subgraph Pooling**
+    - *Goal:* Implement time-decayed attention pooling over multi-hop ego-net embeddings to aggregate node features into fixed-dimensional graph-level fraud embeddings.
+    - *Files:* `src/graph/embeddings.py`, `src/graph/client.py`, `tests/test_graph_pooling.py`
+    - *Metric Impact:* Agent Architecture & GNN / Machine Learning (Lens 2, 11).
+
+38. **[Case Management & Automated Knowledge Discovery] Inductive Fraud Rule Discovery from Closed Cases**
+    - *Goal:* Implement inductive rule induction mining frequent subgraphs and attribute correlations from 5,565 closed historical cases to discover new emergent fraud typologies.
+    - *Files:* `src/cases/rule_miner.py`, `src/rag/chunk.py`, `tests/test_rule_discovery.py`
+    - *Metric Impact:* Innovation & Undocumented Pattern Discovery (Lens 2, 20).
+
+39. **[Policy & Compliance] Cross-Border AML Transaction Bundling & Correspondent Banking Risk**
+    - *Goal:* Implement cross-border wire and transaction bundling detection evaluating correspondent banking intermediary paths and high-risk FATF jurisdictions.
+    - *Files:* `src/policy/jurisdiction.py`, `src/graph/client.py`, `tests/test_cross_border_aml.py`
+    - *Metric Impact:* Policy Engine & Regulatory Compliance (Lens 6, 7).
+
+40. **[Checkpoint 7 & Release Tag v0.4] Mid-Point Major Milestone Review**
+    - *Goal:* Conduct 40% milestone audit, re-verify all 100+ tests, evaluate graph analytics scalability, verify 20/20 benchmark stability, and create tag `v0.4`.
+    - *Files:* `docs/IMPROVEMENT_LOG.md`, `docs/METRICS.md`, git tag `v0.4`
+    - *Metric Impact:* Documentation & Deliverables (Lens 17).
 
 ---
 

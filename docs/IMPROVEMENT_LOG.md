@@ -1,4 +1,45 @@
-## Iteration 034: Regulatory Structuring Alerts & Dynamic Multi-Entity Exposure Rollup | 2026-09-20 19:15 | commit pending
+## Iteration 035: Checkpoint 6 & Release Tag v0.35 (Milestone Review & Calibration Re-Check) | 2026-09-20 19:25 | commit pending
+- **Lens:** 17. Documentation and deliverables & All Lenses 1-16
+- **Goal / hypothesis:** Conduct the comprehensive Milestone Review (Iteration 35/100) evaluating all system components against PRD Section 25 deliverables, verifying 0 regressions across all 28 unit test suites (103 unit tests), certifying all 20 benchmark case schemas, validating uncertainty calibration (ECE 0.0116, Brier 0.0006), confirming graph community detection, topological embeddings, multi-card velocity burst clustering, and regulatory structuring detection, and creating release tag `v0.35`.
+- **Changes (files):**
+  - `docs/BACKLOG.md`: Marked Iterations 31–35 as completed; defined planned milestones for Iterations 36–40 (Personalized PageRank / Random Walk with Restart for fraud contagion, Temporal GNN subgraph pooling, Automated rule discovery from closed cases, Cross-border AML transaction bundling, Checkpoint 7).
+  - `docs/METRICS.md`: Synchronized scoreboard reflecting 103/103 tests passing across 28 suites, 100% backtest recall/precision, 0.00% variance, 1.0000 MRR, 1.00 faithfulness, 0.0116 ECE, 0.0006 Brier score, and release tag `v0.35`.
+  - `docs/IMPROVEMENT_LOG.md`: Documented Checkpoint 6 Milestone Review and State of the Project v0.35.
+  - Annotated Git Tag: `v0.35` tagged on `main`.
+- **State of the Project v0.35 Summary:**
+  1. **Phase 1 (Graph Ingestion & Topology):** 590,742 transactions, 5,565 closed cases, 20 benchmark cases indexed. Bisect temporal slicing delivers 106x query velocity acceleration (~39 us/query).
+  2. **Phase 2 (Graph Analytics & Parallelized Traversal):** Parallelized `ConcurrentGraphTraverser` dispatches 13 independent graph algorithms concurrently across 6 worker threads with 100% result identity and zero race conditions.
+  3. **Phase 3 (GraphRAG & Policy Retrieval):** BM25 & n-gram hybrid retrieval achieves 1.0000 MRR and 100% Top-1 accuracy under a strict 3,000-character context brief budget. Temporal recency-weighted decay ($t_{1/2}=30$ days) dynamically prioritizes active syndicate precedents.
+  4. **Phase 4 (Autonomous Agent & Deliberation):** 4-tier adaptive graph query budgeting (exhaustive, targeted escalation, targeted confirmation, fast path), Shannon entropy Value-of-Information (VOI) inquiry ranking, and graph-native counterfactual decision explainer.
+  5. **Phase 5 (Multi-Jurisdiction Compliance & FinCEN SAR):** Reconstructs cases directly from graph vertices, links cross-case syndicates via `SyndicateNexus`, dispatches multi-jurisdiction statutory filings (US FinCEN, UK NCA DAML, EU 6AMLD), evaluates BSA 31 CFR 1010.314 structuring evasion, enforces GDPR Article 5(1)(c) PAN/email data minimization, and enforces deterministic self-critique audits (1.00 faithfulness, 0 hallucinations).
+  6. **Phase 6 (Deep Graph Intelligence & Embeddings):** Dynamic Label Propagation Algorithm (LPA) community detection, PyTorch Geometric (PyG) tensor exporter ($[N, 9], [2, E], [E, 5]$) and tabular ego-net vectors (< 5ms latency), and multi-card temporal velocity burst clustering with bot periodicity detection.
+  7. **Phase 7 (Uncertainty Calibration & Ablation):** Expected Calibration Error (ECE) = 0.0116 (< 0.08 target), Maximum Calibration Error (MCE) = 0.0500 (< 0.15 target), Brier score = 0.0006 (< 0.12 target). Automated ablation study verifies graph, memory, and policy necessity.
+  8. **Phase 8 (Security & Penetration Defenses):** InputSanitizer prompt-injection shield neutralizes delimiter attacks and instruction overrides; PolicyEngine penetration defenses enforce zero-evidence punitive action gates.
+  9. **Phase 9 (Human-in-the-Loop, Streaming UI, & Portable Dossiers):** Server-Sent Events (SSE) streaming 11 lifecycle event types; interactive analyst override endpoint (`/api/cases/{case_id}/override`) with role-based policy gates and immutable graph audit logging (`OVERRIDDEN_BY`); Cytoscape visual glyphs, 1-hop neighborhood highlight, and real-time HUD inspector; single-file self-contained HTML incident dossier exporter embedding interactive Cytoscape graphs offline.
+- **Tests added/updated:**
+  - Full suite verified: **103 tests across 28 suites (100% pass rate)**.
+- **Metrics before -> after:**
+  - Total Iterations: 30 -> **35** (35% of 100-loop completed)
+  - Test Count: 85 -> **103** (100% pass rate across 28 suites)
+  - Backtest Recall: **100.0%** (251/251)
+  - Backtest Precision: **100.0%** (251/251)
+  - Backtest FPR: **0.0%**
+  - Benchmark Run-to-Run Variance: **0.00%** (100% Deterministic)
+  - Policy Retrieval MRR: **1.0000**
+  - Audit Trail Faithfulness: **1.00 / 1.00**
+  - Expected Calibration Error (ECE): **0.0116** (Target < 0.0800)
+  - Brier Score: **0.0006** (Target < 0.1200)
+  - Demo Path: PASS
+  - Benchmark Answers Valid: 20/20 (100%)
+- **Verification gates:**
+  - Unit tests: PASS (103/103)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Progressing from 85 tests at iteration 30 to 103 tests at iteration 35 added four major capabilities: community detection, GNN tensor export, burst clustering, and structuring alerts—all while maintaining sub-millisecond execution times and 100% deterministic reproducibility.
+- **Follow-ups added to backlog:** Proceed to Iteration 036: Personalized PageRank / Random Walk with Restart for Fraud Contagion (Lens 1 & Lens 2).
+
+## Iteration 034: Regulatory Structuring Alerts & Dynamic Multi-Entity Exposure Rollup | 2026-09-20 19:15 | commit d8e969d
 - **Lens:** 6. Policy engine and next best action & 7. Case summary, SAR, and explainability & 11. Agent architecture
 - **Goal / hypothesis:** Sophisticated money laundering and smurfing operations deliberately break transactions down across multiple cards, accounts, and devices to keep individual transactions below regulatory reporting thresholds (e.g. BSA $10,000 CTR, UK POCA £2,500, EU 6AMLD €2,000). Implementing `RegulatoryStructuringDetector` performs dynamic multi-entity exposure rollups across cards, customer accounts, and shared device profiles within rolling temporal windows (default 24h), detecting sub-threshold clustering ($8,000-$9,999), multi-card dispersion, and rapid velocity bursts, and enforcing mandatory `FILE_CTR` and `FILE_SAR_STRUCTURING` actions.
 - **Changes (files):**
