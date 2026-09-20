@@ -1,4 +1,4 @@
-## Iteration 054: Asynchronous Investigation Event Queue & Distributed Task Dispatcher | 2026-09-20 23:45 | commit TBD_COMMIT
+## Iteration 054: Asynchronous Investigation Event Queue & Distributed Task Dispatcher | 2026-09-20 23:45 | commit 781f925
 - **Lens:** 14. Scale & throughput, 15. Real-time streaming & event queue, 11. Agent architecture & engineering
 - **Goal / hypothesis:** Enterprise financial crime and fraud detection platforms require resilient, non-blocking ingestion pipelines to handle transaction spikes, batch historical backfills, and multi-agent investigations without blocking API servers or dropping events. Implementing `InvestigationTaskQueue` in `src/agent/queue.py` establishes an enterprise-grade asynchronous event dispatcher:
   1. **Priority Heap & FIFO Tie-Breaking**: Priority-ordered task execution (`CRITICAL=0`, `HIGH=1`, `NORMAL=2`, `LOW=3`) with monotonic sequence numbers guaranteeing deterministic FIFO processing within identical priority tiers.
