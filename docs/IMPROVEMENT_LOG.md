@@ -1,4 +1,25 @@
-## Iteration 006: Benchmark Self-Consistency & Determinism Verification | 2026-09-20 16:47 | commit pending
+## Iteration 007: Enhanced Topological Graph Context Brief in GraphRAG | 2026-09-20 16:53 | commit pending
+- **Lens:** 7. GraphRAG quality & 1. Investigation accuracy
+- **Goal / hypothesis:** Raw transaction history alone provides weak context for detecting organized crime syndicates. Enriching the GraphRAG Context Assembler (`src/rag/assemble.py`) with explicit multi-card cluster scope, shared-device nexus blast radius, transaction burst spike ratios, synthetic circular flow indicators, and temporal `as_of` boundaries provides the agent with immediate topological awareness within the strict 3,000-character budget.
+- **Changes (files):**
+  - `src/rag/assemble.py`: Upgraded `ContextAssembler.assemble_brief` with a structured `--- GRAPH TOPOLOGY & SYNDICATE METRICS ---` section synthesizing multi-card cluster scope, device sharing blast radius, 1h/24h velocity spike ratios, and cycle detection.
+  - `src/agent/graph.py`: Integrated `ContextAssembler.assemble_brief` directly into `FraudInvestigatorAgent.investigate_case`, attaching `context_brief` to the returned investigation payload.
+  - `tests/test_phase3.py`: Added `test_04_context_assembler_with_graph_topology` verifying topological metrics formatting and strict budget adherence (<= 3,000 characters).
+  - Regenerated and validated all 20 benchmark case files.
+- **Tests added/updated:**
+  - `tests/test_phase3.py` test count expanded from 3 to 4 (all 4 passing).
+  - Total test suite expanded from 22 to 23 tests (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 22 -> **23** (100% pass rate)
+  - GraphRAG Context Brief: Complete topological synthesis (subgraph scope, device nexus, velocity burst, temporal boundaries)
+  - Valid Benchmark Answers: 20/20 (100%)
+  - Evidence Finding Citation Validity: 100.0%
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **What I learned / what surprised me:** By prioritizing high-signal summary metrics (e.g. "Device Nexus: Shared across 4 cards", "Spike Ratio: 4.5"), the assembled brief delivers dense structural insight in ~1,750 characters, leaving more than 1,200 characters of headroom under the 3,000-character limit.
+- **Follow-ups added to backlog:** Next implement Iteration 008: Structured FinCEN SAR Narrative Generator with Regulatory Sections (Lens 10: Case management & 9: Explainability).
+
+## Iteration 006: Benchmark Self-Consistency & Determinism Verification | 2026-09-20 16:47 | commit d621ef7
 - **Lens:** 14. Testing and evaluation & 11. Agent architecture and robustness
 - **Goal / hypothesis:** For production agentic systems, non-deterministic drift across identical fraud alerts damages operational trust and compliance auditing. Developing an automated multi-run consistency verification harness across all 20 benchmark cases (`HHG-001` to `HHG-020`) ensures 0.00% recommendation variance and 100% deterministic reproducibility across repeated runs.
 - **Changes (files):**

@@ -182,10 +182,10 @@
     "reason": "Section 3a & Rule R2: Confirmed unauthorized fraud with exposure of $100.07 USD and multi-card linkage.",
     "narrative": "Between 2016-12-07 and 2016-12-08, cardholder C02923 experienced unauthorized activity on card C02923-K1. A total of 1 transaction(s) amounting to $100.07 USD were executed under fraud pattern 'card_not_present_new_device'. The primary flagged transaction 3523199 ($100.07) was initiated through the online channel. Activity originated from a device profile (iOS Device | iOS 9.3.5 | mobile safari 9.0 | 1024x768) marked as New for this account. The same device profile was also observed across 112 other distinct cards, demonstrating coordinated compromise. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C02923-K1 to mitigate further loss and placed linked accounts under enhanced monitoring.",
     "subjects": [
-      "C02923-K1",
-      "C02923",
       "C00450-K1",
-      "C00329-K2"
+      "C00329-K2",
+      "C02923",
+      "C02923-K1"
     ],
     "total_amount_usd": 100.07,
     "activity_dates": [
@@ -194,6 +194,7 @@
     ]
   },
   "stop_reason": "Customer denial and definitive graph pattern signatures settled the verdict; further steps would not alter the defensive actions.",
+  "context_brief": "=== INVESTIGATION CONTEXT BRIEF: CASE HHG-005 ===\nTRIGGER: risk_score | Subject: Card C02923-K1, Customer C02923\nTrigger Text: Real-time model scored transaction 3523199 ($100.07, online) at 0.54. Review and decide.\nFlagged Transaction: 3523199 (Risk Score: 0.54)\n\n--- GRAPH TOPOLOGY & SYNDICATE METRICS ---\n- Subgraph Scope: 10 card(s), 11 customer(s)\n- Device Nexus: Shared across 112 cards / 112 customers (Blast Radius: HIGH)\n- Transaction Burst: 0 txn(s)/1h, 0 txn(s)/24h (Spike Ratio: 0.0)\n- Temporal Isolation: Graph expansion strictly bounded as_of 2016-12-08 03:38:37\n\n--- CONNECTED GRAPH EVIDENCE ---\n[EV-01] (graph/query:get_txn(3523199)): Flagged transaction of $100.07 executed via online channel (risk score: 0.54).\n[EV-02] (graph/query:entity_profile(card_id=C02923-K1)): Card baseline: 92 prior transactions totaling $16193.62 (median: $117.01, typical regions: ['330.0', '272.0']).\n[EV-03] (graph/query:velocity(card_id=C02923-K1)): Velocity activity: 0 transaction(s) in last 1h, 0 in last 24h (spike ratio: 0.0).\n[EV-04] (graph/query:new_entity_check(3523199)): Novelty detection: new device profile for this account.\n[EV-05] (graph/query:device_sharing(iOS Device | iOS 9.3.5 | ...)): Device profile is shared across 112 cards and 112 customers.\n[EV-06] (graph/query:pattern_match(card_not_present_new_device)): Pattern signature match for 'card_not_present_new_device' with confidence 0.80.\n\n--- GRAPH PATTERN EVALUATION ---\nTop Matching Typology: card_not_present_new_device\n- card_testing: NO_MATCH (conf: 0.0)\n- card_not_present_fraud: MATCH (conf: 0.7)\n- card_not_present_new_device: MATCH (conf: 0.8)\n- out_of_region_use: NO_MATCH (conf: 0.1)\n\n--- APPLICABLE FRAUD POLICY CLAUSES ---\n[POLICY-R5] Rule R5: Card Testing Sequence: Three or more small online authorizations on one card within an hour, followed by a larger purchase: recommend DECLINE_T...\n[TYP-CNP-NEW-DEV] Pattern 3: Card-Not-Present New Device: Online transactions with identity record marking the device as New for this account, sometimes behind an anonymous proxy...\n[POLICY-R2] Rule R2: Customer Denies Transaction: When customer denies the transaction, recommend BLOCK_CARD and CREATE_CASE. Add FILE_REPORT if exposure exceeds $1,000 o...\n\n--- SIMILAR HISTORICAL CASES (CASE MEMORY) ---\nNo directly matching historical cases found.",
   "tool_calls": 8,
   "tokens": 2400,
   "latency_s": 0.0

@@ -77,11 +77,11 @@
         "id": "EV-06",
         "source": "graph",
         "ref": "query:similar_cases(card=C08299-K1)",
-        "claim": "Found 5 prior closed case(s) touching related entities: CC-3894, CC-0241, CC-0364.",
+        "claim": "Found 5 prior closed case(s) touching related entities: CC-0189, CC-0219, CC-0374.",
         "entity_ids": [
-          "CC-3894",
-          "CC-0241",
-          "CC-0364"
+          "CC-0189",
+          "CC-0219",
+          "CC-0374"
         ]
       },
       {
@@ -113,9 +113,9 @@
       }
     ],
     "similar_prior_cases": [
-      "CC-3894",
-      "CC-0241",
-      "CC-0364"
+      "CC-0189",
+      "CC-0219",
+      "CC-0374"
     ],
     "summary": "Investigation confirmed unauthorized activity on card C08299-K1 under pattern 'card_not_present_fraud'. Total exposure identified is $30.02 across 1 transaction(s). Cardholder outreach and graph evidence confirmed compromise; defensive card blocks and case progression executed.\n\nDecision Sensitivity (Counterfactual Boundaries):\n  1. [Cardholder Confirmation]: Customer confirms authorization during SMS or mobile push challenge -> Fraud probability would reduce from 1.00 to \u2264 0.10, flipping verdict to LEGITIMATE (Rule R3).\n  2. [Billing Region Proximity]: Transaction billing region aligned with baseline regions (330.0, 204.0) -> Eliminates geographic distance anomaly penalty (-20.0 pts) and impossible travel flag.\n  3. [Device Exclusivity]: Device profile observed solely on this customer account -> Removes syndicate sharing flag (1015 linked cards), downgrading from SAR requirement.",
     "written_to_graph": true,
@@ -172,9 +172,9 @@
     "narrative": "Between 2016-12-28 and 2016-12-28, cardholder C08299 experienced unauthorized activity on card C08299-K1. A total of 1 transaction(s) amounting to $30.02 USD were executed under fraud pattern 'card_not_present_fraud'. The primary flagged transaction 3581141 ($30.02) was initiated through the online channel. The same device profile was also observed across 1015 other distinct cards, demonstrating coordinated compromise. The cardholder was contacted for transaction validation and stated: 'Cardholder provided response for analyst_info under scenario denies'. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C08299-K1 to mitigate further loss and placed linked accounts under enhanced monitoring.",
     "subjects": [
       "C08299",
-      "C08299-K1",
       "C00076-K1",
-      "C00073-K1"
+      "C00073-K1",
+      "C08299-K1"
     ],
     "total_amount_usd": 30.02,
     "activity_dates": [
@@ -183,6 +183,7 @@
     ]
   },
   "stop_reason": "Customer denial and definitive graph pattern signatures settled the verdict; further steps would not alter the defensive actions.",
+  "context_brief": "=== INVESTIGATION CONTEXT BRIEF: CASE HHG-009 ===\nTRIGGER: customer_report | Subject: Card C08299-K1, Customer C08299\nTrigger Text: Customer C08299 message: 'I never made this $30.02 purchase. Please check my card.' Refers to 3581141.\nFlagged Transaction: 3581141 (Risk Score: nan)\n\n--- GRAPH TOPOLOGY & SYNDICATE METRICS ---\n- Subgraph Scope: 10 card(s), 11 customer(s)\n- Device Nexus: Shared across 1015 cards / 1011 customers (Blast Radius: HIGH)\n- Transaction Burst: 0 txn(s)/1h, 0 txn(s)/24h (Spike Ratio: 0.0)\n- Temporal Isolation: Graph expansion strictly bounded as_of 2016-12-28 17:10:53\n\n--- CONNECTED GRAPH EVIDENCE ---\n[EV-01] (graph/query:get_txn(3581141)): Flagged transaction of $30.02 executed via online channel (risk score: 0.28).\n[EV-02] (graph/query:entity_profile(card_id=C08299-K1)): Card baseline: 56 prior transactions totaling $3425.37 (median: $49.96, typical regions: ['330.0', '204.0']).\n[EV-03] (graph/query:velocity(card_id=C08299-K1)): Velocity activity: 0 transaction(s) in last 1h, 0 in last 24h (spike ratio: 0.0).\n[EV-04] (graph/query:device_sharing(UnknownDevice | UnknownOS...)): Device profile is shared across 1015 cards and 1011 customers.\n[EV-05] (graph/query:pattern_match(card_not_present_fraud)): Pattern signature match for 'card_not_present_fraud' with confidence 0.70.\n[EV-06] (graph/query:similar_cases(card=C08299-K1)): Found 5 prior closed case(s) touching related entities: CC-0189, CC-0219, CC-0374.\n\n--- GRAPH PATTERN EVALUATION ---\nTop Matching Typology: card_not_present_fraud\n- card_testing: NO_MATCH (conf: 0.0)\n- card_not_present_fraud: MATCH (conf: 0.7)\n- card_not_present_new_device: NO_MATCH (conf: 0.1)\n- out_of_region_use: NO_MATCH (conf: 0.1)\n\n--- APPLICABLE FRAUD POLICY CLAUSES ---\n[POLICY-R5] Rule R5: Card Testing Sequence: Three or more small online authorizations on one card within an hour, followed by a larger purchase: recommend DECLINE_T...\n[POLICY-R10] Rule R10: Restrictions on BLOCK_ALL_CARDS: Never recommend BLOCK_ALL_CARDS unless at least two of the customer's cards show confirmed fraud or the customer's crede...\n[TYP-CARD-TESTING] Pattern 1: Card Testing Signature: A stolen card number is checked before use: three or more tiny online authorizations, often under $5, then a larger purc...\n\n--- SIMILAR HISTORICAL CASES (CASE MEMORY) ---\nNo directly matching historical cases found.",
   "tool_calls": 8,
   "tokens": 2400,
   "latency_s": 0.01

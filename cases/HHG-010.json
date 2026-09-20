@@ -86,11 +86,11 @@
         "id": "EV-07",
         "source": "graph",
         "ref": "query:similar_cases(card=C10434-K1)",
-        "claim": "Found 5 prior closed case(s) touching related entities: CC-0873, CC-0972, CC-1049.",
+        "claim": "Found 5 prior closed case(s) touching related entities: CC-0873, CC-3894, CC-4355.",
         "entity_ids": [
           "CC-0873",
-          "CC-0972",
-          "CC-1049"
+          "CC-3894",
+          "CC-4355"
         ]
       }
     ],
@@ -122,8 +122,8 @@
     ],
     "similar_prior_cases": [
       "CC-0873",
-      "CC-0972",
-      "CC-1049"
+      "CC-3894",
+      "CC-4355"
     ],
     "summary": "Investigation confirmed unauthorized activity on card C10434-K1 under pattern 'card_not_present_new_device'. Total exposure identified is $1000.03 across 1 transaction(s). Cardholder outreach and graph evidence confirmed compromise; defensive card blocks and case progression executed.\n\nDecision Sensitivity (Counterfactual Boundaries):\n  1. [Cardholder Confirmation]: Customer confirms authorization during SMS or mobile push challenge -> Fraud probability would reduce from 1.00 to \u2264 0.10, flipping verdict to LEGITIMATE (Rule R3).\n  2. [Device Fingerprint Baseline]: Device had \u22652 prior authorized transactions in cardholder history -> Eliminates new-device risk penalty (-15.0 pts), preventing automated card block.\n  3. [Billing Region Proximity]: Transaction billing region aligned with baseline regions (469.0, 220.0) -> Eliminates geographic distance anomaly penalty (-20.0 pts) and impossible travel flag.\n  4. [Device Exclusivity]: Device profile observed solely on this customer account -> Removes syndicate sharing flag (208 linked cards), downgrading from SAR requirement.",
     "written_to_graph": true,
@@ -182,10 +182,10 @@
     "reason": "Section 3a & Rule R2: Confirmed unauthorized fraud with exposure of $1000.03 USD and multi-card linkage.",
     "narrative": "Between 2016-12-02 and 2016-12-02, cardholder C10434 experienced unauthorized activity on card C10434-K1. A total of 1 transaction(s) amounting to $1000.03 USD were executed under fraud pattern 'card_not_present_new_device'. The primary flagged transaction 3506725 ($1000.03) was initiated through the online channel. Activity originated from a device profile (Windows | Windows 10 | edge 16.0 | 1366x768) marked as New for this account. The same device profile was also observed across 208 other distinct cards, demonstrating coordinated compromise. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C10434-K1 to mitigate further loss and placed linked accounts under enhanced monitoring.",
     "subjects": [
+      "C00416-K1",
       "C00307-K1",
       "C10434-K1",
-      "C10434",
-      "C00416-K1"
+      "C10434"
     ],
     "total_amount_usd": 1000.03,
     "activity_dates": [
@@ -194,7 +194,8 @@
     ]
   },
   "stop_reason": "Customer denial and definitive graph pattern signatures settled the verdict; further steps would not alter the defensive actions.",
+  "context_brief": "=== INVESTIGATION CONTEXT BRIEF: CASE HHG-010 ===\nTRIGGER: risk_score | Subject: Card C10434-K1, Customer C10434\nTrigger Text: Real-time model scored transaction 3506725 ($1,000.03, online) at 0.90. Review and decide.\nFlagged Transaction: 3506725 (Risk Score: 0.9)\n\n--- GRAPH TOPOLOGY & SYNDICATE METRICS ---\n- Subgraph Scope: 10 card(s), 11 customer(s)\n- Device Nexus: Shared across 208 cards / 208 customers (Blast Radius: HIGH)\n- Transaction Burst: 0 txn(s)/1h, 0 txn(s)/24h (Spike Ratio: 0.0)\n- Temporal Isolation: Graph expansion strictly bounded as_of 2016-12-02 18:18:27\n\n--- CONNECTED GRAPH EVIDENCE ---\n[EV-01] (graph/query:get_txn(3506725)): Flagged transaction of $1000.03 executed via online channel (risk score: 0.9).\n[EV-02] (graph/query:entity_profile(card_id=C10434-K1)): Card baseline: 36 prior transactions totaling $5539.20 (median: $90.00, typical regions: ['469.0', '220.0']).\n[EV-03] (graph/query:velocity(card_id=C10434-K1)): Velocity activity: 0 transaction(s) in last 1h, 0 in last 24h (spike ratio: 0.0).\n[EV-04] (graph/query:new_entity_check(3506725)): Novelty detection: new device profile for this account.\n[EV-05] (graph/query:device_sharing(Windows | Windows 10 | ed...)): Device profile is shared across 208 cards and 208 customers.\n[EV-06] (graph/query:pattern_match(card_not_present_new_device)): Pattern signature match for 'card_not_present_new_device' with confidence 0.80.\n\n--- GRAPH PATTERN EVALUATION ---\nTop Matching Typology: card_not_present_new_device\n- card_testing: NO_MATCH (conf: 0.0)\n- card_not_present_fraud: MATCH (conf: 0.7)\n- card_not_present_new_device: MATCH (conf: 0.8)\n- out_of_region_use: NO_MATCH (conf: 0.1)\n\n--- APPLICABLE FRAUD POLICY CLAUSES ---\n[POLICY-R2] Rule R2: Customer Denies Transaction: When customer denies the transaction, recommend BLOCK_CARD and CREATE_CASE. Add FILE_REPORT if exposure exceeds $1,000 o...\n[TYP-CNP-NEW-DEV] Pattern 3: Card-Not-Present New Device: Online transactions with identity record marking the device as New for this account, sometimes behind an anonymous proxy...\n[POLICY-3A-SAR] Section 3a: Suspicious Activity Report (SAR) Criteria: A SAR (FILE_REPORT) is a regulatory filing sent outside the bank. File one when fraud is confirmed or strongly suspected...\n\n--- SIMILAR HISTORICAL CASES (CASE MEMORY) ---\nNo directly matching historical cases found.",
   "tool_calls": 8,
   "tokens": 2400,
-  "latency_s": 0.0
+  "latency_s": 0.01
 }

@@ -94,6 +94,47 @@ class TestPhase3GraphRAG(unittest.TestCase):
         self.assertIn("APPLICABLE FRAUD POLICY CLAUSES", brief)
         print(f"PASS: Context brief assembled successfully ({len(brief)} characters <= 3000 budget).")
 
+    def test_04_context_assembler_with_graph_topology(self):
+        """Verify graph topology metrics and syndicate nexus are formatted into context brief."""
+        trigger = {
+            "trigger_type": "risk_score",
+            "trigger_text": "Model flagged transaction",
+            "card_id": "C08623-K2",
+            "customer_id": "C08623",
+            "flagged_txn_id": "3514030",
+            "risk_score": 0.88,
+        }
+        evidence = [
+            {"id": "EV-01", "source": "graph", "ref": "query:q1", "claim": "High velocity in 1h window."}
+        ]
+        topology = {
+            "connected_cards_count": 4,
+            "connected_customers_count": 3,
+            "device_sharing": {"is_shared": True, "distinct_cards_count": 4, "distinct_customers_count": 3},
+            "velocity": {"windows": {"1h": {"count": 3}, "24h": {"count": 7}}, "velocity_spike_ratio": 4.5},
+            "geo": {"anomalies_count": 2},
+            "ring": {"ring_detected": True, "cycle_length": 3},
+            "as_of": "2016-12-05 12:00:00",
+        }
+        brief = ContextAssembler.assemble_brief(
+            case_id="HHG-004",
+            trigger=trigger,
+            evidence_items=evidence,
+            policy_clauses=[{"id": "POLICY-R6", "title": "Syndicate Detection", "text": "Coordinate multi-card activity."}],
+            pattern_matches={"best_pattern": "card_not_present_new_device", "patterns": {}},
+            memory_cases=[],
+            graph_topology=topology,
+            max_chars=3000,
+        )
+
+        self.assertLessEqual(len(brief), 3000)
+        self.assertIn("GRAPH TOPOLOGY & SYNDICATE METRICS", brief)
+        self.assertIn("Device Nexus: Shared across 4 cards", brief)
+        self.assertIn("Transaction Burst: 3 txn(s)/1h, 7 txn(s)/24h", brief)
+        self.assertIn("Circular Flow: Synthetic transaction cycle detected", brief)
+        self.assertIn("Temporal Isolation: Graph expansion strictly bounded as_of", brief)
+        print("PASS: Graph topology successfully integrated into Context Brief.")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -202,6 +202,28 @@ class FraudInvestigatorAgent:
             "pattern_match": pat_res,
         }
 
+        # Assemble GraphRAG Topological Context Brief
+        query_text = f"{trigger_data.get('trigger_text', '')} {pat_res.get('best_pattern', '')}"
+        retrieved_policies = self.retriever.retrieve_policy(query_text, top_k=3)
+        context_brief = ContextAssembler.assemble_brief(
+            case_id=case_id,
+            trigger=trigger_data,
+            evidence_items=[ev.model_dump() for ev in evidence_items],
+            policy_clauses=retrieved_policies,
+            pattern_matches=pat_res,
+            memory_cases=similar_cases_res.get("cases", []),
+            graph_topology={
+                "connected_cards_count": len(sharing.get("cards", [])) or 1,
+                "connected_customers_count": len(set([cust_id] + sharing.get("customers", []))),
+                "device_sharing": sharing,
+                "velocity": vel,
+                "geo": graph_evidence.get("geo"),
+                "ring": graph_evidence.get("ring"),
+                "as_of": as_of,
+            },
+            max_chars=3000,
+        )
+
         # 3. PRE-EVIDENCE ASSESSMENT & INITIAL ACTIONS
         pre_assessment = UncertaintyAssessmentEngine.assess(trigger_data, graph_evidence)
         
@@ -400,6 +422,7 @@ class FraudInvestigatorAgent:
             },
             "sar": sar_record,
             "stop_reason": stop_reason,
+            "context_brief": context_brief,
             "tool_calls": tool_calls,
             "tokens": total_tokens,
             "latency_s": total_latency,

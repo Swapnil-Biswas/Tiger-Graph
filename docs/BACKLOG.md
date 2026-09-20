@@ -34,10 +34,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 6. **[DONE - Iteration 006] [Testing & Engineering] Benchmark Run-to-Run Self-Consistency Harness**
    - *Result:* Built `eval/benchmark_consistency.py` and `tests/test_consistency.py`. Verified 0.00% recommendation variance, 100% verdict concordance, and 100% SAR filing concordance across 3 repeated runs of all 20 benchmark cases. Suite expanded to 22 tests (100% pass).
 
-7. **[GraphRAG] Enhanced Topological Expansion in Context Brief**
-   - *Goal:* Incorporate 2-hop community subgraph statistics and PageRank centrality into the assembled LLM brief.
-   - *Files:* `src/rag/assemble.py`, `src/rag/retrieve.py`
-   - *Metric Impact:* GraphRAG quality & retrieval relevance.
+7. **[DONE - Iteration 007] [GraphRAG] Enhanced Topological Expansion in Context Brief**
+   - *Result:* Upgraded `ContextAssembler.assemble_brief` with structured graph topology metrics (cluster scope, device nexus blast radius, velocity burst spike ratio, cycle detection, temporal boundaries). Integrated into `FraudInvestigatorAgent.investigate_case`. Added test in `tests/test_phase3.py` (23 tests, 100% pass).
 
 8. **[Case Management] Enhanced FinCEN SAR Narrative Generator with Structured Sections**
    - *Goal:* Structure SAR narratives with formal regulatory sections: Subject Demographics, Suspicious Activity Timeline, Topology Matrix, Regulatory Impact.

@@ -176,9 +176,9 @@
     "reason": "Section 3a & Rule R2: Confirmed unauthorized fraud with exposure of $125.08 USD and multi-card linkage.",
     "narrative": "Between 2016-12-03 and 2016-12-03, cardholder C12265 experienced unauthorized activity on card C12265-K2. A total of 1 transaction(s) amounting to $125.08 USD were executed under fraud pattern 'card_not_present_new_device'. The primary flagged transaction 3509359 ($125.08) was initiated through the online channel. Activity originated from a device profile (Trident/7.0 | Windows 10 | ie 11.0 for desktop | 1920x1080) marked as New for this account. The same device profile was also observed across 253 other distinct cards, demonstrating coordinated compromise. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C12265-K2 to mitigate further loss and placed linked accounts under enhanced monitoring.",
     "subjects": [
+      "C00328-K1",
       "C12265",
       "C12265-K2",
-      "C00328-K1",
       "C00094-K1"
     ],
     "total_amount_usd": 125.08,
@@ -188,6 +188,7 @@
     ]
   },
   "stop_reason": "Customer denial and definitive graph pattern signatures settled the verdict; further steps would not alter the defensive actions.",
+  "context_brief": "=== INVESTIGATION CONTEXT BRIEF: CASE HHG-020 ===\nTRIGGER: risk_score | Subject: Card C12265-K2, Customer C12265\nTrigger Text: Real-time model scored transaction 3509359 ($125.08, online) at 0.52. Review and decide.\nFlagged Transaction: 3509359 (Risk Score: 0.52)\n\n--- GRAPH TOPOLOGY & SYNDICATE METRICS ---\n- Subgraph Scope: 10 card(s), 11 customer(s)\n- Device Nexus: Shared across 253 cards / 253 customers (Blast Radius: HIGH)\n- Transaction Burst: 0 txn(s)/1h, 0 txn(s)/24h (Spike Ratio: 0.0)\n- Temporal Isolation: Graph expansion strictly bounded as_of 2016-12-03 12:04:26\n\n--- CONNECTED GRAPH EVIDENCE ---\n[EV-01] (graph/query:get_txn(3509359)): Flagged transaction of $125.08 executed via online channel (risk score: 0.52).\n[EV-02] (graph/query:entity_profile(card_id=C12265-K2)): Card baseline: 3 prior transactions totaling $240.96 (median: $81.93, typical regions: ['264.0']).\n[EV-03] (graph/query:velocity(card_id=C12265-K2)): Velocity activity: 0 transaction(s) in last 1h, 0 in last 24h (spike ratio: 0.0).\n[EV-04] (graph/query:new_entity_check(3509359)): Novelty detection: new device profile for this account.\n[EV-05] (graph/query:device_sharing(Trident/7.0 | Windows 10 ...)): Device profile is shared across 253 cards and 253 customers.\n[EV-06] (graph/query:pattern_match(card_not_present_new_device)): Pattern signature match for 'card_not_present_new_device' with confidence 0.80.\n\n--- GRAPH PATTERN EVALUATION ---\nTop Matching Typology: card_not_present_new_device\n- card_testing: NO_MATCH (conf: 0.0)\n- card_not_present_fraud: NO_MATCH (conf: 0.5)\n- card_not_present_new_device: MATCH (conf: 0.8)\n- out_of_region_use: NO_MATCH (conf: 0.1)\n\n--- APPLICABLE FRAUD POLICY CLAUSES ---\n[TYP-CNP-NEW-DEV] Pattern 3: Card-Not-Present New Device: Online transactions with identity record marking the device as New for this account, sometimes behind an anonymous proxy...\n[POLICY-R2] Rule R2: Customer Denies Transaction: When customer denies the transaction, recommend BLOCK_CARD and CREATE_CASE. Add FILE_REPORT if exposure exceeds $1,000 o...\n[POLICY-R3] Rule R3: Customer Confirms Transaction: When customer confirms the transaction, recommend CLOSE_NO_FRAUD. Note the confirmation in the case file.\n\n--- SIMILAR HISTORICAL CASES (CASE MEMORY) ---\nNo directly matching historical cases found.",
   "tool_calls": 8,
   "tokens": 2400,
   "latency_s": 0.0
