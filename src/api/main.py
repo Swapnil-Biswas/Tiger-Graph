@@ -49,6 +49,10 @@ task_queue = InvestigationTaskQueue(max_workers=2, agent=agent)
 from src.graph.simulation import GraphScenarioSimulator
 simulator = GraphScenarioSimulator(agent=agent)
 
+# Temporal Graph Playback Engine
+from src.graph.playback import TemporalGraphPlaybackEngine
+playback_engine = TemporalGraphPlaybackEngine(client=agent.client)
+
 # In-memory store for active cases & approvals
 active_cases: Dict[str, Dict[str, Any]] = {}
 pending_approvals: Dict[str, Dict[str, Any]] = {}
@@ -1057,6 +1061,25 @@ def apply_simulation_template(template_id: str, case_id: str = Query(...)):
         return report.to_dict()
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/api/graph/playback/{case_id}")
+def get_graph_playback(case_id: str, max_frames: int = 50):
+    """Generates an interactive chronological step-by-step graph evolution timeline."""
+    try:
+        timeline = playback_engine.generate_case_playback(case_id=case_id, max_frames=max_frames)
+        return timeline.to_dict()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/graph/playback/{case_id}/frame/{frame_idx}")
+def get_graph_playback_frame(case_id: str, frame_idx: int):
+    """Retrieves a single frame state and active subgraph from the playback timeline."""
+    timeline = playback_engine.generate_case_playback(case_id=case_id)
+    if frame_idx < 0 or frame_idx >= len(timeline.frames):
+        raise HTTPException(status_code=404, detail=f"Frame {frame_idx} out of range [0, {len(timeline.frames)-1}]")
+    return timeline.frames[frame_idx].to_dict()
 
 
 @app.post("/api/benchmark/run")

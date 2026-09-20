@@ -207,10 +207,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 57. **[DONE - Iteration 057] [Graph Scenario Sandbox] Counterfactual Scenario Playground & Policy Simulation Engine**
     - *Result:* Implemented `GraphScenarioSimulator`, `ScenarioPerturbation`, `ScenarioSimulationReport`, and `SIMULATION_TEMPLATES` in `src/graph/simulation.py`. Supports non-destructive in-memory "what-if" simulations over amounts, transaction injections, device unlinking, high-risk MCC 6051 pivots, and customer challenge responses. Computes exact causal delta metrics ($\Delta P_{\text{fraud}}$, $\Delta S_{\text{aml}}$, $\Delta S_{\text{cyber}}$, SAR flips, action diffs) with causal driver narratives. Added 3 API endpoints (`POST /api/simulation/run`, `GET /api/simulation/templates`, `POST /api/simulation/templates/{template_id}/apply`). Added 7 unit tests in `tests/test_graph_simulation.py` (221/221 tests pass across 46 suites).
 
-58. **[Visual Graph Timeline] Interactive Temporal Graph Playback & Syndicate Cascade Visualizer**
-    - *Goal:* Implement interactive chronological step-by-step transaction playback and subgraph cascade visualizer for dynamic web investigation.
-    - *Files:* `src/graph/playback.py`, `src/api/main.py`, `tests/test_graph_playback.py`
-    - *Metric Impact:* Visuals & UI Experience (Lens 8, Lens 12).
+58. **[DONE - Iteration 058] [Visual Graph Timeline] Interactive Temporal Graph Playback & Syndicate Cascade Visualizer**
+    - *Result:* Implemented `TemporalGraphPlaybackEngine`, `PlaybackStep`, and `PlaybackTimeline` in `src/graph/playback.py`. Reconstructs chronological multi-hop transaction evolution and syndicate cascade propagation frame-by-frame with cumulative exposure calculation, dynamic Cytoscape-ready subgraph element extraction, milestone event tracking (`INITIAL_ALERT`, `PEAK_VELOCITY_BURST`, `MULTI_CARD_SYNDICATE_LINK`, `STRUCTURING_THRESHOLD_CROSSING`), progressive risk scoring ($P_{\text{fraud}} \in [0, 1]$), and automated investigation narrative captions. Added REST endpoints `GET /api/graph/playback/{case_id}` and `GET /api/graph/playback/{case_id}/frame/{frame_idx}` in `src/api/main.py`. Added 5 unit tests in `tests/test_graph_playback.py` (226/226 tests pass across 47 suites).
 
 59. **[Compliance Evidence Packager] Automated Audit Dossier & Cryptographic Chain-of-Custody**
     - *Goal:* Bundle investigation steps, model decisions, GSQL query execution proofs, and SHA-256 HMAC digital signatures into an immutable regulatory evidence archive.
