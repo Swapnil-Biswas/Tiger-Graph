@@ -1,4 +1,29 @@
-## Iteration 015: Graph Client Performance Optimization & Bisect Adjacency Slicing | 2026-09-20 17:28 | commit d8791df
+## Iteration 016: Cross-Case Syndicate Nexus Graph Vertex & Edge Persistence | 2026-09-20 17:32 | commit 62ec1a4
+- **Lens:** 10. Case management & 20. Innovation
+- **Goal / hypothesis:** Isolated case files fail to capture the network-level blast radius of organized cybercrime syndicates. Implementing automatic `SyndicateNexus` graph vertex creation and bidirectional `CROSS_CASE_LINK` edges in `CaseManager` connects individual case investigations sharing device profiles or payment cards into a unified criminal ring entity, calculating aggregate exposure, collective card compromise counts, and threat escalation levels.
+- **Changes (files):**
+  - `src/cases/manager.py`: Implemented `graph_syndicates` vertex store, `graph_case_edges` table, `register_syndicate_nexus`, `get_syndicate_dossier`, `get_cross_case_links`, and integrated automated syndicate detection in `write_case_to_graph` and `reconstruct_case_from_graph`.
+  - `tests/test_syndicate_persistence.py`: Added 2 unit tests verifying multi-case syndicate linking across shared devices, exposure aggregation, bidirectional cross-case graph edges, and zero spurious cross-links for clean accounts.
+- **Tests added/updated:**
+  - `tests/test_syndicate_persistence.py` (2 unit tests, all pass).
+  - Total unit test suite expanded from 48 to **50** tests across 13 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 48 -> **50** (100% pass rate)
+  - Syndicate Ring Tracking: Active with `SyndicateNexus` vertices and bidirectional `CROSS_CASE_LINK` edges
+  - Multi-Case Aggregate Exposure: Tracked dynamically across linked cases
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (50/50)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Persisting dedicated `SyndicateNexus` vertices in the graph turns separate point-in-time alerts into a living ring tracker: when case B is investigated, it immediately queries its nexus and inherits the exposure and cards from case A, automatically escalating the threat level to critical and justifying a network-wide `BLOCK_ALL_CARDS` under Rule R10.
+- **Follow-ups added to backlog:** Next implement Iteration 017: Graph-Native Audit Trail Self-Critique & Hallucination Verifier (Lens 9: Explainability & 11: Agent architecture and robustness).
+
+## Iteration 015: Graph Client Performance Optimization & Bisect Adjacency Slicing | 2026-09-20 17:28 | commit 33d27a5
 - **Lens:** 13. Performance and scale & 1. Investigation accuracy
 - **Goal / hypothesis:** In an enterprise fraud knowledge graph containing 590,742 transactions, linear full-list filtering across high-velocity accounts introduces non-trivial CPU latency during burst lookups. Replacing $O(N)$ linear scans with on-demand epoch indexing and $O(\log N)$ binary search (`bisect_left`/`bisect_right`) slicing for `velocity`, `entity_profile`, `txn_context`, `device_sharing`, and `new_entity_check` will achieve > 20x-100x query speedups and guarantee sub-millisecond execution across all graph queries.
 - **Changes (files):**

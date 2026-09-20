@@ -20,6 +20,8 @@ class CaseManager:
             self.store.graph_findings = {}
             self.store.graph_evidence = {}
             self.store.graph_actions = {}
+            self.store.graph_syndicates = {}
+            self.store.graph_case_edges = []
 
     def write_case_to_graph(self, answer_bundle: Dict[str, Any]) -> str:
         """
@@ -78,8 +80,100 @@ class CaseManager:
             }
             case_vertex["action_ids"].append(act_id)
 
+        # 4. Check for Syndicate Nexus (shared device profiles or multi-card rings)
+        syndicate_id = None
+        dev_profiles = c_data.get("connected_device_profiles", [])
+        connected_cards = c_data.get("connected_card_ids", [])
+        if dev_profiles or len(connected_cards) >= 2 or c_data.get("pattern") in ["undocumented", "ring"]:
+            primary_ent = dev_profiles[0] if dev_profiles else (connected_cards[0] if connected_cards else case_id)
+            n_type = "device_pooling_nexus" if dev_profiles else "multi_card_ring"
+            syndicate_id = self.register_syndicate_nexus(
+                nexus_type=n_type,
+                primary_entity=primary_ent,
+                member_case_id=graph_case_id,
+                card_ids=connected_cards,
+                exposure_usd=c_data.get("exposure_usd", 0.0),
+            )
+        case_vertex["syndicate_nexus_id"] = syndicate_id
+
         self.store.graph_cases[graph_case_id] = case_vertex
         return graph_case_id
+
+    def register_syndicate_nexus(
+        self,
+        nexus_type: str,
+        primary_entity: str,
+        member_case_id: str,
+        card_ids: List[str],
+        exposure_usd: float,
+    ) -> str:
+        """
+        Creates or updates a SyndicateNexus vertex in the graph, linking member cases and cards.
+        """
+        import hashlib
+        ent_hash = hashlib.md5(primary_entity.encode("utf-8")).hexdigest()[:8]
+        nexus_id = f"NEXUS-{ent_hash.upper()}"
+        now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+
+        if nexus_id in self.store.graph_syndicates:
+            nexus = self.store.graph_syndicates[nexus_id]
+            if member_case_id not in nexus["member_cases"]:
+                nexus["member_cases"].append(member_case_id)
+            for cid in card_ids:
+                if cid not in nexus["member_cards"]:
+                    nexus["member_cards"].append(cid)
+            nexus["total_exposure_usd"] = round(nexus["total_exposure_usd"] + exposure_usd, 2)
+            nexus["last_detected_at"] = now_str
+            nexus["threat_level"] = "critical" if (nexus["total_exposure_usd"] > 10000.0 or len(nexus["member_cards"]) >= 3) else "high"
+        else:
+            nexus = {
+                "id": nexus_id,
+                "nexus_type": nexus_type,
+                "primary_entity": primary_entity,
+                "member_cases": [member_case_id],
+                "member_cards": list(set(card_ids)),
+                "total_exposure_usd": round(exposure_usd, 2),
+                "threat_level": "critical" if (exposure_usd > 10000.0 or len(card_ids) >= 3) else "high",
+                "first_detected_at": now_str,
+                "last_detected_at": now_str,
+            }
+            self.store.graph_syndicates[nexus_id] = nexus
+
+        # Establish cross-case linking edges with existing cases in this nexus
+        for other_case in nexus["member_cases"]:
+            if other_case != member_case_id:
+                edge = {
+                    "from_case": member_case_id,
+                    "to_case": other_case,
+                    "type": "CROSS_CASE_LINK",
+                    "via_nexus": nexus_id,
+                    "established_at": now_str,
+                }
+                self.store.graph_case_edges.append(edge)
+
+        return nexus_id
+
+    def get_syndicate_dossier(self, nexus_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Retrieves comprehensive multi-case syndicate profile from graph.
+        """
+        return self.store.graph_syndicates.get(nexus_id)
+
+    def get_cross_case_links(self, case_id: str) -> List[Dict[str, Any]]:
+        """
+        Retrieves all cross-case edges connecting this case to other investigations in the graph.
+        """
+        c_id = f"CASE-{case_id}" if not case_id.startswith("CASE-") else case_id
+        links = []
+        for edge in getattr(self.store, "graph_case_edges", []):
+            if edge["from_case"] == c_id or edge["to_case"] == c_id:
+                other = edge["to_case"] if edge["from_case"] == c_id else edge["from_case"]
+                links.append({
+                    "connected_case_id": other,
+                    "via_nexus": edge["via_nexus"],
+                    "established_at": edge["established_at"],
+                })
+        return links
 
     def reconstruct_case_from_graph(self, case_id: str) -> Dict[str, Any]:
         """
@@ -127,6 +221,8 @@ class CaseManager:
             "connected_card_ids": c_vertex["connected_cards"],
             "similar_prior_cases": c_vertex["similar_cases"],
             "affected_txn_ids": c_vertex["affected_txns"],
+            "syndicate_nexus_id": c_vertex.get("syndicate_nexus_id"),
+            "cross_case_links": self.get_cross_case_links(graph_case_id),
             "evidence": evidence_list,
             "actions": action_list,
             "summary": c_vertex["summary"],

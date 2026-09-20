@@ -65,10 +65,13 @@ Ranked by expected impact on Hackathon Judging Criteria:
 15. **[DONE - Iteration 015] [Performance & Scale] Transaction Indexing Optimization & Bisect Adjacency Slicing**
     - *Result:* Replaced $O(N)$ linear scans with on-demand epoch indexing and $O(\log N)$ binary search slicing in `src/graph/client.py`. Achieved 106x velocity query acceleration (~8 microseconds/query) and sub-millisecond execution across all graph queries. Added 5 benchmark tests in `tests/test_performance.py` (48 tests, 100% pass).
 
-16. **[Case Management & Innovation] Cross-Case Ring Nexus Graph Vertex & Edge Persistence**
-    - *Goal:* When an organized fraud syndicate or device pooling nexus is discovered across multiple cards/cases, persist dedicated `SyndicateNexus` vertices and inter-case edges into the graph store, enabling network-wide ring tracking.
-    - *Files:* `src/cases/manager.py`, `src/graph/store.py`
-    - *Metric Impact:* Case Management (Lens 10) & Innovation (Lens 20).
+16. **[DONE - Iteration 016] [Case Management & Innovation] Cross-Case Ring Nexus Graph Vertex & Edge Persistence**
+    - *Result:* Built `SyndicateNexus` graph vertex persistence and bidirectional `CROSS_CASE_LINK` edges in `CaseManager`. Enables multi-case syndicate tracking, dynamic exposure aggregation, and threat level escalation. Added 2 unit tests in `tests/test_syndicate_persistence.py` (50 tests, 100% pass).
+
+17. **[Explainability & Robustness] Deterministic Audit Trail Self-Critique & Citation Verifier**
+    - *Goal:* Implement a deterministic self-critique pass verifying that all claims in the final case summary and SAR narratives directly correlate to concrete evidence IDs (`EV-xx`) and policy rules (`POLICY-Rx`), with automatic redacting of unverified assertions.
+    - *Files:* `src/agent/explainer_validator.py`, `src/agent/graph.py`
+    - *Metric Impact:* Explainability (Lens 9) & Agent Architecture (Lens 11).
 
 ---
 
