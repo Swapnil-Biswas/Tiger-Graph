@@ -185,6 +185,10 @@ class CyberAssessmentRequest(BaseModel):
     as_of: Optional[str] = None
 
 
+class ConsensusDeliberateRequest(BaseModel):
+    investigation_answer: Dict[str, Any]
+
+
 StructuringCheckRequest.model_rebuild()
 ContagionCheckRequest.model_rebuild()
 PoolEmbeddingRequest.model_rebuild()
@@ -202,6 +206,7 @@ TripletExportRequest.model_rebuild()
 ActiveLearningMineRequest.model_rebuild()
 AMLAssessmentRequest.model_rebuild()
 CyberAssessmentRequest.model_rebuild()
+ConsensusDeliberateRequest.model_rebuild()
 
 
 @app.get("/api/health")
@@ -786,6 +791,23 @@ def get_case_cyber_assessment(case_id: str, as_of: Optional[str] = None):
     cyber_agent = CyberForensicsAgent(client=agent.client)
     res = cyber_agent.assess_case(case_id=case_id, as_of=as_of)
     return res.to_dict()
+
+
+@app.post("/api/agents/consensus/deliberate")
+def post_consensus_deliberate(req: ConsensusDeliberateRequest):
+    """Deliberates multi-agent weighted consensus over an investigation answer payload."""
+    from src.agent.consensus import MultiAgentConsensusEngine
+    engine = MultiAgentConsensusEngine()
+    res = engine.deliberate(req.investigation_answer)
+    return res.to_dict()
+
+
+@app.get("/api/cases/{case_id}/consensus")
+def get_case_consensus(case_id: str, as_of: Optional[str] = None):
+    """Executes full multi-agent investigation and retrieves federated consensus dossier."""
+    answer = agent.investigate_case(case_id)
+    return answer.get("federated_consensus", {})
+
 
 
 

@@ -1,3 +1,35 @@
+## Iteration 053: Multi-Agent Debate & Weighted Majority Voting Consensus Protocol | 2026-09-20 23:25 | commit TBD_COMMIT
+- **Lens:** 2. Investigation accuracy & decision making & 11. Agent architecture & engineering
+- **Goal / hypothesis:** In mission-critical financial crime investigations, specialized domain sub-agents (Fraud, AML, Cyber) frequently generate conflicting signals on complex edge cases (e.g. cardholder confirms transaction authorization, but Cyber agent flags critical hardware virtualization pooling, or cumulative account spend mandates BSA FinCEN SAR filing). Implementing `MultiAgentConsensusEngine` in `src/agent/consensus.py` formalizes a multi-agent debate and calibrated majority voting protocol:
+  1. **Dynamic Domain Weighting**: Assigns weights ($w_{\text{fraud}}, w_{\text{aml}}, w_{\text{cyber}}$ summing strictly to 1.00) dynamically calibrated to incident exposure and trigger typologies (e.g. AML dominance on structuring $\ge \$10,000$, Cyber dominance on bot bursts).
+  2. **Statutory Regulatory Veto**: Strictly enforces legal requirements (e.g. mandatory FinCEN SAR Form 111 filing under 31 CFR 1020.320 cannot be overridden by majority vote).
+  3. **Cyber Isolation Defense**: Merges hardware blacklisting and biometric step-ups into the unified action set even if cardholder transaction was allowed.
+  4. **Concordance & Debate Transcripts**: Computes mathematical agreement confidence ($1.0 - 2.5 \cdot \sigma^2$) and logs transparent multi-round deliberation transcripts.
+  Federated into `FraudInvestigatorAgent.investigate_case` as Step 15.
+- **Changes (files):**
+  - `src/agent/consensus.py`: Implemented `MultiAgentConsensusEngine` and `FederatedConsensusDossier` dataclass with weighted voting, conflict detection, debate transcripts, and unified action resolution.
+  - `src/agent/graph.py`: Connected Step 15 consensus deliberation attaching `answer["federated_consensus"]`.
+  - `src/api/main.py`: Added `ConsensusDeliberateRequest` with `model_rebuild()`, `POST /api/agents/consensus/deliberate`, and `GET /api/cases/{case_id}/consensus`.
+  - `tests/test_consensus.py`: Created 6 unit tests covering unanimous agreement, AML statutory vetoes, cyber hardware isolation, mathematical weight bounds, master agent federation, and REST API endpoints.
+- **Tests added/updated:**
+  - `tests/test_consensus.py` (6 unit tests, all pass).
+  - Total unit test suite expanded from 194 to **200** tests across 43 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 194 -> **200** (100% pass rate across 43 test suites)
+  - Multi-Agent Consensus: Calibrated 3-way majority voting with statutory legal vetoes
+  - Concordance & Confidence: Inter-agent variance metric and deliberation debate transcripts
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (200/200)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** The combination of weighted majority voting with absolute statutory legal vetoes ensures that democratic agent consensus cannot inadvertently commit a regulatory compliance violation.
+- **Follow-ups added to backlog:** Proceed to Iteration 054: Asynchronous Investigation Event Queue & Distributed Task Dispatcher (Lens 14 & Lens 15).
+
 ## Iteration 052: Multi-Agent Federation: Cyber-Forensics & Device Fingerprint Specialist | 2026-09-20 23:20 | commit 8a0b4fd
 - **Lens:** 4. Device sharing and IP proxy detection & 11. Agent architecture & engineering
 - **Goal / hypothesis:** Sophisticated cybercrime rings coordinate credential stuffing, hardware virtualization spoofing, and multi-card device pooling across thousands of synthetic identities to evade card-centric fraud rules. Implementing `CyberForensicsAgent` in `src/agent/cyber_agent.py` establishes a dedicated cyber intelligence sub-agent coordinating hardware sharing nexuses (Q4), bot attack periodicity detection (Q15), and probabilistic sybil account network resolution (Q23) into an immutable `CyberForensicsAssessment`. The sub-agent synthesizes threat tiers, outputs forensic telemetry narratives, recommends proactive hardware defenses (`BLACKLIST_DEVICE_HARDWARE`, `STEP_UP_DEVICE_BIOMETRICS`, `RATE_LIMIT_DEVICE_IP`, `MERGE_DEVICE_ENTITY_CLUSTER`), and federates into `FraudInvestigatorAgent.investigate_case` as Step 14.

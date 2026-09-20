@@ -527,4 +527,9 @@ class FraudInvestigatorAgent:
         cyber_agent = CyberForensicsAgent(client=self.client)
         answer["cyber_forensics"] = cyber_agent.assess_case(case_id, as_of=as_of).to_dict()
 
+        # 15. AGENTIC CONSENSUS & DEBATE: MULTI-AGENT WEIGHTED VOTING PROTOCOL
+        from src.agent.consensus import MultiAgentConsensusEngine
+        consensus_engine = MultiAgentConsensusEngine()
+        answer["federated_consensus"] = consensus_engine.deliberate(answer).to_dict()
+
         return answer
