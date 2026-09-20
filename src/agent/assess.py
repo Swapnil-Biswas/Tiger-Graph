@@ -139,9 +139,13 @@ class UncertaintyAssessmentEngine:
                 missing.append("Step-up authentication confirmation")
 
         # Pattern assignment
+        undoc = graph_evidence.get("undocumented_anomaly", {})
         if verdict == "legitimate":
             assigned_pattern = "none"
             pattern_desc = ""
+        elif undoc.get("is_anomaly") and (best_pat == "none" or pat_conf < 0.40):
+            assigned_pattern = "undocumented"
+            pattern_desc = undoc.get("description", "Undocumented multi-card organized fraud anomaly detected.")
         elif ring.get("is_ring_candidate") and new_ent.get("proxy_flag"):
             assigned_pattern = "undocumented"
             pattern_desc = "Multi-card proxy rotation and credential stuffing: identical mobile device profile with anonymous proxy observed across multiple unrelated customer accounts."

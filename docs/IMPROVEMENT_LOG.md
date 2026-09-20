@@ -1,4 +1,24 @@
-## Iteration 010: Checkpoint 2 Audit, State of the Project, and v0.1 Release Tag | 2026-09-20 17:03 | commit pending
+## Iteration 011: Undocumented Pattern Discovery & Multi-Card Syndicate Anomaly Detector | 2026-09-20 17:08 | commit pending
+- **Lens:** 2. Undocumented pattern discovery & 20. Innovation
+- **Goal / hypothesis:** Beyond the 5 documented typologies, organized cybercrime rings utilize multi-card device pooling, proxy rotation, and rapid impossible geographic dispersion to systematically evade rule-based filters. Building a graph-native `UndocumentedPatternDetector` detects these emergent syndicates, flags `pattern = "undocumented"`, and generates structured anomaly descriptions for complex incidents without compromising baseline accuracy.
+- **Changes (files):**
+  - `src/graph/algorithms.py`: Created `UndocumentedPatternDetector` with multi-card proxy rotation syndicate, device pooling nexus, coordinated velocity burst, and impossible geo-dispersion detection signatures.
+  - `src/agent/assess.py`: Integrated undocumented anomaly evaluation into `UncertaintyAssessmentEngine`, populating `pattern = "undocumented"` and `pattern_description` when novel anomalies are uncovered.
+  - `src/agent/graph.py`: Wired `UndocumentedPatternDetector` into investigation pipeline.
+  - `tests/test_undocumented_patterns.py`: Added 2 unit tests verifying detection on real graph topologies and clean isolation on benign traffic.
+- **Tests added/updated:**
+  - `tests/test_undocumented_patterns.py` (2 tests, pass).
+  - Total unit test suite expanded from 25 to 27 tests (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 25 -> **27** (100% pass rate)
+  - Undocumented Pattern Coverage: Formal detection for proxy rotation syndicates, device pooling nexus, and rapid dispersion
+  - Valid Benchmark Answers: 20/20 (100%)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **What I learned / what surprised me:** In the real dataset, device profile `'SM-T810 Build/NRD90M | Android 7.0'` pools 5 distinct payment cards across 5 different customer IDs. The `device_pooling_nexus` signature identifies this organized sharing at 0.90 confidence, enabling early ring interdiction before cardholders discover fraudulent charges.
+- **Follow-ups added to backlog:** Next implement Iteration 012: Prompt Injection Defenses & Adversarial Input Sanitization (Lens 18: Security and safety).
+
+## Iteration 010: Checkpoint 2 Audit, State of the Project, and v0.1 Release Tag | 2026-09-20 17:03 | commit 0c4ae80
 - **Lens:** 14. Testing and evaluation, 17. Documentation and deliverables & PRD Checkpoint 2
 - **Goal / hypothesis:** Reaching milestone Iteration 10 demands a comprehensive PRD deliverables audit, complete verification of all six mandatory judging gates, tagging submission-ready release `v0.1`, and establishing the roadmap for Iterations 11–20.
 - **State of the Project (v0.1 Checkpoint Summary):**

@@ -27,12 +27,14 @@ from src.agent.assess import UncertaintyAssessmentEngine
 from src.agent.decide import NextBestActionPlanner
 from src.agent.counterfactual import CounterfactualExplainer
 from src.cases.sar_generator import SARNarrativeGenerator
+from src.graph.algorithms import UndocumentedPatternDetector
 
 
 class FraudInvestigatorAgent:
     def __init__(self, client: Optional[GraphClient] = None):
         self.client = client or GraphClient(mode="embedded")
         self.retriever = GraphRAGRetriever(client=self.client)
+        self.undocumented_detector = UndocumentedPatternDetector(self.client)
         self.mock_api = MockActionsAPI()
 
     def investigate_case(
@@ -201,6 +203,7 @@ class FraudInvestigatorAgent:
             "geo": self.client.geo_impossible(card_id, as_of=as_of),
             "similar_cases": similar_cases_res,
             "pattern_match": pat_res,
+            "undocumented_anomaly": self.undocumented_detector.detect_anomalies(flagged_txn, as_of=as_of) if flagged_txn else {},
         }
 
         # Assemble GraphRAG Topological Context Brief
