@@ -201,10 +201,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 55. **[DONE - Iteration 055] [Release Tag v0.5] Checkpoint 9 Audit & 55-Iteration Milestone Review**
     - *Result:* Comprehensive audit across multi-agent federation (AML Specialist, Cyber Forensics), 3-agent weighted consensus deliberation, statutory BSA FinCEN SAR regulatory veto enforcement, cyber isolation defenses, and asynchronous event queue with priority heap dispatching and Dead Letter Queue. Full test suite at 207 tests across 44 test suites (100% passing). Verified 0 secrets and tagged release `v0.5`.
 
-56. **[Federated Memory Sync] Cross-Agent Distributed Episodic & Semantic Memory Bus**
-    - *Goal:* Implement shared cross-agent episodic memory store allowing sub-agents (Fraud, AML, Cyber) to query shared case embeddings, cross-domain prior findings, and persistent graph context.
-    - *Files:* `src/cases/federated_memory.py`, `src/agent/graph.py`, `tests/test_federated_memory.py`
-    - *Metric Impact:* Agent Architecture & Explainability (Lens 10, Lens 11).
+56. **[DONE - Iteration 056] [Federated Memory Sync] Cross-Agent Distributed Episodic & Semantic Memory Bus**
+    - *Result:* Implemented `FederatedMemoryBus`, `FederatedEpisode`, and `AgentObservation` in `src/cases/federated_memory.py`. Features multi-agent 8D vector embedding store bootstrapped from closed historical cases, real-time shared working memory blackboard, cosine precedent search with half-life recency decay ($w = e^{-\lambda \cdot \Delta t}$) and entity bonuses, and multi-domain empirical risk priors. Integrated as Step 16 in `FraudInvestigatorAgent.investigate_case`. Added 4 API endpoints (`POST /api/memory/episodes/search`, `GET /api/memory/episodes/{case_id}`, `GET /api/memory/blackboard/{case_id}`, `GET /api/memory/cross-domain-prior`). Added 7 unit tests in `tests/test_federated_memory.py` (214/214 tests pass across 45 suites).
 
 57. **[Graph Scenario Sandbox] Counterfactual Scenario Playground & Policy Simulation Engine**
     - *Goal:* Allow investigators to simulate "what-if" topological perturbations (edge injection, velocity scaling, device unlinking) and re-score case outcomes dynamically.

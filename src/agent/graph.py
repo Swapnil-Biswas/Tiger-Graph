@@ -41,6 +41,8 @@ class FraudInvestigatorAgent:
         self.undocumented_detector = UndocumentedPatternDetector(self.client)
         self.memory_prior_engine = BayesianCaseMemoryPrior(self.client)
         self.mock_api = MockActionsAPI()
+        from src.cases.federated_memory import FederatedMemoryBus
+        self.memory_bus = FederatedMemoryBus(client=self.client)
         self._task_queue = None
 
     @property
@@ -539,5 +541,53 @@ class FraudInvestigatorAgent:
         from src.agent.consensus import MultiAgentConsensusEngine
         consensus_engine = MultiAgentConsensusEngine()
         answer["federated_consensus"] = consensus_engine.deliberate(answer).to_dict()
+
+        # 16. FEDERATED EPISODIC MEMORY SYNC & BLACKBOARD WORKING MEMORY
+        case_dict = answer.get("case", {})
+        fraud_prob = float(case_dict.get("fraud_probability", 0.50))
+        verdict = str(case_dict.get("verdict", "review"))
+        pattern = str(case_dict.get("pattern", "UNKNOWN"))
+
+        # Publish observations from all 3 sub-agents to blackboard
+        self.memory_bus.publish_observation(
+            case_id=case_id,
+            source_agent="fraud_investigator",
+            observation_type="INITIAL_ASSESSMENT",
+            severity="WARNING" if fraud_prob >= 0.50 else "INFO",
+            summary=f"Initial fraud probability {fraud_prob:.2f} ({verdict})",
+            data={"fraud_probability": fraud_prob, "verdict": verdict, "pattern": pattern},
+        )
+        self.memory_bus.publish_observation(
+            case_id=case_id,
+            source_agent="aml_specialist",
+            observation_type="AML_ASSESSMENT",
+            severity="CRITICAL" if answer["aml_specialist"].get("mandatory_sar") else ("WARNING" if answer["aml_specialist"].get("risk_level") == "HIGH" else "INFO"),
+            summary=f"AML risk level {answer['aml_specialist'].get('risk_level')}, score {answer['aml_specialist'].get('aml_score'):.2f}",
+            data=answer["aml_specialist"],
+        )
+        self.memory_bus.publish_observation(
+            case_id=case_id,
+            source_agent="cyber_forensics",
+            observation_type="CYBER_ASSESSMENT",
+            severity="CRITICAL" if answer["cyber_forensics"].get("threat_tier") == "CRITICAL" else ("WARNING" if answer["cyber_forensics"].get("threat_tier") == "ELEVATED" else "INFO"),
+            summary=f"Cyber threat tier {answer['cyber_forensics'].get('threat_tier')}, score {answer['cyber_forensics'].get('cyber_risk_score'):.2f}",
+            data=answer["cyber_forensics"],
+        )
+        answer["working_memory_blackboard"] = [o.to_dict() for o in self.memory_bus.get_blackboard(case_id)]
+
+        # Commit immutable multi-agent episode
+        episode = self.memory_bus.commit_episode(answer)
+        answer["federated_memory_episode"] = episode.to_dict()
+
+        # Query top cross-agent historical precedents
+        precedents = self.memory_bus.query_cross_agent_precedents(
+            query_vector=episode.feature_vector,
+            card_id=case_dict.get("card_id"),
+            customer_id=case_dict.get("customer_id"),
+            device_profile=case_dict.get("device_profile"),
+            as_of=as_of,
+            top_k=3,
+        )
+        answer["cross_agent_precedents"] = precedents
 
         return answer

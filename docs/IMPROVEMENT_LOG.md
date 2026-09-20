@@ -1,3 +1,35 @@
+## Iteration 056: Cross-Agent Distributed Episodic & Semantic Memory Bus | 2026-09-21 00:45 | commit TBD_COMMIT
+- **Lens:** 10. Case memory & knowledge graphs, 11. Agent architecture & engineering, 8. Explainability & human-in-the-loop
+- **Goal / hypothesis:** In multi-agent federated architectures, specialized domain sub-agents (Fraud, AML, Cyber) need a shared, persistent cognitive memory space to cross-reference historical findings, query cross-domain precedents, and share real-time working observations during live case investigations. Implementing `FederatedMemoryBus` in `src/cases/federated_memory.py` provides:
+  1. **Multi-Agent Episodic Memory Store**: Captures immutable investigation episodes with multi-domain findings (Fraud verdict, AML risk rating, Cyber threat tier, consensus verdict, unified actions) and an 8-dimensional normalized embedding vector.
+  2. **Working Memory Blackboard**: Real-time thread-safe publish-subscribe buffer for interim observations (`INITIAL_ASSESSMENT`, `AML_ASSESSMENT`, `CYBER_ASSESSMENT`) across sub-agents during investigation.
+  3. **Cross-Domain Precedent Search**: Multi-field similarity search combining cosine vector similarity, entity matching bonuses (card/customer/device), and exponential recency decay ($w = e^{-\lambda \cdot \Delta t}$) with strict temporal `as_of` leak-free isolation.
+  4. **Multi-Domain Empirical Prior**: Empirical Bayesian risk prior combining historical fraud incidents, AML SAR filings, and cyber threat escalations into a calibrated prior adjustment delta.
+  5. **Step 16 Master Agent Integration**: Integrated Step 16 in `FraudInvestigatorAgent.investigate_case` attaching blackboard observations, committed episodic record, and cross-agent precedent citations.
+  6. **Enterprise REST API**: Four dedicated endpoints (`POST /api/memory/episodes/search`, `GET /api/memory/episodes/{case_id}`, `GET /api/memory/blackboard/{case_id}`, `GET /api/memory/cross-domain-prior`).
+- **Changes (files):**
+  - `src/cases/federated_memory.py`: Implemented `FederatedMemoryBus`, `FederatedEpisode`, and `AgentObservation` with 8D feature embedding, cosine similarity, recency decay, and blackboard working memory.
+  - `src/agent/graph.py`: Connected `FederatedMemoryBus` to `FraudInvestigatorAgent.__init__` and Step 16 in `investigate_case`.
+  - `src/api/main.py`: Added `MemorySearchRequest` model and exposed 4 federated memory endpoints.
+  - `tests/test_federated_memory.py`: Created 7 unit tests covering bootstrapping, blackboard publishing, temporal isolation, vector cosine similarity, cross-domain empirical priors, master agent integration, and REST endpoints.
+- **Tests added/updated:**
+  - `tests/test_federated_memory.py` (7 unit tests, all pass).
+  - Total unit test suite expanded from 207 to **214** tests across 45 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 207 -> **214** (100% pass rate across 45 test suites)
+  - Episodic Memory: Cross-agent 8D vector embedding store with closed-case bootstrapping
+  - Working Memory: Shared thread-safe blackboard with sub-agent observation publishing
+  - Precedent Search: Cosine similarity with exponential half-life recency decay and entity bonuses
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 214 passed, 0 failed across 45 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 055: Checkpoint 9 Audit, 55-Iteration Milestone Review & v0.5 Release Tag | 2026-09-20 23:55 | commit 5f25b09
 - **Lens:** All 15 PRD Evaluation Lenses (Comprehensive Platform Architecture & Submission Audit)
 - **Goal / hypothesis:** Mark completion of Phase 6 milestone (Iteration 055 / 55% of the 100-iteration loop) with full system verification, tagging release `v0.5`. Since Iteration 050 (`v0.45`), the system has introduced multi-agent federation (`AMLSpecialistAgent` and `CyberForensicsAgent`), cross-agent consensus debate (`MultiAgentConsensusEngine`) with statutory regulatory vetoes, and enterprise asynchronous task dispatching (`InvestigationTaskQueue`) with priority heap ordering, idempotency deduplication, and dead-letter queues.

@@ -202,6 +202,16 @@ class EnqueueTaskRequest(BaseModel):
     backoff_factor: float = 0.05
 
 
+class MemorySearchRequest(BaseModel):
+    card_id: Optional[str] = None
+    customer_id: Optional[str] = None
+    device_profile: Optional[str] = None
+    domain_filter: str = "ALL"  # "ALL", "FRAUD", "AML", "CYBER"
+    as_of: Optional[str] = None
+    top_k: int = 5
+    query_vector: Optional[List[float]] = None
+
+
 StructuringCheckRequest.model_rebuild()
 ContagionCheckRequest.model_rebuild()
 PoolEmbeddingRequest.model_rebuild()
@@ -221,6 +231,7 @@ AMLAssessmentRequest.model_rebuild()
 CyberAssessmentRequest.model_rebuild()
 ConsensusDeliberateRequest.model_rebuild()
 EnqueueTaskRequest.model_rebuild()
+MemorySearchRequest.model_rebuild()
 
 
 @app.get("/api/health")
@@ -937,6 +948,62 @@ def get_similar_cases(card_id: str, customer_id: Optional[str] = None):
         card_id=card_id,
         customer_id=customer_id,
         top_k=5,
+    )
+
+
+@app.post("/api/memory/episodes/search")
+def search_memory_episodes(req: MemorySearchRequest):
+    """Searches federated episodic memory across Fraud, AML, and Cyber sub-agent domains."""
+    return agent.memory_bus.query_cross_agent_precedents(
+        query_vector=req.query_vector,
+        card_id=req.card_id,
+        customer_id=req.customer_id,
+        device_profile=req.device_profile,
+        domain_filter=req.domain_filter,
+        as_of=req.as_of,
+        top_k=req.top_k,
+    )
+
+
+@app.get("/api/memory/episodes/{case_id}")
+def get_memory_episode(case_id: str):
+    """Retrieves committed federated multi-agent episode for a specific case."""
+    ep = agent.memory_bus.get_episode(case_id)
+    if not ep:
+        # If not already committed, run investigation to generate and commit episode
+        if case_id in agent.client.store.case_pack or case_id in agent.client.store.closed_cases:
+            ans = agent.investigate_case(case_id)
+            active_cases[case_id] = ans
+            ep = agent.memory_bus.get_episode(case_id)
+    if not ep:
+        raise HTTPException(status_code=404, detail=f"Episode for case '{case_id}' not found.")
+    return ep.to_dict()
+
+
+@app.get("/api/memory/blackboard/{case_id}")
+def get_case_blackboard(case_id: str):
+    """Retrieves real-time working memory blackboard observations for an active investigation."""
+    obs_list = agent.memory_bus.get_blackboard(case_id)
+    return {
+        "case_id": case_id,
+        "observation_count": len(obs_list),
+        "observations": [o.to_dict() for o in obs_list],
+    }
+
+
+@app.get("/api/memory/cross-domain-prior")
+def get_cross_domain_prior(
+    card_id: Optional[str] = None,
+    customer_id: Optional[str] = None,
+    device_profile: Optional[str] = None,
+    as_of: Optional[str] = None,
+):
+    """Calculates unified multi-domain empirical risk prior combining Fraud, AML, and Cyber precedents."""
+    return agent.memory_bus.get_cross_domain_prior(
+        card_id=card_id,
+        customer_id=customer_id,
+        device_profile=device_profile,
+        as_of=as_of,
     )
 
 
