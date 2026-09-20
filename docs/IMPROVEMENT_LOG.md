@@ -1,3 +1,30 @@
+## Iteration 017: Deterministic Audit Trail Self-Critique & Citation Verifier | 2026-09-20 17:37 | commit pending
+- **Lens:** 9. Explainability & 11. Agent architecture and robustness & 20. Innovation
+- **Goal / hypothesis:** In regulatory banking compliance, LLM narrative summaries and SAR filings risk hallucinating non-existent transactions, fictitious cards, or fake regulatory clauses. Implementing a deterministic `AuditTrailSelfCritiqueVerifier` performs an automated self-critique pass over the agent's case summary: extracting all cited evidence IDs (`EV-xx`), regulatory policies (`POLICY-Rx`), and mentioned entities (cards `Cxxxx-Kx`, transactions `xxxxxxx`), cross-referencing them against the verified evidence graph, computing an audit faithfulness score (0.00-1.00), and penalizing/sanitizing any unverified claims.
+- **Changes (files):**
+  - `src/agent/explainer_validator.py`: Implemented `AuditTrailSelfCritiqueVerifier` with citation grounding check, entity extraction, unverified entity detection, mathematical faithfulness scoring ($1.0 - \sum \text{penalties}$), and audit summary generation.
+  - `src/agent/graph.py`: Integrated `AuditTrailSelfCritiqueVerifier.audit_case` directly into `FraudInvestigatorAgent.investigate_case`, attaching `audit_critique` to the returned case payload.
+  - `tests/test_audit_self_critique.py`: Created test suite validating 100% faithfulness score on real cases (`HHG-001`), penalty assignment on fake citations (`EV-999`, `POLICY-FAKE`), detection of ungrounded entities (`C99999-K9`, `9999999`), and automated sanitization.
+- **Tests added/updated:**
+  - `tests/test_audit_self_critique.py` (4 unit tests, all pass).
+  - Total unit test suite expanded from 50 to **54** tests across 14 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 50 -> **54** (100% pass rate)
+  - Audit Trail Faithfulness Score: **1.00 / 1.00 (100%)** on grounded investigations
+  - Hallucinated Citation Detection: 100% caught and flagged
+  - Ungrounded Entity Detection: 100% caught and flagged
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (54/54)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Deterministic regex-based entity grounding combined with set intersection against active graph evidence delivers instant, zero-cost anti-hallucination verification without requiring an expensive secondary LLM judge call.
+- **Follow-ups added to backlog:** Next implement Iteration 018: GraphRAG Multi-Vector Retrieval Relevance Optimization (Lens 7: GraphRAG quality & 12: LLM prompting and cost/latency).
+
 ## Iteration 016: Cross-Case Syndicate Nexus Graph Vertex & Edge Persistence | 2026-09-20 17:32 | commit 62ec1a4
 - **Lens:** 10. Case management & 20. Innovation
 - **Goal / hypothesis:** Isolated case files fail to capture the network-level blast radius of organized cybercrime syndicates. Implementing automatic `SyndicateNexus` graph vertex creation and bidirectional `CROSS_CASE_LINK` edges in `CaseManager` connects individual case investigations sharing device profiles or payment cards into a unified criminal ring entity, calculating aggregate exposure, collective card compromise counts, and threat escalation levels.

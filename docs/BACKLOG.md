@@ -68,10 +68,23 @@ Ranked by expected impact on Hackathon Judging Criteria:
 16. **[DONE - Iteration 016] [Case Management & Innovation] Cross-Case Ring Nexus Graph Vertex & Edge Persistence**
     - *Result:* Built `SyndicateNexus` graph vertex persistence and bidirectional `CROSS_CASE_LINK` edges in `CaseManager`. Enables multi-case syndicate tracking, dynamic exposure aggregation, and threat level escalation. Added 2 unit tests in `tests/test_syndicate_persistence.py` (50 tests, 100% pass).
 
-17. **[Explainability & Robustness] Deterministic Audit Trail Self-Critique & Citation Verifier**
-    - *Goal:* Implement a deterministic self-critique pass verifying that all claims in the final case summary and SAR narratives directly correlate to concrete evidence IDs (`EV-xx`) and policy rules (`POLICY-Rx`), with automatic redacting of unverified assertions.
-    - *Files:* `src/agent/explainer_validator.py`, `src/agent/graph.py`
-    - *Metric Impact:* Explainability (Lens 9) & Agent Architecture (Lens 11).
+17. **[DONE - Iteration 017] [Explainability & Robustness] Deterministic Audit Trail Self-Critique & Citation Verifier**
+    - *Result:* Built `AuditTrailSelfCritiqueVerifier` in `src/agent/explainer_validator.py`. Verifies narrative citation grounding (`EV-xx`, `POLICY-xx`), extracts and validates entity mentions (cards, txns), and computes a 0.00-1.00 faithfulness score. Added 4 unit tests in `tests/test_audit_self_critique.py` (54 tests, 100% pass).
+
+18. **[GraphRAG & Cost/Latency] GraphRAG Multi-Vector Retrieval Relevance & Policy Routing Optimization**
+    - *Goal:* Enhance `PolicyRetriever` in `src/rag/retriever.py` with multi-vector lexical/semantic matching, keyword boosting, and policy relevance@k scoring to ensure 100% accurate policy citation retrieval for all fraud typologies.
+    - *Files:* `src/rag/retriever.py`, `tests/test_phase3.py`
+    - *Metric Impact:* GraphRAG Quality (Lens 7) & LLM Prompting/Cost (Lens 12).
+
+19. **[Testing & Evaluation] Automated Component Ablation Study Harness**
+    - *Goal:* Build `eval/ablation_study.py` evaluating backtest performance with Graph Signals OFF, Case Memory OFF, and Policy Rules OFF, computing exact delta metrics to prove architectural necessity of each component.
+    - *Files:* `eval/ablation_study.py`, `docs/METRICS.md`
+    - *Metric Impact:* Testing & Evaluation (Lens 14) & Investigation Accuracy (Lens 1).
+
+20. **[Release Tag v0.2] Checkpoint 3 Audit & Submission-Ready Release Tag v0.2**
+    - *Goal:* Perform complete audit against PRD Section 25, verify all verification gates, create annotated git tag `v0.2`, push to GitHub, and document State of the Project v0.2 summary.
+    - *Files:* `docs/IMPROVEMENT_LOG.md`, git tag `v0.2`
+    - *Metric Impact:* Documentation & Deliverables (Lens 17).
 
 ---
 

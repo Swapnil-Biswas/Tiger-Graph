@@ -30,6 +30,7 @@ from src.cases.sar_generator import SARNarrativeGenerator
 from src.graph.algorithms import UndocumentedPatternDetector
 from src.agent.security import InputSanitizer
 from src.cases.memory import BayesianCaseMemoryPrior
+from src.agent.explainer_validator import AuditTrailSelfCritiqueVerifier
 
 
 class FraudInvestigatorAgent:
@@ -419,5 +420,13 @@ class FraudInvestigatorAgent:
             "tokens": total_tokens,
             "latency_s": total_latency,
         }
+
+        # 10. DETERMINISTIC AUDIT TRAIL SELF-CRITIQUE
+        critique = AuditTrailSelfCritiqueVerifier.audit_case(
+            case_summary=summary,
+            case_dict=answer["case"],
+            active_evidence_items=[ev.model_dump() for ev in evidence_items],
+        )
+        answer["audit_critique"] = critique
 
         return answer
