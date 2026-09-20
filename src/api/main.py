@@ -1564,6 +1564,39 @@ def reset_rate_limit(client_id: Optional[str] = Query(default=None)):
     return {"status": "all_reset"}
 
 
+# Webhook Dead-Letter Queue & Exponential Backoff Retry Engine
+from src.api.webhook_dlq import webhook_dlq
+
+@app.get("/api/webhooks/dlq")
+def get_webhook_dlq_messages(status: Optional[str] = Query(default=None), limit: int = Query(default=50, ge=1, le=500)):
+    """Retrieve queued webhook messages filtered by status."""
+    return {"messages": webhook_dlq.get_messages(status=status, limit=limit)}
+
+
+@app.get("/api/webhooks/dlq/stats")
+def get_webhook_dlq_stats():
+    """Retrieve aggregate webhook dead-letter queue metrics."""
+    return webhook_dlq.get_stats()
+
+
+@app.post("/api/webhooks/dlq/retry")
+def retry_webhook_dlq(message_id: Optional[str] = Query(default=None), force: bool = Query(default=False)):
+    """Retry pending or dead-letter webhook messages."""
+    if message_id:
+        ok = webhook_dlq.retry_message(message_id)
+        return {"message_id": message_id, "success": ok}
+    summary = webhook_dlq.retry_all_pending(force=force)
+    return {"status": "retried", "summary": summary}
+
+
+@app.post("/api/webhooks/dlq/purge")
+def purge_webhook_dlq(status: Optional[str] = Query(default=None)):
+    """Purge dead-letter or delivered webhook messages."""
+    purged_count = webhook_dlq.purge(status=status)
+    return {"status": "purged", "count": purged_count}
+
+
+
 # Mount UI static directory
 ui_dir = os.path.join(os.path.dirname(__file__), "../../ui")
 if os.path.exists(ui_dir):

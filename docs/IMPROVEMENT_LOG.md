@@ -1,4 +1,35 @@
-## Iteration 091: Automated End-to-End Stress & Concurrent Load Testing Harness | 2026-09-21 09:45 | commit d1b4803
+## Iteration 092: Webhook Dead-Letter Queue & Exponential Backoff Retry Engine | 2026-09-21 10:00 | commit c2d9fd4
+- **Lens:** 15. Operational readiness & runbooks, 11. Agent architecture & engineering, 9. Security, safety & defenses
+- **Goal / hypothesis:** In mission-critical financial crime systems, downstream incident receivers (PagerDuty, SIEMs, Slack) can experience network blips, HTTP 500/503 errors, or rate limiting. Without an asynchronous Dead-Letter Queue (DLQ), critical notifications are permanently dropped. Implementing a DLQ engine delivers:
+  1. **Thread-Safe Dead-Letter Queue (`src/api/webhook_dlq.py`)**: `WebhookDeadLetterQueue` safely queues failed dispatches with full metadata, secret masking, and status lifecycle tracking (`PENDING`, `RETRYING`, `DELIVERED`, `DEAD_LETTER`).
+  2. **Deterministic Exponential Backoff Math**: Computes backoff delay $t_{\text{delay}} = \text{base} \times 2^{\text{attempts}-1}$ bounded by configurable ceilings (`max_delay=60s`).
+  3. **Automatic Dispatcher Failure Enqueueing**: Extended `EnterpriseWebhookDispatcher.dispatch_event` in `src/api/webhooks.py` to automatically capture HTTP errors and enqueue them into `webhook_dlq`.
+  4. **DLQ Management & REST Endpoints**: Exposed `GET /api/webhooks/dlq`, `GET /api/webhooks/dlq/stats`, `POST /api/webhooks/dlq/retry`, and `POST /api/webhooks/dlq/purge` in `src/api/main.py`.
+- **Changes (files):**
+  - `src/api/webhook_dlq.py`: Implemented WebhookDeadLetterQueue, DLQMessage, exponential backoff, and retry scheduler.
+  - `src/api/webhooks.py`: Enqueued failed deliveries into webhook_dlq.
+  - `src/api/main.py`: Added DLQ endpoints (list, stats, retry, purge).
+  - `tests/test_webhook_dlq.py`: Created 7 unit tests covering enqueueing, backoff math, retry execution, exhaustion to dead letter, requeue/purge, automatic dispatcher enqueueing, and FastAPI endpoints.
+  - `docs/METRICS.md`: Added Iteration 092 row.
+  - `docs/BACKLOG.md`: Marked item 92 as DONE.
+  - `docs/IMPROVEMENT_LOG.md`: Documented Iteration 092.
+- **Tests added/updated:**
+  - `tests/test_webhook_dlq.py` (7 unit tests, all pass).
+  - Total unit test suite expanded from 366 to **373** tests across 74 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 366 -> **373** (100% pass rate across 74 test suites)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Extended Benchmark Answers Valid: 50/50 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 373 passed across 74 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
+## Iteration 091: Automated End-to-End Stress & Concurrent Load Testing Harness | 2026-09-21 09:45 | commit 50891e8
 - **Lens:** 14. Testing, evaluation & benchmarks, 15. Operational readiness & runbooks, 11. Agent architecture & engineering
 - **Goal / hypothesis:** Production fraud prevention systems must withstand severe traffic bursts (e.g. Cyber Monday sales, coordinated botnet card testing) without latency degradation or unhandled worker pool saturation. Implementing an automated load testing harness delivers:
   1. **Multi-Threaded Load Harness (`eval/load_tester.py`)**: `LoadTestHarness` manages concurrent thread pools dispatching requests across critical, standard, and telemetry endpoints.

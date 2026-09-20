@@ -194,6 +194,20 @@ class EnterpriseWebhookDispatcher:
             self._delivery_log.append(record)
             deliveries.append(record)
 
+            if not success and send_http:
+                try:
+                    from src.api.webhook_dlq import webhook_dlq
+                    webhook_dlq.enqueue(
+                        subscription_id=sub.subscription_id,
+                        url=sub.url,
+                        secret=sub.secret,
+                        event_type=event_type,
+                        payload=payload,
+                        initial_error=error_msg,
+                    )
+                except Exception:
+                    pass
+
         return deliveries
 
     def get_delivery_log(self, limit: int = 50) -> List[Dict[str, Any]]:
