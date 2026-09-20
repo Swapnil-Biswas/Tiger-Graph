@@ -1,4 +1,4 @@
-## Iteration 056: Cross-Agent Distributed Episodic & Semantic Memory Bus | 2026-09-21 00:45 | commit TBD_COMMIT
+## Iteration 056: Cross-Agent Distributed Episodic & Semantic Memory Bus | 2026-09-21 00:45 | commit c11978b
 - **Lens:** 10. Case memory & knowledge graphs, 11. Agent architecture & engineering, 8. Explainability & human-in-the-loop
 - **Goal / hypothesis:** In multi-agent federated architectures, specialized domain sub-agents (Fraud, AML, Cyber) need a shared, persistent cognitive memory space to cross-reference historical findings, query cross-domain precedents, and share real-time working observations during live case investigations. Implementing `FederatedMemoryBus` in `src/cases/federated_memory.py` provides:
   1. **Multi-Agent Episodic Memory Store**: Captures immutable investigation episodes with multi-domain findings (Fraud verdict, AML risk rating, Cyber threat tier, consensus verdict, unified actions) and an 8-dimensional normalized embedding vector.
