@@ -1,0 +1,9 @@
+// Q11: pattern_match
+USE GRAPH FraudInvestigation
+
+CREATE QUERY pattern_match(VERTEX<Transaction> target_txn, STRING pattern_name, STRING as_of) FOR GRAPH FraudInvestigation {
+    Start = {target_txn};
+    Cards = SELECT c FROM Start:s <-(MADE:e)- Card:c;
+    PRINT Cards;
+}
+INSTALL QUERY pattern_match

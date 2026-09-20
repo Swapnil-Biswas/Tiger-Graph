@@ -1,0 +1,14 @@
+// Q2: txn_context
+// Neighborhood of a transaction on its card
+USE GRAPH FraudInvestigation
+
+CREATE QUERY txn_context(VERTEX<Transaction> target_txn, INT window_hours, STRING as_of) FOR GRAPH FraudInvestigation {
+    Start = {target_txn};
+
+    Cards = SELECT c FROM Start:s <-(MADE:e)- Card:c;
+    AllTxns = SELECT t FROM Cards:c -(MADE:e)-> Transaction:t
+              WHERE t.ts <= as_of;
+
+    PRINT AllTxns;
+}
+INSTALL QUERY txn_context

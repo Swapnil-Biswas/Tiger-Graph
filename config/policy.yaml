@@ -1,0 +1,31 @@
+# Bank Fraud Investigation Policy Configuration
+version: "1.0"
+
+thresholds:
+  single_signal_verify_prob: 0.70    # Rule R1: prob < 0.70 on single signal requires verification
+  create_case_min_prob: 0.30         # Section 3a: prob >= 0.30 triggers CREATE_CASE
+  sar_exposure_threshold_usd: 1000.0 # Section 3a / R2: exposure > $1,000 triggers SAR
+  block_card_l1_max_usd: 2500.0      # Section 2: exposure <= $2,500 is L1; > $2,500 is L2
+  escalate_uncertain_exposure_usd: 500.0 # Rule R8: uncertain and exposure > $500 escalates
+  stop_high_confidence: 0.85         # Section 6: prob >= 0.85 stops investigation
+  stop_low_confidence: 0.15          # Section 6: prob <= 0.15 stops investigation
+
+approval_routes:
+  auto:
+    - ALLOW_TRANSACTION
+    - MONITOR_CARD
+    - MONITOR_CONNECTED_CARDS
+    - WARN_CUSTOMER
+    - VERIFY_WITH_CUSTOMER
+    - STEP_UP_AUTH
+    - GENERATE_REPORT
+    - CREATE_CASE
+    - ESCALATE_TO_ANALYST
+    - CLOSE_NO_FRAUD
+  L1:
+    - DECLINE_TRANSACTION
+    - BLOCK_CARD_UNDER_2500
+  L2:
+    - BLOCK_CARD_OVER_2500
+    - BLOCK_ALL_CARDS
+    - FILE_REPORT

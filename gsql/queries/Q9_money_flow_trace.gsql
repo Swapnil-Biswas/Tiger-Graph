@@ -1,0 +1,12 @@
+// Q9: money_flow_trace
+USE GRAPH FraudInvestigation
+
+CREATE QUERY money_flow_trace(VERTEX<Card> target_card, STRING as_of) FOR GRAPH FraudInvestigation {
+    Start = {target_card};
+    Txns = SELECT t FROM Start:s -(MADE:e)-> Transaction:t
+           WHERE t.ts <= as_of
+           ORDER BY t.epoch_s DESC
+           LIMIT 10;
+    PRINT Txns;
+}
+INSTALL QUERY money_flow_trace

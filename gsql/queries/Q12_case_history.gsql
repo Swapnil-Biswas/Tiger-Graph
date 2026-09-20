@@ -1,0 +1,10 @@
+// Q12: case_history
+USE GRAPH FraudInvestigation
+
+CREATE QUERY case_history(VERTEX<Card> target_card, STRING as_of) FOR GRAPH FraudInvestigation {
+    Start = {target_card};
+    Cases = SELECT cs FROM Start:s <-(ON_CARD:e)- ClosedCase:cs
+            WHERE cs.opened_at <= as_of;
+    PRINT Cases;
+}
+INSTALL QUERY case_history

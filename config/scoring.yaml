@@ -1,0 +1,19 @@
+# Deterministic Scoring & Sufficiency Model Configuration
+weights:
+  bank_risk_score: 0.20
+  pattern_match_confidence: 0.30
+  new_device_novelty: 0.15
+  proxy_presence: 0.10
+  velocity_burst_ratio: 0.10
+  device_sharing_cluster: 0.10
+  geo_anomaly: 0.05
+
+sufficiency:
+  min_confidence_to_act: 0.75
+  min_margin_top_hypothesis: 0.20
+  max_investigation_loops: 3
+  max_evidence_requests: 2
+
+customer_habits_dampener:
+  habitual_region_discount: 0.25
+  long_tenure_baseline_discount: 0.15

@@ -1,0 +1,18 @@
+// Q4: device_sharing
+// Device linkage across distinct cards and customers
+USE GRAPH FraudInvestigation
+
+CREATE QUERY device_sharing(VERTEX<DeviceProfile> target_dev, STRING as_of) FOR GRAPH FraudInvestigation {
+    SetAccum<VERTEX<Card>> @@connected_cards;
+    SetAccum<STRING> @@connected_customers;
+
+    Start = {target_dev};
+    Txns = SELECT t FROM Start:s <-(FROM_DEVICE:e)- Transaction:t
+           WHERE t.ts <= as_of;
+    Cards = SELECT c FROM Txns:t <-(MADE:e)- Card:c
+            ACCUM @@connected_cards += c,
+                  @@connected_customers += c.customer_id;
+
+    PRINT @@connected_cards.size() AS card_count, @@connected_customers.size() AS customer_count;
+}
+INSTALL QUERY device_sharing

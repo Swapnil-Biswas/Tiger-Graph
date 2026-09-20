@@ -1,0 +1,17 @@
+// Q6: ring_detection
+USE GRAPH FraudInvestigation
+
+CREATE QUERY ring_detection(VERTEX<Card> target_card, STRING as_of) FOR GRAPH FraudInvestigation {
+    SetAccum<VERTEX<Card>> @@cluster_cards;
+    SetAccum<VERTEX<ClosedCase>> @@fraud_cases;
+
+    Start = {target_card};
+    Txns = SELECT t FROM Start:s -(MADE:e)-> Transaction:t WHERE t.ts <= as_of;
+    Devices = SELECT d FROM Txns:t -(FROM_DEVICE:e)-> DeviceProfile:d;
+    OtherTxns = SELECT t FROM Devices:d <-(FROM_DEVICE:e)- Transaction:t WHERE t.ts <= as_of;
+    Cards = SELECT c FROM OtherTxns:t <-(MADE:e)- Card:c ACCUM @@cluster_cards += c;
+    Cases = SELECT cs FROM Cards:c <-(ON_CARD:e)- ClosedCase:cs WHERE cs.outcome == "confirmed_fraud" ACCUM @@fraud_cases += cs;
+
+    PRINT @@cluster_cards.size() AS cluster_size, @@fraud_cases.size() AS confirmed_fraud_in_cluster;
+}
+INSTALL QUERY ring_detection

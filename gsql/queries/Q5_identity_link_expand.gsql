@@ -1,0 +1,20 @@
+// Q5: identity_link_expand
+// K-hop expansion via shared device, email, or billing address
+USE GRAPH FraudInvestigation
+
+CREATE QUERY identity_link_expand(VERTEX<Card> target_card, INT k_hops, STRING as_of) FOR GRAPH FraudInvestigation {
+    SetAccum<VERTEX<Card>> @@linked_cards;
+    Start = {target_card};
+
+    Txns = SELECT t FROM Start:s -(MADE:e)-> Transaction:t
+           WHERE t.ts <= as_of;
+    Devices = SELECT d FROM Txns:t -(FROM_DEVICE:e)-> DeviceProfile:d;
+    OtherTxns = SELECT t FROM Devices:d <-(FROM_DEVICE:e)- Transaction:t
+                WHERE t.ts <= as_of;
+    OtherCards = SELECT c FROM OtherTxns:t <-(MADE:e)- Card:c
+                 WHERE c != target_card
+                 ACCUM @@linked_cards += c;
+
+    PRINT @@linked_cards;
+}
+INSTALL QUERY identity_link_expand

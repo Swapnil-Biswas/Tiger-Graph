@@ -1,0 +1,85 @@
+# Action Catalog Configuration
+actions:
+  ALLOW_TRANSACTION:
+    impact: none
+    reversible: true
+    default_route: auto
+    description: "Allow the flagged authorization to proceed."
+
+  DECLINE_TRANSACTION:
+    impact: low
+    reversible: false
+    default_route: L1
+    description: "Decline the flagged authorization only. Card remains active."
+
+  MONITOR_CARD:
+    impact: none
+    reversible: true
+    default_route: auto
+    description: "Card stays active; elevate monitoring sensitivity for 72 hours."
+
+  MONITOR_CONNECTED_CARDS:
+    impact: none
+    reversible: true
+    default_route: auto
+    description: "Put other cards linked to the same device, region cluster, or ring under monitoring."
+
+  WARN_CUSTOMER:
+    impact: none
+    reversible: true
+    default_route: auto
+    description: "Send informational security message or recurring charge tip."
+
+  VERIFY_WITH_CUSTOMER:
+    impact: low
+    reversible: true
+    default_route: auto
+    description: "Ask cardholder whether they recognize the transaction. Card stays active."
+
+  STEP_UP_AUTH:
+    impact: low
+    reversible: true
+    default_route: auto
+    description: "Require one-time passcode or app confirmation before further activity."
+
+  BLOCK_CARD:
+    impact: high
+    reversible: false
+    default_route: L1 # L1 if exposure <= $2,500; L2 if > $2,500
+    description: "Block this card and reissue."
+
+  BLOCK_ALL_CARDS:
+    impact: very_high
+    reversible: false
+    default_route: L2
+    description: "Block every card the customer holds. Requires >= 2 confirmed fraud cards or compromised credentials."
+
+  GENERATE_REPORT:
+    impact: none
+    reversible: true
+    default_route: auto
+    description: "Write up investigation for internal record without opening a case."
+
+  CREATE_CASE:
+    impact: none
+    reversible: true
+    default_route: auto
+    description: "Open an internal fraud case with evidence attached and write to graph."
+
+  FILE_REPORT:
+    impact: none
+    reversible: false
+    default_route: L2
+    description: "File a regulatory Suspicious Activity Report (SAR)."
+
+  ESCALATE_TO_ANALYST:
+    impact: none
+    reversible: true
+    default_route: auto
+    description: "Hand case to human fraud analyst with structured evidence."
+
+  CLOSE_NO_FRAUD:
+    impact: none
+    reversible: true
+    default_route: auto
+    description: "Close alert as legitimate false alarm."

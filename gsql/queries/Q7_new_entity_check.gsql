@@ -1,0 +1,16 @@
+// Q7: new_entity_check
+USE GRAPH FraudInvestigation
+
+CREATE QUERY new_entity_check(VERTEX<Transaction> target_txn, STRING as_of) FOR GRAPH FraudInvestigation {
+    Start = {target_txn};
+    Customers = SELECT cu FROM Start:s <-(MADE:e)- Card:c <-(OWNS:e)- Customer:cu;
+    PriorTxns = SELECT t FROM Customers:cu -(OWNS:e)-> Card:c -(MADE:e)-> Transaction:t
+                WHERE t.ts < as_of;
+    PriorDevices = SELECT d FROM PriorTxns:t -(FROM_DEVICE:e)-> DeviceProfile:d;
+
+    TargetDevice = SELECT d FROM Start:s -(FROM_DEVICE:e)-> DeviceProfile:d;
+    IsNew = (TargetDevice MINUS PriorDevices).size() > 0;
+
+    PRINT IsNew;
+}
+INSTALL QUERY new_entity_check

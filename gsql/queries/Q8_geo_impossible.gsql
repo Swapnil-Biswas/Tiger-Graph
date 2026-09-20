@@ -1,0 +1,10 @@
+// Q8: geo_impossible
+USE GRAPH FraudInvestigation
+
+CREATE QUERY geo_impossible(VERTEX<Card> target_card, STRING as_of) FOR GRAPH FraudInvestigation {
+    Start = {target_card};
+    InPersonTxns = SELECT t FROM Start:s -(MADE:e)-> Transaction:t
+                   WHERE t.ts <= as_of AND t.channel == "in_person";
+    PRINT InPersonTxns;
+}
+INSTALL QUERY geo_impossible

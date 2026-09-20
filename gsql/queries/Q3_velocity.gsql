@@ -1,0 +1,19 @@
+// Q3: velocity
+// Velocity burst detection in time windows
+USE GRAPH FraudInvestigation
+
+CREATE QUERY velocity(VERTEX<Card> target_card, STRING as_of) FOR GRAPH FraudInvestigation {
+    SumAccum<INT> @count_1h = 0;
+    SumAccum<DOUBLE> @sum_1h = 0.0;
+    SumAccum<INT> @count_24h = 0;
+    SumAccum<DOUBLE> @sum_24h = 0.0;
+
+    Start = {target_card};
+    Txns = SELECT t FROM Start:s -(MADE:e)-> Transaction:t
+           WHERE t.ts <= as_of
+           ACCUM s.@count_24h += 1,
+                 s.@sum_24h += t.amount;
+
+    PRINT Start;
+}
+INSTALL QUERY velocity
