@@ -1,3 +1,30 @@
+## Iteration 077: Clean Clone Automated Sanity & Validation Scripts | 2026-09-21 06:15 | commit pending
+- **Lens:** 14. Testing, evaluation & benchmarks, 11. Agent architecture & engineering, 13. System performance & scalability
+- **Goal / hypothesis:** For evaluators, competition judges, and operational engineers cloning the repository for the first time, an automated, cross-platform sanity suite is essential to verify environment readiness, package dependencies, graph assets, benchmark cases, and demo execution in a single command. Creating `scripts/verify_install.py`, `scripts/run_all.sh`, and `scripts/run_all.ps1` delivers:
+  1. **Automated Verification**: Checks Python >= 3.10, imports core dependencies, checks filesystem structure, validates all 20 benchmark case schemas, and runs the Phase 4 demo path.
+  2. **Cross-Platform Compatibility**: Full ASCII/ANSI support compatible with Windows CMD/PowerShell (CP1252/UTF-8) and Linux/macOS.
+  3. **Machine-Readable Diagnostics**: Supports `--quick`, `--skip-demo`, and `--json` for automated CI/CD pipeline gating.
+  4. **One-Click Runners**: Shell (`scripts/run_all.sh`) and PowerShell (`scripts/run_all.ps1`) scripts for instant developer onboarding and automated verification.
+- **Changes (files):**
+  - `scripts/verify_install.py`: Implemented cross-platform verification and sanity auditing tool.
+  - `scripts/run_all.sh`: Created Bash runner for Linux/macOS.
+  - `scripts/run_all.ps1`: Created PowerShell runner for Windows.
+  - `tests/test_sanity_scripts.py`: Created 7 unit tests validating sanity checks, JSON output, and convenience scripts.
+- **Tests added/updated:**
+  - `tests/test_sanity_scripts.py` (7 unit tests, all pass).
+  - Total unit test suite expanded from 292 to **299** tests across 62 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 292 -> **299** (100% pass rate across 62 test suites)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 299 passed across 62 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 076: Architecture Diagrams & End-to-End Visual Flow in Docs | 2026-09-21 06:00 | commit c117c23
 - **Lens:** 10. Case summary, explanation & visual reporting, 11. Agent architecture & engineering, 8. Explainability & human-in-the-loop
 - **Goal / hypothesis:** Enterprise fraud detection architectures require clear, publication-grade visual and technical documentation to allow compliance auditors, platform engineers, and operations teams to understand the end-to-end data flow, multi-agent consensus protocols, and authorization gates. Creating `docs/ARCHITECTURE.md` provides:
