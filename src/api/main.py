@@ -8,6 +8,7 @@ import os
 import sys
 import json
 import time
+import uuid
 from typing import Dict, Any, Optional, List, Union
 from fastapi import FastAPI, HTTPException, Query, Body, Response, Depends
 from fastapi.responses import StreamingResponse, JSONResponse, FileResponse
@@ -87,6 +88,9 @@ telemetry.set_gauge("graph_indexed_entities", len(agent.client.store.transaction
 telemetry.set_gauge("graph_indexed_entities", len(agent.client.store.cards), {"type": "cards"})
 telemetry.set_gauge("graph_indexed_entities", len(agent.client.store.customers), {"type": "customers"})
 telemetry.set_gauge("graph_indexed_entities", len(agent.client.store.closed_cases), {"type": "cases"})
+
+# Enterprise Webhook Dispatcher
+from src.api.webhooks import webhook_dispatcher
 
 # In-memory store for active cases & approvals
 active_cases: Dict[str, Dict[str, Any]] = {}
@@ -382,6 +386,29 @@ def start_investigation(req: InvestigateRequest):
                 "exposure_usd": res["case"]["exposure_usd"],
                 "status": "pending",
             }
+            if act["route"] == "L2":
+                webhook_dispatcher.dispatch_event(
+                    "CASE_ESCALATION_L2",
+                    {
+                        "case_id": req.case_id,
+                        "action": act["action"],
+                        "route": act["route"],
+                        "exposure_usd": res["case"]["exposure_usd"],
+                        "verdict": res["case"]["verdict"],
+                    },
+                )
+
+    if res.get("sar", {}).get("file"):
+        webhook_dispatcher.dispatch_event(
+            "SAR_FILING_REQUIRED",
+            {
+                "case_id": req.case_id,
+                "exposure_usd": res["case"]["exposure_usd"],
+                "verdict": res["case"]["verdict"],
+                "sar_file": res["sar"]["file"],
+                "subjects": res["sar"].get("subjects", []),
+            },
+        )
 
     return {"case_id": req.case_id, "status": "complete", "result": res}
 
@@ -1296,6 +1323,18 @@ def ingest_streaming_transaction(req: StreamingIngestRequest):
     if alerts:
         for a in alerts:
             telemetry.inc_counter("streaming_alerts_emitted_total", 1.0, {"rule": a.rule_triggered, "severity": a.severity})
+            if a.severity == "CRITICAL":
+                webhook_dispatcher.dispatch_event(
+                    "STREAMING_CRITICAL_ANOMALY",
+                    {
+                        "alert_id": a.alert_id,
+                        "card_id": a.card_id,
+                        "rule": a.rule_triggered,
+                        "severity": a.severity,
+                        "details": a.details,
+                        "timestamp": a.timestamp,
+                    },
+                )
     return {
         "processed": len(txns),
         "alerts_triggered": len(alerts),
@@ -1328,6 +1367,75 @@ def get_prometheus_metrics():
 def get_telemetry_dashboard():
     """Returns operational SLA telemetry metrics and health status."""
     return telemetry.get_dashboard_summary()
+
+
+class WebhookSubscriptionRequest(BaseModel):
+    url: str
+    secret: str
+    events: Optional[List[str]] = None
+    enabled: bool = True
+
+
+WebhookSubscriptionRequest.model_rebuild()
+
+
+class WebhookTestRequest(BaseModel):
+    event_type: str = "TEST_INCIDENT_EVENT"
+    payload: Optional[Dict[str, Any]] = None
+
+
+WebhookTestRequest.model_rebuild()
+
+
+@app.post("/api/webhooks/subscriptions")
+def register_webhook_subscription(req: WebhookSubscriptionRequest):
+    """Registers a webhook endpoint to receive real-time fraud incident notifications."""
+    sub = webhook_dispatcher.register_subscription(
+        url=req.url,
+        secret=req.secret,
+        events=req.events,
+        enabled=req.enabled,
+    )
+    return {"status": "success", "subscription": sub.to_dict()}
+
+
+@app.get("/api/webhooks/subscriptions")
+def get_webhook_subscriptions():
+    """Lists all active webhook subscriptions."""
+    return {"subscriptions": [s.to_dict() for s in webhook_dispatcher.get_subscriptions()]}
+
+
+@app.delete("/api/webhooks/subscriptions/{sub_id}")
+def delete_webhook_subscription(sub_id: str):
+    """Removes a registered webhook subscription."""
+    deleted = webhook_dispatcher.delete_subscription(sub_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail=f"Subscription {sub_id} not found.")
+    return {"status": "success", "deleted_id": sub_id}
+
+
+@app.post("/api/webhooks/test")
+def test_webhook_dispatch(req: WebhookTestRequest):
+    """Triggers a simulated webhook delivery for testing external integrations."""
+    sample_payload = req.payload or {
+        "incident_id": f"INC-{uuid.uuid4().hex[:8].upper()}",
+        "severity": "CRITICAL",
+        "description": "Simulated fraud syndicate alert for webhook validation",
+        "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+    }
+    deliveries = webhook_dispatcher.dispatch_event(req.event_type, sample_payload, send_http=False)
+    return {
+        "status": "dispatched",
+        "event_type": req.event_type,
+        "deliveries_count": len(deliveries),
+        "deliveries": [d.to_dict() for d in deliveries],
+    }
+
+
+@app.get("/api/webhooks/deliveries")
+def get_webhook_deliveries(limit: int = 50):
+    """Returns recent webhook delivery audit history."""
+    return {"deliveries": webhook_dispatcher.get_delivery_log(limit=limit)}
 
 
 @app.post("/api/benchmark/run")

@@ -1,3 +1,33 @@
+## Iteration 073: Enterprise HMAC-SHA256 Webhook Dispatcher & PagerDuty/Slack Incident Bridge | 2026-09-21 05:15 | commit pending
+- **Lens:** 3. Next best action & policy guidance, 8. Explainability & human-in-the-loop, 11. Agent architecture & engineering, 15. Real-world fraud domain alignment
+- **Goal / hypothesis:** When critical fraud events (syndicate attacks, high-exposure SAR requirements, L2 approvals) occur, enterprise fraud operations centers require instant notification dispatching to incident management systems (PagerDuty, Slack, OpsGenie) with cryptographic anti-tamper verification. Building an enterprise webhook dispatcher delivers:
+  1. **HMAC-SHA256 Signed Payloads**: Standardized signature headers (`X-TigerGraph-Signature: t=<ts>,v1=<signature>`) enforcing cryptographic authenticity and 300s replay-attack tolerance.
+  2. **Automated Event Triggers**:
+     - `STREAMING_CRITICAL_ANOMALY`: Dispatched automatically when streaming monitor emits a CRITICAL alert.
+     - `CASE_ESCALATION_L2`: Dispatched automatically when a case requires L2 senior investigator approval.
+     - `SAR_FILING_REQUIRED`: Dispatched automatically when a case triggers statutory FinCEN SAR filing.
+  3. **Subscription Lifecycle & Filtering**: Register, list, and delete webhook endpoints with granular event filtering (`*` wildcard or specific events) and secret masking.
+  4. **Audit Trail**: Detailed in-memory delivery logs tracking delivery IDs, timestamps, HTTP status codes, and error messages.
+- **Changes (files):**
+  - `src/api/webhooks.py`: Created `EnterpriseWebhookDispatcher`, `WebhookSubscription`, and `WebhookDeliveryRecord`.
+  - `src/api/main.py`: Integrated webhook dispatching into `start_investigation` and `ingest_streaming_transaction`; added REST endpoints `/api/webhooks/subscriptions`, `/api/webhooks/test`, and `/api/webhooks/deliveries`.
+  - `tests/test_webhooks.py`: Created 4 unit and integration tests verifying HMAC signatures, subscription lifecycle, REST endpoints, and pipeline dispatching.
+- **Tests added/updated:**
+  - `tests/test_webhooks.py` (4 unit tests, all pass).
+  - Total unit test suite expanded from 280 to **284** tests across 59 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 280 -> **284** (100% pass rate across 59 test suites)
+  - Incident Bridge: Cryptographically signed HMAC-SHA256 webhook dispatcher for PagerDuty/Slack/SOC
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 284 passed across 59 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
 ## Iteration 072: Production Grafana SLA Monitoring Dashboard & Prometheus Alertmanager Rules | 2026-09-21 05:00 | commit ace40c3
 - **Lens:** 13. System performance & scalability, 7. Real-time latency & computational efficiency, 9. Demo & presentation quality, 15. Real-world fraud domain alignment
 - **Goal / hypothesis:** Enterprise fraud operations centers rely on production Grafana visual dashboards for monitoring SLA compliance and Prometheus Alertmanager rules for automated incident alerting when SLAs are violated or high-severity fraud waves occur. Delivering these observability assets provides:

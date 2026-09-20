@@ -256,6 +256,9 @@ Ranked by expected impact on Hackathon Judging Criteria:
 72. **[DONE - Iteration 072] [Observability & SRE Dashboards] Production Grafana SLA Monitoring Dashboard & Prometheus Alertmanager Rules**
     - *Result:* Created production Grafana 10 dashboard in `deploy/grafana/fraud_sla_dashboard.json` (uid: `tigergraph-fraud-sla`) featuring 9 panels: SLA Health Status Single-Stat, End-to-End Investigation Latency Percentiles (P50/P90/P99), Streaming Influx Throughput, Real-Time Streaming Anomaly Alerts by Rule & Severity, Policy Actions Authorized by Role, and Graph Store Entity Gauges. Added Prometheus Alertmanager alerting rules in `deploy/grafana/alerts.yml` covering P95 latency violations (> 50ms), critical streaming anomaly surges (> 5/min), velocity burst clusters, and graph capacity warnings. Added 3 unit tests in `tests/test_grafana_dashboard.py` (280/280 tests pass across 58 suites).
 
+73. **[DONE - Iteration 073] [Enterprise Incident Bridge & Webhooks] Cryptographically Signed Webhook Dispatcher & PagerDuty/Slack Bridge**
+    - *Result:* Implemented `EnterpriseWebhookDispatcher`, `WebhookSubscription`, and `WebhookDeliveryRecord` in `src/api/webhooks.py`. Provides HMAC-SHA256 signature signing (`X-TigerGraph-Signature: t=<timestamp>,v1=<hex>`) and verification with replay attack prevention (300s tolerance). Integrated automatic webhook dispatching for `STREAMING_CRITICAL_ANOMALY` events, `CASE_ESCALATION_L2` approvals, and `SAR_FILING_REQUIRED` submissions. Added REST endpoints `POST /api/webhooks/subscriptions`, `GET /api/webhooks/subscriptions`, `DELETE /api/webhooks/subscriptions/{sub_id}`, `POST /api/webhooks/test`, and `GET /api/webhooks/deliveries`. Added 4 unit tests in `tests/test_webhooks.py` (284/284 tests pass across 59 suites).
+
 ---
 
 ## Polish & Submission Readiness (Iterations 76–100)
