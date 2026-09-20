@@ -1,4 +1,4 @@
-## Iteration 053: Multi-Agent Debate & Weighted Majority Voting Consensus Protocol | 2026-09-20 23:25 | commit TBD_COMMIT
+## Iteration 053: Multi-Agent Debate & Weighted Majority Voting Consensus Protocol | 2026-09-20 23:25 | commit 37ba769
 - **Lens:** 2. Investigation accuracy & decision making & 11. Agent architecture & engineering
 - **Goal / hypothesis:** In mission-critical financial crime investigations, specialized domain sub-agents (Fraud, AML, Cyber) frequently generate conflicting signals on complex edge cases (e.g. cardholder confirms transaction authorization, but Cyber agent flags critical hardware virtualization pooling, or cumulative account spend mandates BSA FinCEN SAR filing). Implementing `MultiAgentConsensusEngine` in `src/agent/consensus.py` formalizes a multi-agent debate and calibrated majority voting protocol:
   1. **Dynamic Domain Weighting**: Assigns weights ($w_{\text{fraud}}, w_{\text{aml}}, w_{\text{cyber}}$ summing strictly to 1.00) dynamically calibrated to incident exposure and trigger typologies (e.g. AML dominance on structuring $\ge \$10,000$, Cyber dominance on bot bursts).
