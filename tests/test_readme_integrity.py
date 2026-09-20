@@ -19,8 +19,8 @@ class TestReadmeIntegrity(unittest.TestCase):
         self.content = self.readme_path.read_text(encoding="utf-8")
 
     def test_badges_present(self):
-        self.assertIn("badge/release-v0.85", self.content)
-        self.assertIn("badge/tests-334", self.content)
+        self.assertIn("badge/release-v1.0", self.content)
+        self.assertIn("badge/tests-409", self.content)
         self.assertIn("badge/python", self.content)
         self.assertIn("badge/TigerGraph", self.content)
 

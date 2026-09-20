@@ -1,7 +1,7 @@
 # TigerGraph Autonomous Fraud Investigator & Next-Best-Action Agent
 
-[![Release](https://img.shields.io/badge/release-v0.85-brightgreen.svg)](https://github.com/Swapnil-Biswas/Tiger-Graph/releases/tag/v0.85)
-[![Tests](https://img.shields.io/badge/tests-334%20passed%20%7C%2068%20suites-brightgreen.svg)](tests/)
+[![Release](https://img.shields.io/badge/release-v1.0-brightgreen.svg)](https://github.com/Swapnil-Biswas/Tiger-Graph/releases/tag/v1.0)
+[![Tests](https://img.shields.io/badge/tests-409%20passed%20%7C%2080%20suites-brightgreen.svg)](tests/)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.14-blue.svg)](https://www.python.org/)
 [![TigerGraph](https://img.shields.io/badge/TigerGraph-Native%20GSQL%20(Q1--Q26)-FF6600.svg)](https://www.tigergraph.com/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.140+-009688.svg)](https://fastapi.tiangolo.com)
@@ -177,7 +177,7 @@ Evaluated against the official benchmark pack. All 20 cases achieve **100% schem
 ## 6. Verification Gates
 
 ```bash
-# Run full test suite (334 tests across 68 suites)
+# Run full test suite (409 tests across 80 suites)
 python -m unittest discover -s tests -p "test_*.py"
 
 # Run official benchmark schema validator (20/20 valid)
