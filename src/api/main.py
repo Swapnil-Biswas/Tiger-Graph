@@ -1517,6 +1517,28 @@ def get_graphql(query: Optional[str] = Query(default=None)):
     return HTMLResponse(content=get_graphiql_html())
 
 
+# Rate Limiting & DoS Interception Filter
+from src.api.rate_limiter import rate_limiter
+
+@app.get("/api/security/ratelimit/stats")
+def get_rate_limit_stats():
+    """Retrieve diagnostic rate limiting metrics and quarantined clients."""
+    return rate_limiter.get_stats()
+
+
+@app.post("/api/security/ratelimit/reset")
+def reset_rate_limit(client_id: Optional[str] = Query(default=None)):
+    """Reset rate limit buckets for a specific client or all clients."""
+    if client_id:
+        rate_limiter.reset_client(client_id)
+        return {"status": "reset", "client_id": client_id}
+    with rate_limiter._lock:
+        rate_limiter.buckets.clear()
+        rate_limiter.violations.clear()
+        rate_limiter.quarantined.clear()
+    return {"status": "all_reset"}
+
+
 # Mount UI static directory
 ui_dir = os.path.join(os.path.dirname(__file__), "../../ui")
 if os.path.exists(ui_dir):

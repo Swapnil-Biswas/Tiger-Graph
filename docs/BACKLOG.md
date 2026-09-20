@@ -311,6 +311,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 87. **[DONE - Iteration 087] [API & Protocol Integration] GraphQL Schema Definition & Query Resolver**
     - *Result:* Implemented lightweight zero-dependency `GraphQLParser`, `FraudGraphQLResolver`, and `GraphQLSchema` in `src/api/graphql_schema.py`. Supports recursive AST parsing, arguments, field aliases, variable substitution, and schema introspection (`__schema`). Resolves `case(caseId)`, `cases(limit, verdict, status)`, `customer(customerId)`, `auditLedger(limit)`, and `benchmarkSummary`. Integrated into `src/api/main.py` via `POST /graphql` and interactive dark-mode GraphiQL playground via `GET /graphql`. Added `__len__` to `CryptographicAuditLedger`. Added 9 unit tests in `tests/test_graphql_api.py` (348/348 tests pass across 70 suites).
 
-88. **[Security & Policy] Dynamic Rate Limiting & DoS Interception Filter**
+88. **[DONE - Iteration 088] [Security & Policy] Dynamic Rate Limiting & DoS Interception Filter**
+    - *Result:* Implemented `TokenBucket`, `DynamicRateLimiter`, and `RateLimitMiddleware` in `src/api/rate_limiter.py`. Provides thread-safe token bucket consumption with sub-millisecond overhead, tiered quotas (critical: 10 burst / 0.5 refill, standard: 60 burst / 2.0 refill, relaxed: 200 burst / 10.0 refill), automatic client quarantining upon repeated violations, IP and API-key identification, and RFC 6585 HTTP 429 responses with `Retry-After` headers. Integrated into `src/api/main.py` with diagnostic endpoints `GET /api/security/ratelimit/stats` and `POST /api/security/ratelimit/reset`. Added 7 unit tests in `tests/test_rate_limiter.py` (355/355 tests pass across 71 suites).
+
 89. **[Explainability & Synthesis] Executive Case Summary PDF/Markdown Briefing Exporter**
 90. **[Release Tag v0.9] Checkpoint 16 Audit & 90-Iteration Milestone Review**

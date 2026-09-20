@@ -1,4 +1,35 @@
-## Iteration 087: GraphQL Schema Definition & Query Resolver | 2026-09-21 08:45 | commit 77ec152
+## Iteration 088: Dynamic Rate Limiting & DoS Interception Filter | 2026-09-21 09:00 | commit d960266
+- **Lens:** 9. Security, safety & defenses, 15. Operational readiness & runbooks, 11. Agent architecture & engineering
+- **Goal / hypothesis:** Mission-critical fraud investigation APIs require robust denial-of-service (DoS) interception and resource protection against abusive traffic spikes, rogue scraper loops, and brute-force mutations. Implementing a dynamic rate limiter delivers:
+  1. **Thread-Safe Token Bucket Algorithm (`TokenBucket`)**: High-performance $O(1)$ token consumption with sub-millisecond overhead, continuous fractional refill math, and dynamic capacity tracking.
+  2. **Route-Based Tiering (`DynamicRateLimiter`)**: Categorizes paths into critical (burst 10, refill 0.5 req/s for `/api/investigate`, `/api/benchmark/run`, `/graphql`), standard (burst 60, refill 2.0 req/s for read endpoints), and relaxed (burst 200, refill 10.0 req/s for telemetry/health).
+  3. **Automatic Client Quarantining**: Automatically detects repetitive rate limit violations (>= 5 429s in 30s) and quarantines the offending client IP or API key for a configurable cooldown window (30s).
+  4. **RFC 6585 & IETF Compliance**: Generates HTTP 429 Too Many Requests responses with canonical headers (`Retry-After`, `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`).
+  5. **Security Telemetry & Admin Endpoints**: Exposed `GET /api/security/ratelimit/stats` and `POST /api/security/ratelimit/reset` in `src/api/main.py`.
+- **Changes (files):**
+  - `src/api/rate_limiter.py`: Implemented TokenBucket, DynamicRateLimiter, RateLimitMiddleware, and route tiering.
+  - `src/api/main.py`: Integrated rate_limiter with security admin endpoints.
+  - `tests/test_rate_limiter.py`: Created 7 unit tests covering token consumption, refill, tiers, quarantine, reset, whitelist, and middleware interception.
+  - `docs/METRICS.md`: Added Iteration 088 row.
+  - `docs/BACKLOG.md`: Marked item 88 as DONE.
+  - `docs/IMPROVEMENT_LOG.md`: Documented Iteration 088.
+- **Tests added/updated:**
+  - `tests/test_rate_limiter.py` (7 unit tests, all pass).
+  - Total unit test suite expanded from 348 to **355** tests across 71 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 348 -> **355** (100% pass rate across 71 test suites)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Extended Benchmark Answers Valid: 50/50 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: 355 passed across 71 suites.
+  - Schema validator: 20/20 benchmark cases pass.
+  - Demo path (`test_phase4.py`): 6/6 tests pass.
+  - Zero secrets committed.
+
+## Iteration 087: GraphQL Schema Definition & Query Resolver | 2026-09-21 08:45 | commit f872b23
 - **Lens:** 11. Agent architecture & engineering, 15. Operational readiness & runbooks, 10. Visualization & UI/UX
 - **Goal / hypothesis:** Enterprise financial crime platforms require flexible, zero-overfetch querying for mobile apps, analyst dashboards, and external microservices. Implementing a native GraphQL engine delivers:
   1. **Zero-Dependency GraphQL AST Parser (`src/api/graphql_schema.py`)**: `GraphQLParser` performs recursive descent parsing of selection sets, arguments (`caseId: "..."`, `limit: 5`), field aliases (`targetCase: case(...)`), and variable substitutions (`$id: String!`).
