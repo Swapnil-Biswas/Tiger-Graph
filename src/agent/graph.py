@@ -28,6 +28,7 @@ from src.agent.decide import NextBestActionPlanner
 from src.agent.counterfactual import CounterfactualExplainer
 from src.cases.sar_generator import SARNarrativeGenerator
 from src.graph.algorithms import UndocumentedPatternDetector
+from src.agent.security import InputSanitizer
 
 
 class FraudInvestigatorAgent:
@@ -74,11 +75,14 @@ class FraudInvestigatorAgent:
         else:
             t_type = "risk_score"
 
+        raw_trigger = case_info.get("trigger_text", f"Alert triggered on card {card_id}")
+        clean_trigger, is_mal_trigger, _ = InputSanitizer.sanitize_untrusted_text(raw_trigger)
+
         trigger_data = {
             "case_id": case_id,
             "opened_at": opened_at,
             "trigger_type": t_type,
-            "trigger_text": case_info.get("trigger_text", f"Alert triggered on card {card_id}"),
+            "trigger_text": clean_trigger,
             "card_id": card_id,
             "customer_id": cust_id,
             "flagged_txn_id": flagged_txn,
@@ -270,14 +274,16 @@ class FraudInvestigatorAgent:
                 request_type=ev_req.type,
                 scenario=scenario,
             )
-            ev_req.assumed_response = sim_reply["assumed_response"]
+            clean_reply, is_mal, _ = InputSanitizer.sanitize_untrusted_text(sim_reply["assumed_response"])
+            sim_reply["assumed_response"] = clean_reply
+            ev_req.assumed_response = clean_reply
             evidence_requests.append(ev_req)
 
             # Add customer response as evidence
             add_evidence(
                 "customer",
                 "evidence_request:1",
-                sim_reply["assumed_response"],
+                clean_reply,
                 [],
             )
 

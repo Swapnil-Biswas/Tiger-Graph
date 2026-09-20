@@ -53,10 +53,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 11. **[DONE - Iteration 011] [Undocumented Pattern Discovery] Graph Anomaly Detection & Syndicate Nexus**
     - *Result:* Built `src/graph/algorithms.py` detecting multi-card proxy rotation, device pooling nexus, coordinated bursts, and rapid geo-dispersion. Integrated into `UncertaintyAssessmentEngine` and `FraudInvestigatorAgent`. Added 2 unit tests in `tests/test_undocumented_patterns.py` (27 tests, 100% pass).
 
-12. **[Security & Safety] Prompt Injection Defenses & Adversarial Input Sanitization**
-    - *Goal:* Implement strict input sanitization preventing prompt injection attacks embedded in customer disavowal text, simulated chat replies, or merchant descriptor strings.
-    - *Files:* `src/agent/security.py`, `tests/test_security.py`
-    - *Metric Impact:* Security & Safety.
+12. **[DONE - Iteration 012] [Security & Safety] Prompt Injection Defenses & Adversarial Input Sanitization**
+    - *Result:* Built `src/agent/security.py` detecting and defanging direct instruction overrides, jailbreak phrases, delimiter injections, and zero-width control characters. Integrated into `FraudInvestigatorAgent`. Added 4 unit tests in `tests/test_security.py` (31 tests, 100% pass).
 
 13. **[Case Memory] Dynamic Prior-Based Bayesian Adjustment Loop**
     - *Goal:* Formally condition the fraud prior on historical closed-case outcomes for identical merchants/regions without leaking post-hoc ground truth.
