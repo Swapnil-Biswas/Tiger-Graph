@@ -1,4 +1,4 @@
-## Iteration 044: Temporal Transaction Subgraph Motif Mining | 2026-09-20 20:30 | commit iter-044
+## Iteration 044: Temporal Transaction Subgraph Motif Mining | 2026-09-20 20:30 | commit 6052b3e
 - **Lens:** 1. Graph schema & modeling & 6. Transaction velocity & burst & 11. Agent architecture & engineering
 - **Goal / hypothesis:** Fraud syndicates and automated card-cracking bots exhibit distinct temporal subgraph motifs that cannot be captured by static degree counts or single-edge queries alone. By mining higher-order temporal transaction motifs across continuous rolling windows (fan-out stars, fan-in hubs, bipartite meshes, temporal chains, and sharing triangles), the agent can quantify complex coordinated behavioral topology, evaluate anomaly scores, and assign threat levels (critical, high, elevated, low, none).
 - **Changes (files):**
