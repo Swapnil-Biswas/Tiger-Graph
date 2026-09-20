@@ -33,7 +33,7 @@
       align-items: center;
     }
     .verdict-badge {
-      background: #10b981;
+      background: #ef4444;
       color: #fff;
       padding: 0.5rem 1.25rem;
       border-radius: 20px;
@@ -112,24 +112,24 @@
     <div class="header">
       <div>
         <h1 style="font-size: 1.75rem; font-weight: 800; color: #fff;">TigerGraph Incident Dossier</h1>
-        <p style="color: var(--text-muted); margin-top: 0.25rem;">Case Reference: <code>HHG-001</code> | Status: Closed Legitimate</p>
+        <p style="color: var(--text-muted); margin-top: 0.25rem;">Case Reference: <code>HHG-001</code> | Status: Closed Fraud</p>
       </div>
-      <div class="verdict-badge">LEGITIMATE</div>
+      <div class="verdict-badge">FRAUD</div>
     </div>
 
     <!-- Stats Bar -->
     <div class="stats-bar">
       <div class="stat-card">
         <div class="lbl">Assessed Exposure</div>
-        <div class="val">$0.00</div>
+        <div class="val">$413.10</div>
       </div>
       <div class="stat-card">
         <div class="lbl">Fraud Probability</div>
-        <div class="val">0.06</div>
+        <div class="val">1.00</div>
       </div>
       <div class="stat-card">
         <div class="lbl">Typology Pattern</div>
-        <div class="val" style="font-size: 1.1rem; padding-top: 0.4rem;">None</div>
+        <div class="val" style="font-size: 1.1rem; padding-top: 0.4rem;">Out Of Region Use</div>
       </div>
       <div class="stat-card">
         <div class="lbl">Audit Faithfulness</div>
@@ -140,12 +140,12 @@
     <!-- Investigation Narrative -->
     <div class="section-card">
       <h2>1. Autonomous Investigation Narrative</h2>
-      <p>Investigation cleared the alert for card C12382-K1 as legitimate activity. Transaction characteristics match cardholder baseline history; customer confirmation confirmed authorized use.
+      <p>Investigation confirmed unauthorized activity on card C12382-K1 under pattern &#x27;out_of_region_use&#x27;. Total exposure identified is $413.10 across 4 transaction(s). Cardholder outreach and graph evidence confirmed compromise; defensive card blocks and case progression executed.
 
 Decision Sensitivity (Counterfactual Boundaries):
-  1. [Unrecognized Device / Proxy]: Transaction executed from anonymous VPN proxy or unknown mobile OS -&gt; Would trigger Rule R1 step-up authentication challenge and elevate risk points by +30.0.
-  2. [Cross-Card Cluster Sharing]: Device or billing IP detected across ≥ 2 other compromised accounts -&gt; Would trigger Rule R6 syndicate ring alert, escalating to immediate card hold.</p>
-      <p style="font-size: 0.85rem; color: var(--text-muted);"><strong>Reason Stopped:</strong> Customer confirmation and baseline habit alignment verified legitimacy; alert cleared without fraud.</p>
+  1. [Cardholder Confirmation]: Customer confirms authorization during SMS or mobile push challenge -&gt; Fraud probability would reduce from 1.00 to ≤ 0.10, flipping verdict to LEGITIMATE (Rule R3).
+  2. [Billing Region Proximity]: Transaction billing region aligned with baseline regions (204.0, 264.0) -&gt; Eliminates geographic distance anomaly penalty (-20.0 pts) and impossible travel flag.</p>
+      <p style="font-size: 0.85rem; color: var(--text-muted);"><strong>Reason Stopped:</strong> Customer denial and definitive graph pattern signatures settled the verdict; further steps would not alter the defensive actions.</p>
     </div>
 
     <!-- Interactive Subgraph -->
@@ -169,11 +169,11 @@ Decision Sensitivity (Counterfactual Boundaries):
         </thead>
         <tbody>
           <tr><td><span class='badge-id'>EV-01</span></td><td>graph</td><td><code>query:get_txn(3514030)</code></td><td>Flagged transaction of $77.07 executed via in_person channel (risk score: 0.61).</td></tr>
-<tr><td><span class='badge-id'>EV-02</span></td><td>graph</td><td><code>query:entity_profile(card_id=C12382-K1)</code></td><td>Card baseline: 422 prior transactions totaling $48783.68 (median: $82.96, typical regions: [&#x27;204.0&#x27;, &#x27;264.0&#x27;]).</td></tr>
-<tr><td><span class='badge-id'>EV-03</span></td><td>graph</td><td><code>query:velocity(card_id=C12382-K1)</code></td><td>Velocity activity: 0 transaction(s) in last 1h, 0 in last 24h (spike ratio: 0.0).</td></tr>
+<tr><td><span class='badge-id'>EV-02</span></td><td>graph</td><td><code>query:entity_profile(card_id=C12382-K1)</code></td><td>Card baseline: 359 prior transactions totaling $41970.52 (median: $83.89, typical regions: [&#x27;204.0&#x27;, &#x27;512.0&#x27;]).</td></tr>
+<tr><td><span class='badge-id'>EV-03</span></td><td>graph</td><td><code>query:velocity(card_id=C12382-K1)</code></td><td>Velocity activity: 1 transaction(s) in last 1h, 4 in last 24h (spike ratio: 6.36).</td></tr>
 <tr><td><span class='badge-id'>EV-04</span></td><td>graph</td><td><code>query:similar_cases(card=C12382-K1)</code></td><td>Found 5 prior closed case(s) touching related entities: CC-1066, CC-1673, CC-2964.</td></tr>
 <tr><td><span class='badge-id'>EV-05</span></td><td>graph</td><td><code>query:empirical_bayes_prior(card=C12382-K1)</code></td><td>Historical memory prior: 4 precedent case(s) (4 confirmed fraud, 0 cleared) yielding posterior fraud risk rate of 0.333.</td></tr>
-<tr><td><span class='badge-id'>EV-06</span></td><td>customer</td><td><code>evidence_request:1</code></td><td>Customer confirms they made this purchase while traveling and still has possession of the card</td></tr>
+<tr><td><span class='badge-id'>EV-06</span></td><td>customer</td><td><code>evidence_request:1</code></td><td>Customer states they did not make these purchases and still has the card</td></tr>
         </tbody>
       </table>
     </div>
@@ -209,8 +209,8 @@ Decision Sensitivity (Counterfactual Boundaries):
           </tr>
         </thead>
         <tbody>
-          <tr><td><strong>ALLOW_TRANSACTION</strong></td><td><span class='route-badge route-auto'>AUTO</span></td><td>R3: Customer confirmed transaction as authorized.</td></tr>
-<tr><td><strong>CLOSE_NO_FRAUD</strong></td><td><span class='route-badge route-auto'>AUTO</span></td><td>R3: Verification confirmed false alarm; alert closed without fraud.</td></tr>
+          <tr><td><strong>BLOCK_CARD</strong></td><td><span class='route-badge route-L1'>L1</span></td><td>R2: Customer confirmed unauthorized activity; exposure $413.10.</td></tr>
+<tr><td><strong>CREATE_CASE</strong></td><td><span class='route-badge route-auto'>AUTO</span></td><td>R2: Formal internal fraud case created.</td></tr>
         </tbody>
       </table>
     </div>
@@ -227,14 +227,14 @@ Decision Sensitivity (Counterfactual Boundaries):
         <strong>Deterministic Audit Trail Certified</strong> — 0 Hallucinations, Faithfulness: 1.00/1.00
       </div>
       <div style="color: var(--text-muted);">
-        Generated: 2026-09-20 13:08:21 UTC
+        Generated: 2026-09-20 13:46:31 UTC
       </div>
     </div>
   </div>
 
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-      const elements = {"nodes": [{"data": {"id": "CASE-HHG-001", "label": "Case: HHG-001", "type": "Case", "color": "#8b5cf6"}}, {"data": {"id": "CARD-HHG-001", "label": "Card", "type": "Card", "color": "#00f0ff"}}], "edges": [{"data": {"source": "CASE-HHG-001", "target": "CARD-HHG-001", "label": "SUBJECT_CARD"}}]};
+      const elements = {"nodes": [{"data": {"id": "CASE-HHG-001", "label": "Case: HHG-001", "type": "Case", "color": "#8b5cf6"}}, {"data": {"id": "CARD-HHG-001", "label": "Card", "type": "Card", "color": "#00f0ff"}}, {"data": {"id": "TXN-3514030", "label": "Txn 3514030", "type": "Transaction", "color": "#ef4444"}}, {"data": {"id": "TXN-3513814", "label": "Txn 3513814", "type": "Transaction", "color": "#ef4444"}}, {"data": {"id": "TXN-3511596", "label": "Txn 3511596", "type": "Transaction", "color": "#ef4444"}}, {"data": {"id": "TXN-3512936", "label": "Txn 3512936", "type": "Transaction", "color": "#ef4444"}}], "edges": [{"data": {"source": "CASE-HHG-001", "target": "CARD-HHG-001", "label": "SUBJECT_CARD"}}, {"data": {"source": "CARD-HHG-001", "target": "TXN-3514030", "label": "EXPOSURE"}}, {"data": {"source": "CARD-HHG-001", "target": "TXN-3513814", "label": "EXPOSURE"}}, {"data": {"source": "CARD-HHG-001", "target": "TXN-3511596", "label": "EXPOSURE"}}, {"data": {"source": "CARD-HHG-001", "target": "TXN-3512936", "label": "EXPOSURE"}}]};
       cytoscape({
         container: document.getElementById('cy-container'),
         elements: elements,

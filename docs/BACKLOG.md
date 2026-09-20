@@ -127,15 +127,18 @@ Ranked by expected impact on Hackathon Judging Criteria:
 33. **[DONE - Iteration 033] [Investigation Accuracy & Anomaly Detection] Multi-Card Temporal Velocity Burst Clustering**
     - *Result:* Implemented `MultiCardBurstClusterDetector.detect_burst_cluster` in `src/graph/algorithms.py` and exposed `detect_burst_cluster` (Q15) in `GraphClient`. Detects coordinated card testing, bot attacks, and synchronized cash-outs across distinct payment cards sharing hardware fingerprints or merchant channels in narrow temporal windows (e.g. 1h-24h). Computes inter-arrival std deviations for bot periodicity detection and micro-deposit ratios. Integrated into `ConcurrentGraphTraverser` and `FraudInvestigatorAgent`. Added 4 unit tests in `tests/test_burst_clustering.py` (97/97 tests pass).
 
-34. **[Policy & Compliance] Regulatory Threshold Alerts & Dynamic Multi-Entity Exposure Rollup**
-    - *Goal:* Implement automated BSA structuring detection ($10,000 threshold smurfing) aggregating cross-card, cross-account exposures within 24h/7d windows to trigger mandatory CTR/SAR thresholds.
-    - *Files:* `src/policy/jurisdiction.py`, `src/agent/graph.py`, `tests/test_structuring_detection.py`
-    - *Metric Impact:* Regulatory Compliance & SAR (Lens 6, 7).
+34. **[DONE - Iteration 034] [Policy & Compliance] Regulatory Structuring Alerts & Dynamic Multi-Entity Exposure Rollup**
+    - *Result:* Implemented `RegulatoryStructuringDetector` in `src/policy/jurisdiction.py` performing dynamic multi-entity exposure rollup across cards, customer accounts, and shared devices within 24h rolling windows. Flags BSA 31 CFR 1010.314 structuring evasion, sub-threshold smurfing ($8,000-$9,999), multi-card dispersion, and rapid velocity bursts under US BSA ($10,000 CTR), UK POCA (£2,500), and EU 6AMLD (€2,000). Exposed `detect_structuring` (Q16) in `GraphClient`, integrated into `ConcurrentGraphTraverser`, `AdaptiveGraphBudgeter`, and `JurisdictionComplianceRouter`. Added API endpoints `/api/cases/{case_id}/structuring` and `/api/regulatory/structuring-check`. Added 6 unit tests in `tests/test_structuring_detection.py` (103/103 tests pass).
 
 35. **[Checkpoint 6 & Release Tag v0.35] Milestone Review & System Calibration Re-Check**
-    - *Goal:* Audit across all 35 iterations, re-evaluate ECE/reliability, verify 0 regressions, and create tag `v0.35`.
-    - *Files:* `docs/IMPROVEMENT_LOG.md`, git tag `v0.35`
+    - *Goal:* Audit across all 35 iterations, re-evaluate ECE/reliability, verify 0 regressions across all 103 unit tests, update documentation scoreboard, and create release tag `v0.35`.
+    - *Files:* `docs/IMPROVEMENT_LOG.md`, `docs/METRICS.md`, git tag `v0.35`
     - *Metric Impact:* Documentation & Deliverables (Lens 17).
+
+36. **[Graph Analytics & Contagion Scoring] Personalized PageRank / Random Walk with Restart for Fraud Contagion**
+    - *Goal:* Implement personalized PageRank / Random Walk with Restart (RWR) from confirmed fraud seeds to calculate continuous fraud contagion scores across entire graph neighborhoods.
+    - *Files:* `src/graph/algorithms.py`, `src/graph/client.py`, `tests/test_pagerank_contagion.py`
+    - *Metric Impact:* Investigation Accuracy & Graph Algorithms (Lens 1, 2).
 
 ---
 

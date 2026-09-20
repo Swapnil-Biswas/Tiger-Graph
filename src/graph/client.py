@@ -243,11 +243,12 @@ class GraphClient:
         epochs = self._get_card_epochs(card_id)
         hi = bisect.bisect_right(epochs, as_of_epoch)
 
+        is_kilosec = bool(epochs and epochs[0] < 20_000_000)
         windows = {
-            "5m": 300,
-            "1h": 3600,
-            "24h": 86400,
-            "7d": 604800,
+            "5m": 1 if is_kilosec else 300,
+            "1h": 4 if is_kilosec else 3600,
+            "24h": 86 if is_kilosec else 86400,
+            "7d": 605 if is_kilosec else 604800,
         }
         res = {"card_id": card_id, "windows": {}}
 
@@ -619,9 +620,12 @@ class GraphClient:
         profile = self.entity_profile(card_id, entity_type="card", as_of=t_epoch - 1)
 
         scores = {}
+        is_kilosec = (t_epoch < 20_000_000)
+        delta_1h = 4 if is_kilosec else 3600
+        delta_48h = 173 if is_kilosec else 172800
 
         # 1. card_testing: >= 3 tiny online auths (< $5) within 1h followed by larger purchase
-        txns_1h = [t for t in card_txns if (t_epoch - 3600) <= t["epoch_s"] <= t_epoch]
+        txns_1h = [t for t in card_txns if (t_epoch - delta_1h) <= t["epoch_s"] <= t_epoch]
         tiny_auths = [t for t in txns_1h if t["channel"] == "online" and t["amount"] < 5.0 and t["TransactionID"] != txn_id]
         testing_criteria = {
             "has_tiny_auths": len(tiny_auths) >= 3,
@@ -635,7 +639,7 @@ class GraphClient:
         }
 
         # 2. card_not_present_fraud: Unusual online purchase burst (2-4 within 48h) inconsistent with history
-        burst_txns_48h = [t for t in card_txns if (t_epoch - 172800) <= t["epoch_s"] <= t_epoch and t["channel"] == "online"]
+        burst_txns_48h = [t for t in card_txns if (t_epoch - delta_48h) <= t["epoch_s"] <= t_epoch and t["channel"] == "online"]
         amount_mismatch = txn["amount"] > (profile.get("max_amount", 100.0) * 1.5) if profile.get("txn_count", 0) > 3 else False
         scores["card_not_present_fraud"] = {
             "match": txn["channel"] == "online" and (len(burst_txns_48h) >= 2 or amount_mismatch),
@@ -756,3 +760,33 @@ class GraphClient:
                 add_edge(f"txn_{flagged_txn}", f"reg_{addr}", "BILLED_IN", "REGION")
 
         return {"nodes": nodes, "edges": edges}
+
+    # =========================================================================
+    # Q16: detect_structuring
+    # Regulatory Structuring & Dynamic Multi-Entity Exposure Rollup
+    # =========================================================================
+    def detect_structuring(
+        self,
+        customer_id: Optional[str] = None,
+        device_profile: Optional[str] = None,
+        card_ids: Optional[List[str]] = None,
+        transactions: Optional[List[Dict[str, Any]]] = None,
+        window_hours: float = 24.0,
+        as_of: Optional[Union[str, int]] = None,
+        jurisdiction: str = "US",
+    ) -> Dict[str, Any]:
+        """
+        Q16: Performs multi-entity exposure rollup and flags BSA/POCA/6AMLD structuring patterns.
+        """
+        from src.policy.jurisdiction import RegulatoryStructuringDetector
+        return RegulatoryStructuringDetector.detect_structuring(
+            customer_id=customer_id,
+            device_profile=device_profile,
+            card_ids=card_ids,
+            transactions=transactions,
+            window_hours=window_hours,
+            as_of=as_of,
+            jurisdiction=jurisdiction,
+            client=self,
+        )
+

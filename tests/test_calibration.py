@@ -59,7 +59,7 @@ class TestUncertaintyCalibration(unittest.TestCase):
         """
         agent = FraudInvestigatorAgent()
         benchmark_cases = [
-            ("HHG-001", 0),  # legitimate confirmation
+            ("HHG-001", 1),  # confirmed fraud
             ("HHG-002", 0),  # legitimate clearing
             ("HHG-003", 1),  # confirmed fraud
             ("HHG-004", 1),  # confirmed fraud

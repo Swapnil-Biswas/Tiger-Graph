@@ -1,4 +1,34 @@
-## Iteration 033: Multi-Card Temporal Velocity Burst Clustering | 2026-09-20 18:57 | commit pending
+## Iteration 034: Regulatory Structuring Alerts & Dynamic Multi-Entity Exposure Rollup | 2026-09-20 19:15 | commit pending
+- **Lens:** 6. Policy engine and next best action & 7. Case summary, SAR, and explainability & 11. Agent architecture
+- **Goal / hypothesis:** Sophisticated money laundering and smurfing operations deliberately break transactions down across multiple cards, accounts, and devices to keep individual transactions below regulatory reporting thresholds (e.g. BSA $10,000 CTR, UK POCA £2,500, EU 6AMLD €2,000). Implementing `RegulatoryStructuringDetector` performs dynamic multi-entity exposure rollups across cards, customer accounts, and shared device profiles within rolling temporal windows (default 24h), detecting sub-threshold clustering ($8,000-$9,999), multi-card dispersion, and rapid velocity bursts, and enforcing mandatory `FILE_CTR` and `FILE_SAR_STRUCTURING` actions.
+- **Changes (files):**
+  - `src/policy/jurisdiction.py`: Created `RegulatoryStructuringDetector` class with `detect_structuring` supporting US BSA, UK POCA, and EU 6AMLD statutes, CTR threshold evaluation, sub-threshold smurfing detection, and multi-card dispersion analysis. Integrated structuring detection directly into `JurisdictionComplianceRouter.generate_dispatch_bundle`.
+  - `src/graph/client.py`: Added `detect_structuring` (Q16) to `GraphClient`. Fixed kilosecond timestamp scale discrepancy in `velocity` and `pattern_match` to ensure consistent temporal window evaluation.
+  - `src/graph/traverser.py`: Added `_get_structuring` task to `ConcurrentGraphTraverser.gather_graph_evidence`.
+  - `src/agent/budgeter.py`: Added `allow_structuring_scan` flag across all budget tiers.
+  - `src/agent/graph.py`: Passed `client=self.client` to `generate_dispatch_bundle` and restored architectural ablation overrides for `ablate_graph` and `ablate_memory`.
+  - `src/api/main.py`: Added `GET /api/cases/{case_id}/structuring` and `POST /api/regulatory/structuring-check` endpoints.
+  - `tests/test_structuring_detection.py`: Created 6 unit tests covering US BSA $10,000 CTR threshold, sub-threshold smurfing, UK/EU thresholds, rapid velocity bursts, dispatch bundle integration, and Q16 client method.
+- **Tests added/updated:**
+  - `tests/test_structuring_detection.py` (6 unit tests, all pass).
+  - Total unit test suite expanded from 97 to **103** tests across 28 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 97 -> **103** (100% pass rate across 28 test suites)
+  - Structuring Detection: BSA 31 CFR 1010.314, UK POCA 2002, and EU 6AMLD multi-entity exposure rollup
+  - Mandatory Regulatory Filings: Automatically triggers `FILE_CTR` and `FILE_SAR_STRUCTURING`
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (103/103)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** In pandas 2.2+, `pd.to_datetime().astype('int64')` defaults to microseconds (`datetime64[us]`), which when divided by $10^9$ yielded kiloseconds (1,467,417) rather than seconds. Explicitly normalizing timestamp scales across `velocity`, `pattern_match`, and `detect_structuring` guarantees exact temporal slicing and prevents false positive velocity bursts.
+- **Follow-ups added to backlog:** Proceed to Iteration 035: Checkpoint 6 Milestone Review & System Calibration Re-Check (v0.35 Release Tag).
+
+## Iteration 033: Multi-Card Temporal Velocity Burst Clustering | 2026-09-20 18:57 | commit ea490a0
 - **Lens:** 1. Graph schema and ingestion & 2. Graph database and query performance & 11. Agent architecture
 - **Goal / hypothesis:** Distributed card testing and automated bot cash-out attacks spread low-value authorizations across multiple stolen cards to evade single-card velocity thresholds. Implementing `MultiCardBurstClusterDetector` in `src/graph/algorithms.py` analyzes the temporal neighborhood around flagged transactions within configurable time windows (e.g. 1h-24h), detects multi-card clustering, computes micro-deposit ratios, and evaluates bot periodicity from inter-arrival standard deviations.
 - **Changes (files):**

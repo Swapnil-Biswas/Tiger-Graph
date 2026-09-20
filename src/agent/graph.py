@@ -143,6 +143,32 @@ class FraudInvestigatorAgent:
             max_workers=6,
         )
 
+        # Apply Architectural Ablation Overrides
+        if ablate_graph:
+            graph_evidence["context"] = {}
+            graph_evidence["velocity"] = {"windows": {"1h": {"count": 0, "txn_ids": []}, "24h": {"count": 0, "txn_ids": []}}, "velocity_spike_ratio": 1.0}
+            graph_evidence["new_entity"] = {"is_new_device": False, "proxy_flag": False, "is_new_region": False}
+            graph_evidence["device_sharing"] = {"is_shared": False, "cards": [], "customers": [], "distinct_cards_count": 1, "distinct_customers_count": 1}
+            graph_evidence["ring"] = {"ring_detected": False}
+            graph_evidence["geo"] = {"anomalies_count": 0, "has_geo_anomaly": False}
+            graph_evidence["pattern_match"] = {"best_pattern": "none", "patterns": {}}
+            graph_evidence["undocumented_anomaly"] = {}
+            graph_evidence["community"] = {"is_dense_fraud_cluster": False, "community_size": 1}
+            graph_evidence["burst_cluster"] = {"is_coordinated_burst": False, "burst_card_count": 0}
+            graph_evidence["structuring"] = {"is_structuring": False, "mandatory_filings": []}
+
+        if ablate_memory:
+            graph_evidence["similar_cases"] = {"case_ids": [], "cases": []}
+            graph_evidence["memory_prior"] = {
+                "has_history": False,
+                "total_prior_cases": 0,
+                "confirmed_fraud_count": 0,
+                "cleared_count": 0,
+                "posterior_fraud_rate": 0.091,
+                "risk_adjustment": 0.0,
+                "prior_cases_cited": [],
+            }
+
         ctx = graph_evidence["context"]
         vel = graph_evidence["velocity"]
         new_ent = graph_evidence["new_entity"]
@@ -472,7 +498,7 @@ class FraudInvestigatorAgent:
 
         # 11. MULTI-JURISDICTION REGULATORY ROUTING & GDPR MINIMIZATION
         from src.policy.jurisdiction import JurisdictionComplianceRouter
-        dispatch = JurisdictionComplianceRouter.generate_dispatch_bundle(answer)
+        dispatch = JurisdictionComplianceRouter.generate_dispatch_bundle(answer, client=self.client)
         answer["regulatory_dispatch"] = dispatch
 
         return answer

@@ -245,8 +245,58 @@ def get_regulatory_dispatch(case_id: str, jurisdiction: Optional[str] = None):
     bundle = JurisdictionComplianceRouter.generate_dispatch_bundle(
         case_answer=case_data,
         override_jurisdiction=jurisdiction,
+        client=agent.client,
     )
     return bundle
+
+
+@app.get("/api/cases/{case_id}/structuring")
+def get_case_structuring(case_id: str, window_hours: float = 24.0, jurisdiction: str = "US"):
+    """Evaluates BSA/POCA/6AMLD regulatory structuring alerts and multi-entity exposure rollup."""
+    if case_id not in active_cases:
+        if case_id in agent.client.store.case_pack:
+            res = agent.investigate_case(case_id)
+            active_cases[case_id] = res
+            case_manager.write_case_to_graph(res)
+        else:
+            raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
+
+    case_data = active_cases[case_id]
+    from src.policy.jurisdiction import RegulatoryStructuringDetector
+    connected_cards = case_data.get("case", {}).get("connected_card_ids", [])
+    analysis = RegulatoryStructuringDetector.detect_structuring(
+        card_ids=connected_cards if connected_cards else None,
+        window_hours=window_hours,
+        jurisdiction=jurisdiction,
+        client=agent.client,
+    )
+    return {"case_id": case_id, "structuring_analysis": analysis}
+
+
+class StructuringCheckRequest(BaseModel):
+    customer_id: Optional[str] = None
+    device_profile: Optional[str] = None
+    card_ids: Optional[List[str]] = None
+    transactions: Optional[List[Dict[str, Any]]] = None
+    window_hours: float = 24.0
+    as_of: Optional[str] = None
+    jurisdiction: str = "US"
+
+
+@app.post("/api/regulatory/structuring-check")
+def run_structuring_check(req: StructuringCheckRequest):
+    """On-demand regulatory structuring & multi-entity exposure rollup."""
+    from src.policy.jurisdiction import RegulatoryStructuringDetector
+    return RegulatoryStructuringDetector.detect_structuring(
+        customer_id=req.customer_id,
+        device_profile=req.device_profile,
+        card_ids=req.card_ids,
+        transactions=req.transactions,
+        window_hours=req.window_hours,
+        as_of=req.as_of,
+        jurisdiction=req.jurisdiction,
+        client=agent.client,
+    )
 
 
 @app.get("/api/cases/{case_id}/dossier")

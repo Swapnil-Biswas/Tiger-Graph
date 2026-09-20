@@ -19,14 +19,15 @@ class TestComponentAblation(unittest.TestCase):
         """Validates that Full System operates with 0 policy violations and grounded decisions."""
         ans = self.agent.investigate_case("HHG-001", ablate_graph=False, ablate_memory=False, ablate_policy=False)
         actions = ans["next_best_actions"]["final"]
+        evidence = ans.get("evidence") or ans.get("case", {}).get("evidence", [])
         for act in actions:
             action_name = act.get("action") if isinstance(act, dict) else act.action
             res = PolicyEngine.check(
                 action=action_name,
                 fraud_probability=ans["case"]["fraud_probability"],
                 exposure_usd=ans["case"]["exposure_usd"],
-                signal_count=len(ans.get("evidence", [])),
-                evidence_claims=ans.get("evidence", []),
+                signal_count=len(evidence),
+                evidence_claims=evidence,
             )
             self.assertNotEqual(res["decision"], "deny", f"Unexpected policy deny in Full System: {res['reasons']}")
         print("PASS: Full System produced 0 policy violations on ambiguous case HHG-001.")
@@ -35,7 +36,7 @@ class TestComponentAblation(unittest.TestCase):
         """Validates that ablating graph signals zeroes velocity, device sharing, and ring detection."""
         ans = self.agent.investigate_case("HHG-004", ablate_graph=True)
         # Verify no graph topological anomaly claims in evidence
-        evidence = ans.get("evidence", [])
+        evidence = ans.get("evidence") or ans.get("case", {}).get("evidence", [])
         for ev in evidence:
             self.assertNotIn("query:device_sharing", ev.get("ref", ""))
             self.assertNotIn("query:geo_impossible", ev.get("ref", ""))

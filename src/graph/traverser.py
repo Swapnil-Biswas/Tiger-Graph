@@ -91,6 +91,11 @@ class ConcurrentGraphTraverser:
                 return "burst_cluster", client.detect_burst_cluster(flagged_txn, as_of=as_of)
             return "burst_cluster", {"is_coordinated_burst": False, "burst_card_count": 0}
 
+        def _get_structuring():
+            if budget_plan.get("allow_structuring_scan", True):
+                return "structuring", client.detect_structuring(customer_id=customer_id, device_profile=dev_profile, card_ids=[card_id], as_of=as_of)
+            return "structuring", {"is_structuring": False, "mandatory_filings": []}
+
         tasks = [
             _get_profile,
             _get_context,
@@ -105,6 +110,7 @@ class ConcurrentGraphTraverser:
             _get_undocumented,
             _get_community,
             _get_burst_cluster,
+            _get_structuring,
         ]
 
         results = {}
