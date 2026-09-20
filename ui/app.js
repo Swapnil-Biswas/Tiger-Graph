@@ -28,6 +28,18 @@ function initTabs() {
       if (tabId === "investigate" && cyInstance) {
         setTimeout(() => cyInstance.resize().fit(), 100);
       }
+      if (tabId === "playback") {
+        if (!cyPlaybackInstance) {
+          initPlaybackCytoscape();
+        } else {
+          setTimeout(() => cyPlaybackInstance.resize().fit(), 100);
+        }
+      }
+      if (tabId === "compliance" && !activeEvidenceBundle) {
+        const cCase = document.getElementById("select-compliance-case");
+        const targetCid = (cCase && cCase.value) ? cCase.value : "HHG-001";
+        loadEvidenceVault(targetCid);
+      }
     });
   });
 }
@@ -223,6 +235,10 @@ async function loadCasesList() {
 
     const select = document.getElementById("select-case");
     select.innerHTML = "";
+    const selectCompliance = document.getElementById("select-compliance-case");
+    if (selectCompliance) selectCompliance.innerHTML = "";
+    const selectPlayback = document.getElementById("select-playback-case");
+    if (selectPlayback) selectPlayback.innerHTML = "";
     const tbody = document.getElementById("case-board-tbody");
     tbody.innerHTML = "";
 
@@ -232,6 +248,15 @@ async function loadCasesList() {
       opt.value = c.case_id;
       opt.textContent = `${c.case_id} — Card ${c.card_id} (${c.trigger_type})`;
       select.appendChild(opt);
+
+      if (selectCompliance) {
+        const optComp = opt.cloneNode(true);
+        selectCompliance.appendChild(optComp);
+      }
+      if (selectPlayback) {
+        const optPlay = opt.cloneNode(true);
+        selectPlayback.appendChild(optPlay);
+      }
 
       // Table row in Case Board
       const tr = document.createElement("tr");
@@ -596,4 +621,385 @@ window.loadCaseAuditTrail = async function(caseId) {
     console.error("Failed to load audit trail:", e);
   }
 };
+
+// =========================================================================
+// 5. COMPLIANCE & EVIDENCE VAULT (FRE 902)
+// =========================================================================
+
+let activeEvidenceBundle = null;
+
+async function loadEvidenceVault(caseId) {
+  const btnGen = document.getElementById("btn-generate-bundle");
+  if (btnGen) btnGen.disabled = true;
+
+  try {
+    const res = await fetch(`/api/cases/${caseId}/evidence-bundle`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const bundle = await res.json();
+    activeEvidenceBundle = bundle;
+
+    // Update Header Card
+    document.getElementById("vault-bundle-id").textContent = bundle.bundle_id;
+    document.getElementById("vault-legal-status").textContent = "FEDERAL RULES OF EVIDENCE RULE 902(13)/(14) CERTIFIED RECORD";
+    const statusTag = document.getElementById("vault-status-tag");
+    statusTag.className = "cert-status-tag cert-valid";
+    statusTag.textContent = "SEALED & AUTHENTICATED";
+
+    document.getElementById("vault-merkle-root").textContent = bundle.merkle_root;
+    document.getElementById("vault-signature").textContent = bundle.signature;
+    document.getElementById("vault-signer").textContent = bundle.signer_identity;
+    document.getElementById("vault-items-count").textContent = `${bundle.item_count} / ${bundle.item_count} Verified`;
+
+    // Render 16 Items
+    const container = document.getElementById("vault-items-container");
+    container.innerHTML = "";
+
+    bundle.items.forEach((item, idx) => {
+      const card = document.createElement("div");
+      card.className = "vault-item-card";
+      card.innerHTML = `
+        <div class="vault-item-top">
+          <span class="vault-cat-badge">${item.category}</span>
+          <span class="vault-item-num">Leaf #${idx + 1}</span>
+        </div>
+        <div class="vault-item-title">${item.title}</div>
+        <div class="vault-item-hash mono-font" title="${item.sha256_hash}">
+          SHA-256: <code>${item.sha256_hash.slice(0, 16)}...${item.sha256_hash.slice(-8)}</code>
+        </div>
+        <details class="vault-item-details">
+          <summary>Inspect Canonical Payload</summary>
+          <pre class="vault-item-json">${JSON.stringify(item.content, null, 2)}</pre>
+        </details>
+      `;
+      container.appendChild(card);
+    });
+
+    // Render Chain of Custody
+    const timeline = document.getElementById("vault-custody-timeline");
+    timeline.innerHTML = "";
+    bundle.chain_of_custody.forEach(evt => {
+      const entry = document.createElement("div");
+      entry.className = "custody-entry";
+      entry.innerHTML = `
+        <div class="custody-dot"></div>
+        <div class="custody-content">
+          <div class="custody-header">
+            <strong>${evt.action}</strong>
+            <span class="custody-time">${evt.timestamp}</span>
+          </div>
+          <div class="custody-body">
+            <span>Actor: <code>${evt.actor}</code> (${evt.system_component})</span>
+            <span class="custody-status ${evt.verification_status.includes('FAIL') ? 'status-fail' : 'status-ok'}">${evt.verification_status}</span>
+          </div>
+          ${evt.notes ? `<div class="custody-notes">${evt.notes}</div>` : ''}
+        </div>
+      `;
+      timeline.appendChild(entry);
+    });
+
+  } catch (err) {
+    console.error("Failed to load evidence vault:", err);
+    alert("Evidence Vault error: " + err.message);
+  } finally {
+    if (btnGen) btnGen.disabled = false;
+  }
+}
+
+async function verifyEvidenceVault(overrideBundle = null) {
+  const bundleToTest = overrideBundle || activeEvidenceBundle;
+  if (!bundleToTest) {
+    alert("Please generate or seal an evidence bundle first.");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/compliance/verify-evidence-bundle", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(bundleToTest)
+    });
+    const audit = await res.json();
+
+    const statusTag = document.getElementById("vault-status-tag");
+    const countBadge = document.getElementById("vault-items-count");
+
+    if (audit.is_valid) {
+      statusTag.className = "cert-status-tag cert-valid";
+      statusTag.textContent = "100% CRYPTOGRAPHICALLY VERIFIED";
+      countBadge.textContent = `${audit.items_verified} / ${audit.total_items} Verified`;
+      alert(`PASS: Merkle Root & HMAC-SHA256 Signature Verified. Zero Bit-Flips Detected. ${audit.legal_admissibility}`);
+    } else {
+      statusTag.className = "cert-status-tag cert-invalid";
+      statusTag.textContent = "TAMPER DETECTED / AUDIT FAILED";
+      countBadge.textContent = `${audit.items_verified} / ${audit.total_items} Verified (Corrupted: ${audit.corrupted_items.length})`;
+      const corruptedNames = audit.corrupted_items.map(c => c.item_id).join(", ");
+      alert(`CRITICAL ALERT: Tamper detected! Merkle root or signature invalid. Corrupted artifacts: ${corruptedNames}`);
+    }
+  } catch (e) {
+    alert("Verification failed: " + e.message);
+  }
+}
+
+function simulateTamperVault() {
+  if (!activeEvidenceBundle) {
+    alert("Generate an evidence bundle first.");
+    return;
+  }
+  // Deep clone and corrupt item #1
+  const tampered = JSON.parse(JSON.stringify(activeEvidenceBundle));
+  tampered.items[0].content.exposure_usd = 999999.99; // Forged exposure
+  alert("SIMULATING MALICIOUS BIT-FLIP: Forged exposure_usd in Item #1. Submitting to cryptographic verifier...");
+  verifyEvidenceVault(tampered);
+}
+
+// =========================================================================
+// 6. TEMPORAL GRAPH PLAYBACK & SYNDICATE CASCADE
+// =========================================================================
+
+let playbackTimelineData = null;
+let currentPlaybackStep = 0;
+let playbackIntervalId = null;
+let cyPlaybackInstance = null;
+
+function initPlaybackCytoscape() {
+  const container = document.getElementById("cy-playback-container");
+  if (!container) return;
+
+  cyPlaybackInstance = cytoscape({
+    container: container,
+    style: [
+      {
+        selector: 'node',
+        style: {
+          'label': 'data(label)',
+          'color': '#f0f4fc',
+          'font-size': '10px',
+          'font-family': 'JetBrains Mono, monospace',
+          'text-valign': 'bottom',
+          'text-margin-y': 5,
+          'background-color': '#00f0ff',
+          'width': 26,
+          'height': 26,
+          'border-width': 2,
+          'border-color': 'rgba(255, 255, 255, 0.4)'
+        }
+      },
+      {
+        selector: 'node[type = "Card"]',
+        style: { 'background-color': '#00f0ff' }
+      },
+      {
+        selector: 'node[type = "Transaction"]',
+        style: { 'background-color': '#ef4444' }
+      },
+      {
+        selector: 'node[type = "Device"]',
+        style: { 'background-color': '#eab308' }
+      },
+      {
+        selector: 'node[type = "Merchant"]',
+        style: { 'background-color': '#10b981' }
+      },
+      {
+        selector: 'node.highlighted-step',
+        style: {
+          'border-width': 4,
+          'border-color': '#ff0055',
+          'width': 34,
+          'height': 34
+        }
+      },
+      {
+        selector: 'edge',
+        style: {
+          'width': 2,
+          'line-color': 'rgba(100, 116, 139, 0.4)',
+          'curve-style': 'bezier',
+          'target-arrow-shape': 'triangle',
+          'target-arrow-color': 'rgba(100, 116, 139, 0.4)',
+          'arrow-scale': 0.8
+        }
+      },
+      {
+        selector: 'edge.highlighted-edge',
+        style: {
+          'line-color': '#ff0055',
+          'target-arrow-color': '#ff0055',
+          'width': 3.5
+        }
+      }
+    ],
+    layout: { name: 'concentric', padding: 25 }
+  });
+}
+
+async function loadPlaybackTimeline(caseId) {
+  const btnLoad = document.getElementById("btn-load-playback");
+  if (btnLoad) btnLoad.disabled = true;
+
+  try {
+    const res = await fetch(`/api/graph/playback/${caseId}?max_frames=40`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    playbackTimelineData = await res.json();
+    currentPlaybackStep = 0;
+
+    const totalFrames = playbackTimelineData.total_frames || (playbackTimelineData.frames ? playbackTimelineData.frames.length : 0);
+
+    // Update Slider Bounds
+    const slider = document.getElementById("playback-slider");
+    slider.min = 0;
+    slider.max = Math.max(0, totalFrames - 1);
+    slider.value = 0;
+
+    document.getElementById("playback-step-total").textContent = totalFrames;
+
+    // Render Milestone Chips
+    const mContainer = document.getElementById("playback-milestones-container");
+    mContainer.innerHTML = "";
+    if (playbackTimelineData.milestones) {
+      Object.entries(playbackTimelineData.milestones).forEach(([name, fIdx]) => {
+        const chip = document.createElement("span");
+        chip.className = "milestone-chip";
+        chip.textContent = `★ Frame ${fIdx + 1}: ${name}`;
+        chip.onclick = () => renderPlaybackFrame(fIdx);
+        mContainer.appendChild(chip);
+      });
+    }
+
+    if (!cyPlaybackInstance) {
+      initPlaybackCytoscape();
+    }
+
+    renderPlaybackFrame(0);
+  } catch (err) {
+    console.error("Failed to load playback timeline:", err);
+    alert("Playback error: " + err.message);
+  } finally {
+    if (btnLoad) btnLoad.disabled = false;
+  }
+}
+
+function renderPlaybackFrame(idx) {
+  if (!playbackTimelineData || !playbackTimelineData.frames || !playbackTimelineData.frames[idx]) return;
+  currentPlaybackStep = idx;
+
+  const frame = playbackTimelineData.frames[idx];
+  const exposure = frame.current_exposure_usd !== undefined ? frame.current_exposure_usd : (frame.cumulative_exposure || 0.0);
+
+  // Update Counters & Metrics
+  document.getElementById("playback-step-cur").textContent = idx + 1;
+  document.getElementById("playback-slider").value = idx;
+  document.getElementById("playback-exposure").textContent = `$${exposure.toFixed(2)}`;
+  document.getElementById("playback-risk").textContent = frame.risk_score.toFixed(4);
+  document.getElementById("playback-caption-text").textContent = `[${frame.timestamp}] ${frame.narrative_caption}`;
+
+  const elements = frame.cumulative_elements || { nodes: frame.active_nodes || [], edges: frame.active_edges || [] };
+  const nodes = elements.nodes || [];
+  const edges = elements.edges || [];
+
+  document.getElementById("playback-nodes-count").textContent = `${nodes.length} Active Nodes`;
+
+  // Render Subgraph in Cytoscape
+  if (cyPlaybackInstance) {
+    cyPlaybackInstance.elements().remove();
+    cyPlaybackInstance.add(nodes);
+    cyPlaybackInstance.add(edges);
+
+    // Highlight Current Step Node & Edge
+    if (frame.highlight_node_ids && frame.highlight_node_ids.length > 0) {
+      frame.highlight_node_ids.forEach(nid => {
+        const targetNode = cyPlaybackInstance.getElementById(nid);
+        if (targetNode.length > 0) {
+          targetNode.addClass('highlighted-step');
+        }
+      });
+    }
+    if (frame.highlight_edge_ids && frame.highlight_edge_ids.length > 0) {
+      frame.highlight_edge_ids.forEach(eid => {
+        const targetEdge = cyPlaybackInstance.getElementById(eid);
+        if (targetEdge.length > 0) {
+          targetEdge.addClass('highlighted-edge');
+        }
+      });
+    }
+
+    cyPlaybackInstance.layout({ name: 'concentric', padding: 25, animate: false }).run();
+  }
+}
+
+function stepPlayback(delta) {
+  if (!playbackTimelineData) return;
+  const next = Math.max(0, Math.min(playbackTimelineData.total_steps - 1, currentPlaybackStep + delta));
+  renderPlaybackFrame(next);
+}
+
+function togglePlaybackPlay() {
+  const btn = document.getElementById("btn-playback-play");
+  if (playbackIntervalId) {
+    clearInterval(playbackIntervalId);
+    playbackIntervalId = null;
+    btn.textContent = "▶ Play";
+    btn.classList.remove("btn-danger");
+    btn.classList.add("btn-primary");
+  } else {
+    if (!playbackTimelineData) return;
+    btn.textContent = "⏸ Pause";
+    btn.classList.remove("btn-primary");
+    btn.classList.add("btn-danger");
+
+    playbackIntervalId = setInterval(() => {
+      if (currentPlaybackStep >= playbackTimelineData.total_steps - 1) {
+        togglePlaybackPlay();
+      } else {
+        stepPlayback(1);
+      }
+    }, 1200);
+  }
+}
+
+// Wire additional listeners
+document.addEventListener("DOMContentLoaded", () => {
+  const btnGen = document.getElementById("btn-generate-bundle");
+  if (btnGen) {
+    btnGen.addEventListener("click", () => {
+      const sel = document.getElementById("select-compliance-case");
+      loadEvidenceVault(sel ? sel.value : "HHG-001");
+    });
+  }
+
+  const btnVer = document.getElementById("btn-verify-bundle");
+  if (btnVer) {
+    btnVer.addEventListener("click", () => verifyEvidenceVault());
+  }
+
+  const btnTamper = document.getElementById("btn-tamper-test");
+  if (btnTamper) {
+    btnTamper.addEventListener("click", () => simulateTamperVault());
+  }
+
+  const btnLoadPlay = document.getElementById("btn-load-playback");
+  if (btnLoadPlay) {
+    btnLoadPlay.addEventListener("click", () => {
+      const sel = document.getElementById("select-playback-case");
+      loadPlaybackTimeline(sel ? sel.value : "HHG-001");
+    });
+  }
+
+  const btnBack = document.getElementById("btn-playback-step-back");
+  if (btnBack) btnBack.addEventListener("click", () => stepPlayback(-1));
+
+  const btnFwd = document.getElementById("btn-playback-step-forward");
+  if (btnFwd) btnFwd.addEventListener("click", () => stepPlayback(1));
+
+  const btnPlay = document.getElementById("btn-playback-play");
+  if (btnPlay) btnPlay.addEventListener("click", () => togglePlaybackPlay());
+
+  const slider = document.getElementById("playback-slider");
+  if (slider) {
+    slider.addEventListener("input", (e) => {
+      renderPlaybackFrame(parseInt(e.target.value));
+    });
+  }
+});
+
 

@@ -49,6 +49,8 @@
       <button class="nav-btn active" data-tab="investigate" id="tab-investigate">Investigation View</button>
       <button class="nav-btn" data-tab="board" id="tab-board">Case Board (20)</button>
       <button class="nav-btn" data-tab="approvals" id="tab-approvals">Approvals Queue <span class="badge" id="badge-approvals">0</span></button>
+      <button class="nav-btn" data-tab="compliance" id="tab-compliance">Compliance Vault (FRE 902)</button>
+      <button class="nav-btn" data-tab="playback" id="tab-playback">Temporal Playback</button>
       <button class="nav-btn" data-tab="memory" id="tab-memory">Graph Memory & Typologies</button>
     </nav>
   </header>
@@ -340,6 +342,149 @@
             <li><strong>5. Account takeover:</strong> Mixed-channel credential compromise and account attribute changes.</li>
           </ul>
         </div>
+      </div>
+    </section>
+
+    <!-- 5. COMPLIANCE & EVIDENCE VAULT (FRE 902) -->
+    <section id="view-compliance" class="tab-view">
+      <div class="case-selector-bar glass-card">
+        <div class="selector-group">
+          <label for="select-compliance-case">Select Target Case:</label>
+          <select id="select-compliance-case" class="custom-select">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+        <button id="btn-generate-bundle" class="btn btn-primary glow-button">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          Generate & Seal Evidence Bundle (FRE 902)
+        </button>
+        <button id="btn-verify-bundle" class="btn btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          Audit & Verify Cryptographic Integrity
+        </button>
+        <button id="btn-tamper-test" class="btn btn-danger-outline">
+          ⚠️ Simulate Tamper / Bit-Flip Detection
+        </button>
+      </div>
+
+      <!-- Sealed Certificate Header Card -->
+      <div class="glass-card certificate-card" id="vault-certificate-card">
+        <div class="cert-header">
+          <div class="cert-badge">
+            <span class="cert-shield-icon">🛡️</span>
+            <div>
+              <h3 id="vault-bundle-id">BUNDLE-HHG-001-PENDING</h3>
+              <p class="subtitle" id="vault-legal-status">FEDERAL RULES OF EVIDENCE RULE 902(13)/(14) CERTIFIED RECORD</p>
+            </div>
+          </div>
+          <div class="cert-status-tag" id="vault-status-tag">SEALED & AUTHENTICATED</div>
+        </div>
+        <div class="cert-grid">
+          <div class="cert-field">
+            <span class="field-label">Merkle Tree Root Hash:</span>
+            <span class="hash-chip mono-font" id="vault-merkle-root">Generating...</span>
+          </div>
+          <div class="cert-field">
+            <span class="field-label">HMAC-SHA256 Digital Signature:</span>
+            <span class="hash-chip mono-font" id="vault-signature">Generating...</span>
+          </div>
+          <div class="cert-field">
+            <span class="field-label">Signer Identity:</span>
+            <span class="field-val mono-font" id="vault-signer">TIGERGRAPH_AGENTIC_ORCHESTRATOR_V0.55</span>
+          </div>
+          <div class="cert-field">
+            <span class="field-label">FinCEN 31 CFR 1020.320 Retention:</span>
+            <span class="field-val" id="vault-retention">5-Year Immutable Cryptographic Lock</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Evidence Items Accordion Grid -->
+      <div class="glass-card mt-4">
+        <div class="card-header">
+          <div>
+            <h3>Sealed Evidentiary Artifacts (16 Categories)</h3>
+            <p class="subtitle">Individual SHA-256 leaves forming the Merkle audit tree.</p>
+          </div>
+          <span class="badge" id="vault-items-count">16 / 16 Verified</span>
+        </div>
+        <div class="evidence-vault-grid" id="vault-items-container">
+          <p class="placeholder-text">Click 'Generate & Seal Evidence Bundle' to view the 16 evidentiary categories.</p>
+        </div>
+      </div>
+
+      <!-- Chain of Custody Timeline -->
+      <div class="glass-card mt-4">
+        <div class="card-header">
+          <h3>Cryptographic Chain of Custody Audit Log</h3>
+        </div>
+        <div class="custody-timeline" id="vault-custody-timeline">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. TEMPORAL GRAPH PLAYBACK & SYNDICATE CASCADE -->
+    <section id="view-playback" class="tab-view">
+      <div class="case-selector-bar glass-card">
+        <div class="selector-group">
+          <label for="select-playback-case">Select Playback Case:</label>
+          <select id="select-playback-case" class="custom-select">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+        <button id="btn-load-playback" class="btn btn-primary glow-button">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polygon points="10 8 16 12 10 16 10 8"></polygon>
+          </svg>
+          Load Playback Timeline
+        </button>
+      </div>
+
+      <!-- Playback Controls Bar -->
+      <div class="glass-card playback-scrubber-card mt-3">
+        <div class="scrubber-top">
+          <div class="playback-controls">
+            <button id="btn-playback-step-back" class="btn btn-small btn-secondary">⏮ Step</button>
+            <button id="btn-playback-play" class="btn btn-small btn-primary">▶ Play</button>
+            <button id="btn-playback-step-forward" class="btn btn-small btn-secondary">Step ⏭</button>
+          </div>
+          <div class="playback-counter">
+            Step <strong id="playback-step-cur">0</strong> of <strong id="playback-step-total">0</strong>
+          </div>
+          <div class="playback-meta-pills">
+            <span class="meta-pill">Exposure: <strong id="playback-exposure">$0.00</strong></span>
+            <span class="meta-pill">Risk P(Fraud): <strong id="playback-risk">0.00</strong></span>
+          </div>
+        </div>
+
+        <div class="scrubber-slider-wrapper">
+          <input type="range" id="playback-slider" min="0" max="0" value="0" class="playback-slider">
+        </div>
+
+        <div class="playback-milestones-row" id="playback-milestones-container">
+          <!-- Milestone chips populated dynamically -->
+        </div>
+
+        <div class="playback-caption-box" id="playback-caption-box">
+          <span class="caption-label">Automated Investigation Narrative:</span>
+          <p id="playback-caption-text">Load a timeline to begin chronological syndicate playback.</p>
+        </div>
+      </div>
+
+      <!-- Playback Cytoscape Canvas -->
+      <div class="glass-card mt-4">
+        <div class="card-header">
+          <h3>Evolving Subgraph Visualization (Active Cascade)</h3>
+          <span class="badge" id="playback-nodes-count">0 Active Nodes</span>
+        </div>
+        <div id="cy-playback-container" class="cy-canvas" style="height: 480px;"></div>
       </div>
     </section>
 
