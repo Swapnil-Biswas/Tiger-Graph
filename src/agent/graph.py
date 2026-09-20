@@ -263,6 +263,15 @@ class FraudInvestigatorAgent:
                 burst_res.get("cards_involved", [])[:4],
             )
 
+        contagion_res = graph_evidence.get("contagion", {})
+        if contagion_res.get("target_contagion_score", 0.0) >= 0.03:
+            add_evidence(
+                "graph",
+                f"query:fraud_contagion({card_id})",
+                f"Personalized PageRank fraud contagion score {contagion_res['target_contagion_score']:.4f} ({contagion_res.get('contagion_risk_level', 'elevated')} risk) propagating from {len(contagion_res.get('fraud_seeds', []))} confirmed fraud seed(s) in local subgraph.",
+                contagion_res.get("fraud_seeds", [])[:4],
+            )
+
         # Apply Architectural Ablation Overrides
         if ablate_graph:
             graph_evidence["context"] = {}
@@ -275,6 +284,7 @@ class FraudInvestigatorAgent:
             graph_evidence["undocumented_anomaly"] = {}
             graph_evidence["community"] = {"is_dense_fraud_cluster": False, "community_size": 1, "card_count": 1, "fraud_contagion_score": 0.0}
             graph_evidence["burst_cluster"] = {"is_coordinated_burst": False, "burst_card_count": 0}
+            graph_evidence["contagion"] = {"target_contagion_score": 0.0, "contagion_risk_level": "none", "fraud_seeds": []}
 
         if ablate_memory:
             graph_evidence["similar_cases"] = {"case_ids": [], "cases": []}
@@ -307,6 +317,7 @@ class FraudInvestigatorAgent:
                 "ring": graph_evidence.get("ring"),
                 "community": comm_res,
                 "burst_cluster": burst_res,
+                "contagion": contagion_res,
                 "as_of": as_of,
             },
             max_chars=3000,

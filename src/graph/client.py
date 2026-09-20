@@ -790,3 +790,37 @@ class GraphClient:
             client=self,
         )
 
+    # =========================================================================
+    # Q17: calculate_fraud_contagion
+    # Personalized PageRank / Random Walk with Restart Contagion Scoring
+    # =========================================================================
+    def calculate_fraud_contagion(
+        self,
+        seed_id: str,
+        entity_type: str = "card",
+        as_of: Optional[Union[str, int]] = None,
+        restart_prob: float = 0.15,
+        max_iter: int = 30,
+        tol: float = 1e-5,
+        max_hops: int = 2,
+        max_nodes: int = 60,
+        custom_fraud_seeds: Optional[List[str]] = None,
+    ) -> dict:
+        """
+        Q17: Computes continuous Personalized PageRank (PPR) fraud contagion from confirmed fraud seeds.
+        """
+        from src.graph.algorithms import FraudContagionPageRank
+        rwr = FraudContagionPageRank(self)
+        return rwr.calculate_contagion(
+            seed_id=seed_id,
+            entity_type=entity_type,
+            as_of=as_of,
+            restart_prob=restart_prob,
+            max_iter=max_iter,
+            tol=tol,
+            max_hops=max_hops,
+            max_nodes=max_nodes,
+            custom_fraud_seeds=custom_fraud_seeds,
+        )
+
+

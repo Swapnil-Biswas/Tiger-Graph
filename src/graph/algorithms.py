@@ -487,3 +487,240 @@ class MultiCardBurstClusterDetector:
             "txn_ids": [t["TransactionID"] for t in cluster_txns][:15],
             "description": description,
         }
+
+
+class FraudContagionPageRank:
+    """
+    Personalized PageRank / Random Walk with Restart (RWR) Engine for Fraud Contagion.
+    Calculates continuous structural contagion distributions from confirmed fraud seeds
+    across heterogeneous multi-hop financial subgraphs.
+    """
+
+    def __init__(self, client):
+        self.client = client
+
+    def calculate_contagion(
+        self,
+        seed_id: str,
+        entity_type: str = "card",
+        as_of: Optional[Union[str, int]] = None,
+        restart_prob: float = 0.15,
+        max_iter: int = 30,
+        tol: float = 1e-5,
+        max_hops: int = 2,
+        max_nodes: int = 60,
+        custom_fraud_seeds: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Calculates Personalized PageRank from confirmed fraud seeds in the local ego-network.
+        Returns continuous contagion score, risk classification, and top contagion nodes.
+        """
+        import time
+        from src.graph.client import parse_as_of_epoch
+
+        t0 = time.perf_counter()
+        as_of_epoch = parse_as_of_epoch(as_of)
+
+        if entity_type == "card":
+            target_card = seed_id
+        elif entity_type == "customer":
+            cust_txns = self.client.store.txns_by_customer.get(seed_id, [])
+            target_card = cust_txns[0]["card_id"] if cust_txns else seed_id
+        elif entity_type == "transaction":
+            txn = self.client.store.transactions.get(seed_id, {})
+            target_card = txn.get("card_id", seed_id)
+        else:
+            target_card = seed_id
+
+        target_node = f"CARD:{target_card}"
+
+        adj: Dict[str, Set[str]] = defaultdict(set)
+        node_types: Dict[str, str] = {target_node: "card"}
+        visited: Set[str] = {target_node}
+        queue: List[Tuple[str, int]] = [(target_node, 0)]
+
+        # Multi-hop ego-net extraction with temporal bounds
+        while queue and len(visited) < max_nodes:
+            curr_node, hops = queue.pop(0)
+            if hops >= max_hops:
+                continue
+
+            ntype, nid = curr_node.split(":", 1)
+
+            if ntype == "CARD":
+                # Connect to customer
+                cust_id = self.client.store.cards.get(nid, {}).get("customer_id")
+                if cust_id:
+                    cnode = f"CUST:{cust_id}"
+                    adj[curr_node].add(cnode)
+                    adj[cnode].add(curr_node)
+                    if cnode not in visited and len(visited) < max_nodes:
+                        visited.add(cnode)
+                        node_types[cnode] = "customer"
+                        queue.append((cnode, hops + 1))
+
+                # Connect to transactions & devices
+                card_txns = self.client.store.txns_by_card.get(nid, [])
+                recent_txns = [t for t in card_txns if t["epoch_s"] <= as_of_epoch][-10:]
+                for t in recent_txns:
+                    dev = t.get("device_profile")
+                    if dev and dev != "None | None | None | None" and not dev.startswith("UnknownDevice"):
+                        dnode = f"DEV:{dev[:35]}"
+                        adj[curr_node].add(dnode)
+                        adj[dnode].add(curr_node)
+                        if dnode not in visited and len(visited) < max_nodes:
+                            visited.add(dnode)
+                            node_types[dnode] = "device"
+                            queue.append((dnode, hops + 1))
+
+                # Connect to closed cases
+                cases = self.client.store.cases_by_card.get(nid, [])
+                for c in cases:
+                    if parse_as_of_epoch(c.get("opened_at")) <= as_of_epoch:
+                        casenode = f"CASE:{c['case_id']}"
+                        adj[curr_node].add(casenode)
+                        adj[casenode].add(curr_node)
+                        if casenode not in visited and len(visited) < max_nodes:
+                            visited.add(casenode)
+                            node_types[casenode] = "case"
+                            queue.append((casenode, hops + 1))
+
+            elif ntype == "DEV":
+                dev_key = nid
+                all_cards = set()
+                for d_full, cards in getattr(self.client.store, "cards_by_device", {}).items():
+                    if d_full.startswith(dev_key):
+                        all_cards.update(cards)
+                if len(all_cards) <= 15:
+                    for c_id in list(all_cards)[:6]:
+                        cnode = f"CARD:{c_id}"
+                        adj[curr_node].add(cnode)
+                        adj[cnode].add(curr_node)
+                        if cnode not in visited and len(visited) < max_nodes:
+                            visited.add(cnode)
+                            node_types[cnode] = "card"
+                            queue.append((cnode, hops + 1))
+
+            elif ntype == "CUST":
+                cust_txns = self.client.store.txns_by_customer.get(nid, [])
+                cust_cards = set(t["card_id"] for t in cust_txns if t["epoch_s"] <= as_of_epoch)
+                for c_id in list(cust_cards)[:5]:
+                    cnode = f"CARD:{c_id}"
+                    adj[curr_node].add(cnode)
+                    adj[cnode].add(curr_node)
+                    if cnode not in visited and len(visited) < max_nodes:
+                        visited.add(cnode)
+                        node_types[cnode] = "card"
+                        queue.append((cnode, hops + 1))
+
+        # Identify fraud seeds
+        fraud_seeds = set()
+        if custom_fraud_seeds:
+            for s in custom_fraud_seeds:
+                s_node = s if ":" in s else f"CARD:{s}"
+                if s_node in visited:
+                    fraud_seeds.add(s_node)
+        else:
+            for node in visited:
+                ntype, nid = node.split(":", 1)
+                if ntype == "CASE":
+                    c_obj = self.client.store.closed_cases.get(nid, {})
+                    if c_obj.get("outcome") == "confirmed_fraud":
+                        fraud_seeds.add(node)
+                elif ntype == "CARD":
+                    cases = self.client.store.cases_by_card.get(nid, [])
+                    if any(c.get("outcome") == "confirmed_fraud" and parse_as_of_epoch(c.get("opened_at")) <= as_of_epoch for c in cases):
+                        fraud_seeds.add(node)
+
+        node_list = sorted(list(visited))
+        node_idx = {n: i for i, n in enumerate(node_list)}
+        N = len(node_list)
+
+        p0 = [0.0] * N
+        if fraud_seeds:
+            mode = "contagion_from_fraud_seeds"
+            seed_weight = 1.0 / len(fraud_seeds)
+            for s in fraud_seeds:
+                p0[node_idx[s]] = seed_weight
+        else:
+            mode = "target_centrality"
+            p0[node_idx[target_node]] = 1.0
+
+        # Power iteration
+        r = list(p0)
+        n_iter = 0
+        for it in range(max_iter):
+            n_iter += 1
+            r_next = [0.0] * N
+            for u in node_list:
+                u_idx = node_idx[u]
+                r_u = r[u_idx]
+                if r_u <= 0.0:
+                    continue
+                nbrs = adj.get(u, set())
+                if nbrs:
+                    share = (1.0 - restart_prob) * r_u / len(nbrs)
+                    for v in nbrs:
+                        r_next[node_idx[v]] += share
+                else:
+                    for i in range(N):
+                        r_next[i] += (1.0 - restart_prob) * r_u / N
+
+            for i in range(N):
+                r_next[i] += restart_prob * p0[i]
+
+            diff = sum(abs(r_next[i] - r[i]) for i in range(N))
+            r = r_next
+            if diff < tol:
+                break
+
+        target_score = round(r[node_idx[target_node]], 4)
+
+        if mode == "contagion_from_fraud_seeds":
+            if target_score >= 0.15:
+                threat = "critical"
+            elif target_score >= 0.08:
+                threat = "high"
+            elif target_score >= 0.03:
+                threat = "elevated"
+            else:
+                threat = "low"
+            contagion_score = target_score
+            description = (
+                f"Personalized PageRank contagion: Target {seed_id} received {target_score:.4f} "
+                f"contagion probability from {len(fraud_seeds)} confirmed fraud seed(s) in its local subgraph "
+                f"(threat level: {threat})."
+            )
+        else:
+            threat = "none"
+            contagion_score = 0.0
+            description = (
+                f"Personalized PageRank centrality: Target {seed_id} has 0 confirmed fraud seeds in its local subgraph "
+                f"(contagion: 0.0, local structural centrality: {target_score:.4f})."
+            )
+
+        top_nodes = sorted(
+            [{"id": n, "type": node_types.get(n, "unknown"), "score": round(r[node_idx[n]], 4)} for n in node_list],
+            key=lambda x: x["score"],
+            reverse=True,
+        )[:10]
+
+        elapsed_ms = round((time.perf_counter() - t0) * 1000.0, 2)
+
+        return {
+            "target_id": seed_id,
+            "target_node": target_node,
+            "subgraph_size": N,
+            "edge_count": sum(len(adj[n]) for n in node_list) // 2,
+            "fraud_seeds": sorted(list(fraud_seeds)),
+            "mode": mode,
+            "target_contagion_score": contagion_score,
+            "target_centrality_score": target_score,
+            "contagion_risk_level": threat,
+            "top_nodes_by_contagion": top_nodes,
+            "iterations_to_convergence": n_iter,
+            "restart_probability": restart_prob,
+            "elapsed_ms": elapsed_ms,
+            "description": description,
+        }
+

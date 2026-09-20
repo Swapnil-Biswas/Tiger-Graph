@@ -96,6 +96,11 @@ class ConcurrentGraphTraverser:
                 return "structuring", client.detect_structuring(customer_id=customer_id, device_profile=dev_profile, card_ids=[card_id], as_of=as_of)
             return "structuring", {"is_structuring": False, "mandatory_filings": []}
 
+        def _get_contagion():
+            if budget_plan.get("allow_contagion_scan", True):
+                return "contagion", client.calculate_fraud_contagion(card_id, as_of=as_of)
+            return "contagion", {"target_contagion_score": 0.0, "contagion_risk_level": "none"}
+
         tasks = [
             _get_profile,
             _get_context,
@@ -111,6 +116,7 @@ class ConcurrentGraphTraverser:
             _get_community,
             _get_burst_cluster,
             _get_structuring,
+            _get_contagion,
         ]
 
         results = {}

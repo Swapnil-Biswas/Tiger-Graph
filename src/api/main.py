@@ -7,7 +7,7 @@ memory retrieval, mock actions, and serves the web frontend.
 import os
 import sys
 import json
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List, Union
 from fastapi import FastAPI, HTTPException, Query, Body, Response
 from fastapi.responses import StreamingResponse, JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -63,6 +63,28 @@ class CaseOverrideRequest(BaseModel):
     new_verdict: str  # "fraud" | "legitimate" | "uncertain"
     justification: str
     new_actions: Optional[list] = None
+
+
+class StructuringCheckRequest(BaseModel):
+    customer_id: Optional[str] = None
+    device_profile: Optional[str] = None
+    card_ids: Optional[List[str]] = None
+    transactions: Optional[List[Dict[str, Any]]] = None
+    window_hours: float = 24.0
+    as_of: Optional[str] = None
+    jurisdiction: str = "US"
+
+
+class ContagionCheckRequest(BaseModel):
+    seed_id: str
+    entity_type: str = "card"
+    as_of: Optional[str] = None
+    restart_prob: float = 0.15
+    custom_fraud_seeds: Optional[List[str]] = None
+
+
+StructuringCheckRequest.model_rebuild()
+ContagionCheckRequest.model_rebuild()
 
 
 @app.get("/api/health")
@@ -273,16 +295,6 @@ def get_case_structuring(case_id: str, window_hours: float = 24.0, jurisdiction:
     return {"case_id": case_id, "structuring_analysis": analysis}
 
 
-class StructuringCheckRequest(BaseModel):
-    customer_id: Optional[str] = None
-    device_profile: Optional[str] = None
-    card_ids: Optional[List[str]] = None
-    transactions: Optional[List[Dict[str, Any]]] = None
-    window_hours: float = 24.0
-    as_of: Optional[str] = None
-    jurisdiction: str = "US"
-
-
 @app.post("/api/regulatory/structuring-check")
 def run_structuring_check(req: StructuringCheckRequest):
     """On-demand regulatory structuring & multi-entity exposure rollup."""
@@ -296,6 +308,41 @@ def run_structuring_check(req: StructuringCheckRequest):
         as_of=req.as_of,
         jurisdiction=req.jurisdiction,
         client=agent.client,
+    )
+
+
+@app.get("/api/cases/{case_id}/contagion")
+def get_case_contagion(case_id: str, restart_prob: float = 0.15):
+    """Calculates Personalized PageRank fraud contagion score from confirmed fraud seeds."""
+    if case_id not in active_cases:
+        if case_id in agent.client.store.case_pack:
+            res = agent.investigate_case(case_id)
+            active_cases[case_id] = res
+            case_manager.write_case_to_graph(res)
+        else:
+            raise HTTPException(status_code=404, detail=f"Case {case_id} not found.")
+
+    case_data = active_cases[case_id]
+    card_id = case_data.get("case", {}).get("card_id")
+    as_of = case_data.get("case", {}).get("as_of")
+    contagion = agent.client.calculate_fraud_contagion(
+        seed_id=card_id,
+        entity_type="card",
+        as_of=as_of,
+        restart_prob=restart_prob,
+    )
+    return {"case_id": case_id, "contagion": contagion}
+
+
+@app.post("/api/graph/contagion-check")
+def run_contagion_check(req: ContagionCheckRequest):
+    """On-demand Personalized PageRank fraud contagion calculation."""
+    return agent.client.calculate_fraud_contagion(
+        seed_id=req.seed_id,
+        entity_type=req.entity_type,
+        as_of=req.as_of,
+        restart_prob=req.restart_prob,
+        custom_fraud_seeds=req.custom_fraud_seeds,
     )
 
 

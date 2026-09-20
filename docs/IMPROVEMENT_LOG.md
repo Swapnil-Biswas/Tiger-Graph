@@ -1,4 +1,34 @@
-## Iteration 035: Checkpoint 6 & Release Tag v0.35 (Milestone Review & Calibration Re-Check) | 2026-09-20 19:25 | commit pending
+## Iteration 036: Graph Centrality-Weighted PageRank for Fraud Contagion | 2026-09-20 19:35 | commit pending
+- **Lens:** 1. Graph schema and ingestion & 2. Graph database and query performance & 11. Agent architecture
+- **Goal / hypothesis:** Binary or discrete hop-based alerts fail to capture the continuous structural distance and network influence of fraudulent entities. Implementing `FraudContagionPageRank` in `src/graph/algorithms.py` calculates Personalized PageRank (PPR) / Random Walk with Restart (RWR) from confirmed fraud seeds ($r = (1 - c) P^T r + c p_0$), computing continuous fraud contagion distributions ($[0, 1]$), identifying top contagion diffusion nodes, and categorizing threat levels while enforcing strict `as_of` temporal bounds.
+- **Changes (files):**
+  - `src/graph/algorithms.py`: Created `FraudContagionPageRank` with power iteration, multi-hop ego-net extraction, fraud seed discovery from closed cases, and contagion score computation.
+  - `src/graph/client.py`: Added `calculate_fraud_contagion` (Q17) to `GraphClient`.
+  - `src/graph/traverser.py`: Added `_get_contagion` task to `ConcurrentGraphTraverser.gather_graph_evidence`.
+  - `src/agent/budgeter.py`: Added `allow_contagion_scan` flag across budget tiers.
+  - `src/agent/graph.py`: Integrated fraud contagion evidence into `FraudInvestigatorAgent.investigate_case` and topological context brief.
+  - `src/api/main.py`: Added `GET /api/cases/{case_id}/contagion` and `POST /api/graph/contagion-check` endpoints; fixed Pydantic request models with `model_rebuild()`.
+  - `tests/test_pagerank_contagion.py`: Created 7 unit tests covering isolated clean entity, syndicate contagion propagation, custom fraud seeds, mathematical convergence (sum ~1.0), temporal cutoff isolation, sub-15ms latency (0.30ms actual), and API endpoints.
+- **Tests added/updated:**
+  - `tests/test_pagerank_contagion.py` (7 unit tests, all pass).
+  - Total unit test suite expanded from 103 to **110** tests across 29 test suites (100% passing).
+- **Metrics before -> after:**
+  - Test Count: 103 -> **110** (100% pass rate across 29 test suites)
+  - Fraud Contagion: Continuous Personalized PageRank ($r \in [0, 1]$) with Random Walk with Restart
+  - PageRank Latency: 0.30ms execution time (< 15ms target)
+  - Benchmark Answers Valid: 20/20 (100%)
+  - Benchmark Run-to-Run Variance: 0.00% (100% Deterministic)
+  - Policy Violations: 0
+  - Demo Path: PASS
+- **Verification gates:**
+  - Unit tests: PASS (110/110)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** Calculating Personalized PageRank over the local 2-hop ego-net converged in 30 iterations in just 0.30ms. For syndicate card C00259-K1, PPR immediately captured a critical contagion score of 0.2779 propagating from 14 closed fraud precedents across shared hardware fingerprints, while routine card C06743-K1 registered exactly 0.0000 contagion.
+- **Follow-ups added to backlog:** Proceed to Iteration 037: Temporal Graph Attention Subgraph Pooling (Lens 2 & Lens 11).
+
+## Iteration 035: Checkpoint 6 & Release Tag v0.35 (Milestone Review & Calibration Re-Check) | 2026-09-20 19:25 | commit e06e23a
 - **Lens:** 17. Documentation and deliverables & All Lenses 1-16
 - **Goal / hypothesis:** Conduct the comprehensive Milestone Review (Iteration 35/100) evaluating all system components against PRD Section 25 deliverables, verifying 0 regressions across all 28 unit test suites (103 unit tests), certifying all 20 benchmark case schemas, validating uncertainty calibration (ECE 0.0116, Brier 0.0006), confirming graph community detection, topological embeddings, multi-card velocity burst clustering, and regulatory structuring detection, and creating release tag `v0.35`.
 - **Changes (files):**

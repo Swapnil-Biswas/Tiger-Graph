@@ -133,10 +133,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 35. **[DONE - Iteration 035] [Checkpoint 6 & Release Tag v0.35] Milestone Review & System Calibration Re-Check**
     - *Result:* Comprehensive PRD Section 25 audit completed. All 6 mandatory gates passed (103/103 unit tests across 28 suites, 100% backtest recall/precision, 0.00% benchmark variance, 1.0000 policy retrieval MRR, 1.00 audit faithfulness, 20/20 valid benchmark answers, ECE 0.0116, Brier 0.0006, 0 secrets, demo path green). Tagged and pushed `v0.35`.
 
-36. **[Graph Analytics & Contagion Scoring] Personalized PageRank / Random Walk with Restart for Fraud Contagion**
-    - *Goal:* Implement personalized PageRank / Random Walk with Restart (RWR) from confirmed fraud seeds to calculate continuous fraud contagion scores across entire heterogeneous graph neighborhoods.
-    - *Files:* `src/graph/algorithms.py`, `src/graph/client.py`, `src/graph/traverser.py`, `src/agent/budgeter.py`, `src/agent/graph.py`, `tests/test_pagerank_contagion.py`
-    - *Metric Impact:* Investigation Accuracy & Graph Algorithms (Lens 1, 2).
+36. **[DONE - Iteration 036] [Graph Analytics & Contagion Scoring] Personalized PageRank / Random Walk with Restart for Fraud Contagion**
+    - *Result:* Implemented `FraudContagionPageRank` in `src/graph/algorithms.py` and exposed `calculate_fraud_contagion` (Q17) in `GraphClient`. Computes continuous steady-state fraud contagion distribution ($r \in [0, 1]$) using power iteration Random Walk with Restart (RWR, $c=0.15$) from confirmed fraud seeds across heterogeneous multi-hop financial subgraphs. Enforces strict `as_of` temporal bounds, identifies top contagion nodes, and categorizes threat levels (critical, high, elevated, low, none). Integrated into `ConcurrentGraphTraverser`, `AdaptiveGraphBudgeter`, and `FraudInvestigatorAgent`. Added API endpoints `/api/cases/{case_id}/contagion` and `/api/graph/contagion-check`. Added 7 unit tests in `tests/test_pagerank_contagion.py` (110/110 tests pass).
 
 37. **[Graph Analytics & Machine Learning] Temporal Graph Attention Subgraph Pooling**
     - *Goal:* Implement time-decayed attention pooling over multi-hop ego-net embeddings to aggregate node features into fixed-dimensional graph-level fraud embeddings.

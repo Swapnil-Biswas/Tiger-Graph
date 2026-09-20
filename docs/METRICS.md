@@ -37,7 +37,8 @@
 | **032** | `194b0e6` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 93/93 (100%) | 0.008s | PASS | Topological feature vector & GNN-ready adjacency matrix exporter (PyG & GBDT) |
 | **033** | `ea490a0` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 97/97 (100%) | 0.008s | PASS | Multi-card temporal velocity burst clustering & bot periodicity detection |
 | **034** | `d8e969d` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 103/103 (100%) | 0.008s | PASS | Regulatory structuring alerts & dynamic multi-entity exposure rollup (BSA/POCA/6AMLD) |
-| **035** | `v0.35` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 103/103 (100%) | 0.008s | PASS | Checkpoint 6 Audit, Milestone Review, and v0.35 Release Tag |
+| **035** | `e06e23a` | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 103/103 (100%) | 0.008s | PASS | Checkpoint 6 Audit, Milestone Review, and v0.35 Release Tag |
+| **036** | pending | 100.0% | 100.0% | 100.0% | 0.0% | 20/20 (100%) | 100.0% | 0 | 110/110 (100%) | 0.008s | PASS | Personalized PageRank fraud contagion (RWR) & continuous diffusion scoring |
 
 ---
 
