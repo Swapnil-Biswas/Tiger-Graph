@@ -1,4 +1,4 @@
-## Iteration 040: Checkpoint 7 Milestone Review & Release Tag v0.4 | 2026-09-20 20:15 | commit pending
+## Iteration 040: Checkpoint 7 Milestone Review & Release Tag v0.4 | 2026-09-20 20:15 | commit 12285c5
 - **Lens:** 14. Testing and evaluation & 17. Documentation & deliverables & 11. Agent architecture & engineering
 - **Goal / hypothesis:** Conduct comprehensive 40% milestone audit of the TigerGraph Agentic Fraud Investigation Agent, certifying system calibration, query scalability across Q1-Q20, deterministic reliability across repeated benchmark runs, complete schema conformance, and release tag `v0.4`.
 - **Changes (files):**
