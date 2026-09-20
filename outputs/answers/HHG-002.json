@@ -50,11 +50,11 @@
         "id": "EV-05",
         "source": "graph",
         "ref": "query:similar_cases(card=C11891-K1)",
-        "claim": "Found 5 prior closed case(s) touching related entities: CC-4160, CC-3039, CC-3206.",
+        "claim": "Found 5 prior closed case(s) touching related entities: CC-4160, CC-0031, CC-0037.",
         "entity_ids": [
           "CC-4160",
-          "CC-3039",
-          "CC-3206"
+          "CC-0031",
+          "CC-0037"
         ]
       },
       {
@@ -81,8 +81,8 @@
     ],
     "similar_prior_cases": [
       "CC-4160",
-      "CC-3039",
-      "CC-3206"
+      "CC-0031",
+      "CC-0037"
     ],
     "summary": "Investigation cleared the alert for card C11891-K1 as legitimate activity. Transaction characteristics match cardholder baseline history; customer confirmation confirmed authorized use.\n\nDecision Sensitivity (Counterfactual Boundaries):\n  1. [Unrecognized Device / Proxy]: Transaction executed from anonymous VPN proxy or unknown mobile OS -> Would trigger Rule R1 step-up authentication challenge and elevate risk points by +30.0.\n  2. [Cross-Card Cluster Sharing]: Device or billing IP detected across \u2265 2 other compromised accounts -> Would trigger Rule R6 syndicate ring alert, escalating to immediate card hold.",
     "written_to_graph": true,
@@ -93,7 +93,7 @@
       "type": "customer_validation",
       "asked_after_step": 3,
       "assumed_response": "Customer confirms they made this purchase while traveling and still has possession of the card",
-      "reason": "R1: Ambiguous risk score requires cardholder validation before permanent card block."
+      "reason": "Optimal VOI (15.72 bits/$): Cardholder inquiry has high expected entropy reduction (-0.79 bits) at low cost."
     }
   ],
   "next_best_actions": {

@@ -88,7 +88,7 @@
         "id": "EV-07",
         "source": "customer",
         "ref": "evidence_request:1",
-        "claim": "Customer states they did not make these purchases and still has the card",
+        "claim": "Cardholder provided response for analyst_info under scenario denies",
         "entity_ids": []
       }
     ],
@@ -117,10 +117,10 @@
   },
   "evidence_requests": [
     {
-      "type": "customer_validation",
+      "type": "analyst_info",
       "asked_after_step": 3,
-      "assumed_response": "Customer states they did not make these purchases and still has the card",
-      "reason": "R1: Cardholder inquiry to verify transaction legitimacy."
+      "assumed_response": "Cardholder provided response for analyst_info under scenario denies",
+      "reason": "Optimal VOI (0.03 bits/$): Manual analyst escalation offers complete uncertainty resolution but high operational cost."
     }
   ],
   "next_best_actions": {
@@ -163,12 +163,12 @@
   "sar": {
     "file": true,
     "reason": "Section 3a & Rule R2: Confirmed unauthorized fraud with exposure of $55.68 USD and multi-card linkage.",
-    "narrative": "Between 2016-12-19 and 2016-12-20, cardholder C13171 experienced unauthorized activity on card C13171-K2. A total of 1 transaction(s) amounting to $55.68 USD were executed under fraud pattern 'card_not_present_fraud'. The primary flagged transaction 3558054 ($55.68) was initiated through the online channel. The same device profile was also observed across 171 other distinct cards, demonstrating coordinated compromise. The cardholder was contacted for transaction validation and stated: 'Customer states they did not make these purchases and still has the card'. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C13171-K2 to mitigate further loss and placed linked accounts under enhanced monitoring.",
+    "narrative": "Between 2016-12-19 and 2016-12-20, cardholder C13171 experienced unauthorized activity on card C13171-K2. A total of 1 transaction(s) amounting to $55.68 USD were executed under fraud pattern 'card_not_present_fraud'. The primary flagged transaction 3558054 ($55.68) was initiated through the online channel. The same device profile was also observed across 171 other distinct cards, demonstrating coordinated compromise. The cardholder was contacted for transaction validation and stated: 'Cardholder provided response for analyst_info under scenario denies'. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C13171-K2 to mitigate further loss and placed linked accounts under enhanced monitoring.",
     "subjects": [
-      "C13171",
       "C13171-K2",
-      "C00036-K1",
-      "C00027-K1"
+      "C00027-K1",
+      "C13171",
+      "C00036-K1"
     ],
     "total_amount_usd": 55.68,
     "activity_dates": [

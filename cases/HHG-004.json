@@ -92,7 +92,7 @@
         "id": "EV-08",
         "source": "customer",
         "ref": "evidence_request:1",
-        "claim": "Customer states they did not make these purchases and still has the card",
+        "claim": "Cardholder provided response for analyst_info under scenario denies",
         "entity_ids": []
       }
     ],
@@ -127,10 +127,10 @@
   },
   "evidence_requests": [
     {
-      "type": "customer_validation",
+      "type": "analyst_info",
       "asked_after_step": 3,
-      "assumed_response": "Customer states they did not make these purchases and still has the card",
-      "reason": "R1: Cardholder inquiry to verify transaction legitimacy."
+      "assumed_response": "Cardholder provided response for analyst_info under scenario denies",
+      "reason": "Optimal VOI (0.03 bits/$): Manual analyst escalation offers complete uncertainty resolution but high operational cost."
     }
   ],
   "next_best_actions": {
@@ -173,12 +173,12 @@
   "sar": {
     "file": true,
     "reason": "Section 3a & Rule R2: Confirmed unauthorized fraud with exposure of $128.33 USD and multi-card linkage.",
-    "narrative": "Between 2016-12-29 and 2016-12-29, cardholder C08106 experienced unauthorized activity on card C08106-K1. A total of 1 transaction(s) amounting to $128.33 USD were executed under fraud pattern 'card_not_present_new_device'. The primary flagged transaction 3583227 ($128.33) was initiated through the online channel. Activity originated from a device profile (UnknownDevice | UnknownOS | firefox 47.0 | UnknownScreen) marked as New for this account. The same device profile was also observed across 6 other distinct cards, demonstrating coordinated compromise. The cardholder was contacted for transaction validation and stated: 'Customer states they did not make these purchases and still has the card'. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C08106-K1 to mitigate further loss and placed linked accounts under enhanced monitoring.",
+    "narrative": "Between 2016-12-29 and 2016-12-29, cardholder C08106 experienced unauthorized activity on card C08106-K1. A total of 1 transaction(s) amounting to $128.33 USD were executed under fraud pattern 'card_not_present_new_device'. The primary flagged transaction 3583227 ($128.33) was initiated through the online channel. Activity originated from a device profile (UnknownDevice | UnknownOS | firefox 47.0 | UnknownScreen) marked as New for this account. The same device profile was also observed across 6 other distinct cards, demonstrating coordinated compromise. The cardholder was contacted for transaction validation and stated: 'Cardholder provided response for analyst_info under scenario denies'. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C08106-K1 to mitigate further loss and placed linked accounts under enhanced monitoring.",
     "subjects": [
+      "C02222-K1",
       "C08106",
       "C03095-K1",
-      "C08106-K1",
-      "C02222-K1"
+      "C08106-K1"
     ],
     "total_amount_usd": 128.33,
     "activity_dates": [

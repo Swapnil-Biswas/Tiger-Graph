@@ -92,26 +92,15 @@ class NextBestActionPlanner:
         return actions
 
     @staticmethod
-    def plan_evidence_request(assessment: Assessment, trigger: Dict[str, Any]) -> Optional[EvidenceRequest]:
-        if assessment.sufficient_to_act and not assessment.is_ambiguous:
-            return None
-
-        # Determine best inquiry
-        if trigger.get("trigger_type") == "customer_report":
-            # Customer already initiated, ask for validation of specific cards
-            return EvidenceRequest(
-                type="customer_validation",
-                asked_after_step=3,
-                assumed_response="Customer states they did not make these purchases and still has the card",
-                reason="R1: Cardholder inquiry to verify transaction legitimacy.",
-            )
-        else:
-            return EvidenceRequest(
-                type="customer_validation",
-                asked_after_step=3,
-                assumed_response="Customer states they did not make these purchases and still has the card",
-                reason="R1: Ambiguous risk score requires cardholder validation before permanent card block.",
-            )
+    def plan_evidence_request(
+        assessment: Assessment,
+        trigger: Dict[str, Any],
+        has_new_device: bool = False,
+    ) -> Optional[EvidenceRequest]:
+        from src.agent.voi import ValueOfInformationEngine
+        return ValueOfInformationEngine.select_best_inquiry(
+            assessment, trigger, has_new_device=has_new_device
+        )
 
     @staticmethod
     def plan_final_actions(

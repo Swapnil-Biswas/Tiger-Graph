@@ -77,18 +77,18 @@
         "id": "EV-06",
         "source": "graph",
         "ref": "query:similar_cases(card=C07297-K1)",
-        "claim": "Found 5 prior closed case(s) touching related entities: CC-0026, CC-0781, CC-0796.",
+        "claim": "Found 5 prior closed case(s) touching related entities: CC-0766, CC-1025, CC-1105.",
         "entity_ids": [
-          "CC-0026",
-          "CC-0781",
-          "CC-0796"
+          "CC-0766",
+          "CC-1025",
+          "CC-1105"
         ]
       },
       {
         "id": "EV-07",
         "source": "customer",
         "ref": "evidence_request:1",
-        "claim": "Customer states they did not make these purchases and still has the card",
+        "claim": "Cardholder provided response for analyst_info under scenario denies",
         "entity_ids": []
       }
     ],
@@ -113,9 +113,9 @@
       }
     ],
     "similar_prior_cases": [
-      "CC-0026",
-      "CC-0781",
-      "CC-0796"
+      "CC-0766",
+      "CC-1025",
+      "CC-1105"
     ],
     "summary": "Investigation confirmed unauthorized activity on card C07297-K1 under pattern 'card_not_present_new_device'. Total exposure identified is $482.12 across 1 transaction(s). Cardholder outreach and graph evidence confirmed compromise; defensive card blocks and case progression executed.\n\nDecision Sensitivity (Counterfactual Boundaries):\n  1. [Cardholder Confirmation]: Customer confirms authorization during SMS or mobile push challenge -> Fraud probability would reduce from 1.00 to \u2264 0.10, flipping verdict to LEGITIMATE (Rule R3).\n  2. [Billing Region Proximity]: Transaction billing region aligned with baseline regions (264.0, 485.0) -> Eliminates geographic distance anomaly penalty (-20.0 pts) and impossible travel flag.\n  3. [Device Exclusivity]: Device profile observed solely on this customer account -> Removes syndicate sharing flag (544 linked cards), downgrading from SAR requirement.",
     "written_to_graph": true,
@@ -123,10 +123,10 @@
   },
   "evidence_requests": [
     {
-      "type": "customer_validation",
+      "type": "analyst_info",
       "asked_after_step": 3,
-      "assumed_response": "Customer states they did not make these purchases and still has the card",
-      "reason": "R1: Cardholder inquiry to verify transaction legitimacy."
+      "assumed_response": "Cardholder provided response for analyst_info under scenario denies",
+      "reason": "Optimal VOI (0.03 bits/$): Manual analyst escalation offers complete uncertainty resolution but high operational cost."
     }
   ],
   "next_best_actions": {
@@ -169,12 +169,12 @@
   "sar": {
     "file": true,
     "reason": "Section 3a & Rule R2: Confirmed unauthorized fraud with exposure of $482.12 USD and multi-card linkage.",
-    "narrative": "Between 2016-11-21 and 2016-11-22, cardholder C07297 experienced unauthorized activity on card C07297-K1. A total of 1 transaction(s) amounting to $482.12 USD were executed under fraud pattern 'card_not_present_new_device'. The primary flagged transaction 3476682 ($482.12) was initiated through the online channel. The same device profile was also observed across 544 other distinct cards, demonstrating coordinated compromise. The cardholder was contacted for transaction validation and stated: 'Customer states they did not make these purchases and still has the card'. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C07297-K1 to mitigate further loss and placed linked accounts under enhanced monitoring.",
+    "narrative": "Between 2016-11-21 and 2016-11-22, cardholder C07297 experienced unauthorized activity on card C07297-K1. A total of 1 transaction(s) amounting to $482.12 USD were executed under fraud pattern 'card_not_present_new_device'. The primary flagged transaction 3476682 ($482.12) was initiated through the online channel. The same device profile was also observed across 544 other distinct cards, demonstrating coordinated compromise. The cardholder was contacted for transaction validation and stated: 'Cardholder provided response for analyst_info under scenario denies'. The activity represents a coordinated breach consistent with regulatory typology guidance. The financial institution has blocked card C07297-K1 to mitigate further loss and placed linked accounts under enhanced monitoring.",
     "subjects": [
       "C00094-K1",
-      "C00118-K1",
+      "C07297",
       "C07297-K1",
-      "C07297"
+      "C00118-K1"
     ],
     "total_amount_usd": 482.12,
     "activity_dates": [

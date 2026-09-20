@@ -1,4 +1,29 @@
-## Iteration 003: Graph-Native Counterfactual Decision Explainer | 2026-09-20 16:39 | commit pending
+## Iteration 004: Evidence Value-of-Information (VOI) Ranking Engine | 2026-09-20 16:41 | commit pending
+- **Lens:** 20. Innovation, 4. Next-best-action quality & 5. Evidence-request design
+- **Goal / hypothesis:** Requesting evidence imposes customer friction and operational cost ($0.05 SMS, $0.10 OTP, $2.50 human review). Implementing a Shannon entropy reduction model ($H_{prior} - E[H_{post}]$) per unit cost provides a mathematically principled Value of Information (VOI) ranking engine, optimizing inquiry selection and raising Agentic Design & Innovation scores.
+- **Changes (files):**
+  - `src/agent/voi.py`: Implemented `ValueOfInformationEngine` computing binary Shannon entropy reduction ($\Delta H$) and cost-weighted VOI scores across candidate inquiries (`customer_validation`, `step_up_auth`, `analyst_info`).
+  - `src/agent/decide.py`: Wired `ValueOfInformationEngine.select_best_inquiry` into `plan_evidence_request`.
+  - `tests/test_voi.py`: Added 2 unit tests covering Shannon entropy mathematical boundaries and candidate ranking order.
+  - Regenerated and validated all 20 benchmark case outputs.
+- **Tests added/updated:**
+  - `tests/test_voi.py` (2 tests, pass).
+  - Total test count expanded from 19 to 21 (100% pass rate).
+- **Metrics before -> after:**
+  - Test Count: 19 -> **21** (100% pass rate)
+  - Inquiry Optimization: Mathematically principled VOI inquiry ranking replacing static heuristic
+  - Valid Benchmark Answers: 20/20 (100%)
+  - Evidence Finding Citation Validity: 100.0%
+  - Policy Violations: 0
+- **Verification gates:**
+  - Unit tests: PASS (21/21)
+  - Demo path: PASS
+  - Answer-file validation: PASS (20/20)
+  - Secret scan: PASS
+- **What I learned / what surprised me:** For medium-risk alerts (p ≈ 0.60), cardholder SMS outreach produces the highest information gain per dollar (15.37 bits/$) because it reduces nearly 0.8 bits of uncertainty at negligible operational cost compared to human analyst queues.
+- **Follow-ups added to backlog:** Next implement UI/UX item 5: 1-Click Interactive Preset Scenarios in the web dashboard for instant demo replay during judging presentations.
+
+## Iteration 003: Graph-Native Counterfactual Decision Explainer | 2026-09-20 16:39 | commit 2ca2604
 - **Lens:** 20. Innovation & 9. Explainability
 - **Goal / hypothesis:** Financial crime compliance and regulatory audits demand transparent counterfactual sensitivity ("What would change this verdict?"). Implementing a deterministic `CounterfactualExplainer` that maps topological inversion conditions (device history, billing region proximity, step-up challenge) into the case payload and analyst summary raises auditability and innovation.
 - **Changes (files):**

@@ -86,7 +86,7 @@
       "type": "customer_validation",
       "asked_after_step": 3,
       "assumed_response": "Customer states they did not make these purchases and still has the card",
-      "reason": "R1: Ambiguous risk score requires cardholder validation before permanent card block."
+      "reason": "Optimal VOI (13.58 bits/$): Cardholder inquiry has high expected entropy reduction (-0.68 bits) at low cost."
     }
   ],
   "next_best_actions": {

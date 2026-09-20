@@ -75,11 +75,11 @@
         "id": "EV-06",
         "source": "graph",
         "ref": "query:similar_cases(card=C13487-K1)",
-        "claim": "Found 5 prior closed case(s) touching related entities: CC-0932, CC-1065, CC-1258.",
+        "claim": "Found 5 prior closed case(s) touching related entities: CC-2649, CC-2971, CC-2985.",
         "entity_ids": [
-          "CC-0932",
-          "CC-1065",
-          "CC-1258"
+          "CC-2649",
+          "CC-2971",
+          "CC-2985"
         ]
       }
     ],
@@ -98,9 +98,9 @@
       }
     ],
     "similar_prior_cases": [
-      "CC-0932",
-      "CC-1065",
-      "CC-1258"
+      "CC-2649",
+      "CC-2971",
+      "CC-2985"
     ],
     "summary": "Investigation cleared the alert for card C13487-K1 as legitimate activity. Transaction characteristics match cardholder baseline history; customer confirmation confirmed authorized use.\n\nDecision Sensitivity (Counterfactual Boundaries):\n  1. [Unrecognized Device / Proxy]: Transaction executed from anonymous VPN proxy or unknown mobile OS -> Would trigger Rule R1 step-up authentication challenge and elevate risk points by +30.0.\n  2. [Cross-Card Cluster Sharing]: Device or billing IP detected across \u2265 2 other compromised accounts -> Would trigger Rule R6 syndicate ring alert, escalating to immediate card hold.",
     "written_to_graph": true,

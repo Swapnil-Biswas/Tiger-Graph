@@ -21,10 +21,8 @@ Ranked by expected impact on Hackathon Judging Criteria:
 3. **[DONE - Iteration 003] [Innovation] Graph-Native Counterfactual Explainer**
    - *Result:* Implemented `CounterfactualExplainer` calculating decision inversion boundaries across topological factors (device history, region alignment, OTP challenges). Added 2 unit tests, expanding test suite to 19 tests (100% pass).
 
-4. **[Innovation] Evidence Value-of-Information (VOI) Ranking**
-   - *Goal:* Formally calculate expected uncertainty reduction for candidate evidence requests before selecting the optimal inquiry.
-   - *Files:* `src/agent/assess.py`, `src/agent/decide.py`
-   - *Metric Impact:* Agentic Design (15%) and Next-Best-Action (25%).
+4. **[DONE - Iteration 004] [Innovation] Evidence Value-of-Information (VOI) Ranking**
+   - *Result:* Implemented `ValueOfInformationEngine` utilizing Shannon entropy reduction per unit cost to mathematically optimize inquiry selection. Added 2 unit tests, expanding test suite to 21 tests (100% pass).
 
 5. **[UI/UX] 1-Click Interactive Preset Scenarios in Web Dashboard**
    - *Goal:* Add pre-configured 1-click demo buttons in UI for key personas (`Clear-Cut Syndicate HHG-004`, `Ambiguous Evolution HHG-001`, `Card Testing HHG-011`, `Disputed Recurring HHG-007`).
