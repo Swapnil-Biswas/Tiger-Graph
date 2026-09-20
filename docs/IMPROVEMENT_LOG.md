@@ -1,4 +1,4 @@
-## Iteration 076: Architecture Diagrams & End-to-End Visual Flow in Docs | 2026-09-21 06:00 | commit pending
+## Iteration 076: Architecture Diagrams & End-to-End Visual Flow in Docs | 2026-09-21 06:00 | commit c117c23
 - **Lens:** 10. Case summary, explanation & visual reporting, 11. Agent architecture & engineering, 8. Explainability & human-in-the-loop
 - **Goal / hypothesis:** Enterprise fraud detection architectures require clear, publication-grade visual and technical documentation to allow compliance auditors, platform engineers, and operations teams to understand the end-to-end data flow, multi-agent consensus protocols, and authorization gates. Creating `docs/ARCHITECTURE.md` provides:
   1. **5 Comprehensive Mermaid Diagrams**:
