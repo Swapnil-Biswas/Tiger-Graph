@@ -1692,6 +1692,22 @@ def audit_compliance_batch(
     return res
 
 
+from src.cases.comparator import ThreeWayComparator
+three_way_comparator = ThreeWayComparator(agent=agent)
+
+
+@app.get("/api/eval/compare-three-way/{case_id}")
+def compare_three_way(case_id: str, scenario: str = Query("denies")):
+    """
+    Evaluates an investigation across three paradigms:
+    1. Plain RAG
+    2. GraphRAG
+    3. Agentic GraphRAG
+    Highlights where each paradigm succeeds or fails.
+    """
+    return three_way_comparator.evaluate_case(case_id=case_id, scenario=scenario)
+
+
 # Mount UI static directory
 ui_dir = os.path.join(os.path.dirname(__file__), "../../ui")
 if os.path.exists(ui_dir):

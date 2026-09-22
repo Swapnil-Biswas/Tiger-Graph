@@ -741,9 +741,10 @@ class GraphClient:
         if not pack_item:
             return {"nodes": [], "edges": []}
 
-        card_id = pack_item.get("card_id", "")
-        cust_id = pack_item.get("customer_id", "")
-        flagged_txn = pack_item.get("flagged_txn_id", "") or pack_item.get("first_fraud_txn_id", "")
+        card_id = str(pack_item.get("card_id", "")).strip()
+        cust_id = str(pack_item.get("customer_id", "")).strip()
+        raw_flagged = pack_item.get("flagged_txn_id") or pack_item.get("first_fraud_txn_id") or ""
+        flagged_txn = str(raw_flagged).split(".")[0].strip()
 
         nodes = []
         edges = []
@@ -761,30 +762,76 @@ class GraphClient:
             if src in node_ids and dst in node_ids:
                 edges.append({"data": {"source": src, "target": dst, "type": etype, "label": label}})
 
-        # Seed Nodes
+        # 1. Primary Incident Hub
         add_node(f"case_{case_id}", "Case", f"Case {case_id}")
         if cust_id:
             add_node(f"cust_{cust_id}", "Customer", f"Customer {cust_id}")
         if card_id:
             add_node(f"card_{card_id}", "Card", f"Card {card_id}")
-            add_edge(f"cust_{cust_id}", f"card_{card_id}", "OWNS", "OWNS")
+            if cust_id:
+                add_edge(f"cust_{cust_id}", f"card_{card_id}", "OWNS", "OWNS")
             add_edge(f"case_{case_id}", f"card_{card_id}", "ABOUT", "ABOUT")
 
+        # 2. Flagged & Surrounding Transactions on Subject Card
+        all_card_txns = self.store.txns_by_card.get(card_id, [])
+        txns_to_show = []
+        
+        # Ensure flagged transaction is included
         if flagged_txn and flagged_txn in self.store.transactions:
-            txn_obj = self.store.transactions[flagged_txn]
-            add_node(f"txn_{flagged_txn}", "Transaction", f"${txn_obj['amount']:.2f} ({flagged_txn})", {"risk": txn_obj["risk_score"]})
-            add_edge(f"card_{card_id}", f"txn_{flagged_txn}", "MADE", "MADE")
-            
-            dev = txn_obj.get("device_profile")
-            if dev and dev != "None | None | None | None":
-                dev_short = dev.split(" | ")[0]
-                add_node(f"dev_{dev[:20]}", "DeviceProfile", dev_short)
-                add_edge(f"txn_{flagged_txn}", f"dev_{dev[:20]}", "FROM_DEVICE", "DEVICE")
+            flagged_obj = self.store.transactions[flagged_txn]
+            txns_to_show.append(flagged_obj)
 
-            addr = txn_obj.get("addr1")
-            if addr:
-                add_node(f"reg_{addr}", "BillingRegion", f"Region {addr}")
-                add_edge(f"txn_{flagged_txn}", f"reg_{addr}", "BILLED_IN", "REGION")
+        # Add 3 preceding and 2 succeeding context transactions
+        for t in all_card_txns[-6:]:
+            if t["TransactionID"] != flagged_txn and len(txns_to_show) < 5:
+                txns_to_show.append(t)
+
+        devices_seen = set()
+        regions_seen = set()
+
+        for t_obj in txns_to_show:
+            t_id = str(t_obj["TransactionID"]).split(".")[0]
+            amt = float(t_obj.get("amount", 0.0))
+            is_target = (t_id == flagged_txn)
+            t_lbl = f"${amt:.2f} ({'FLAGGED' if is_target else t_id[-4:]})"
+            add_node(f"txn_{t_id}", "Transaction", t_lbl, {"risk": t_obj.get("risk_score", 0.5), "is_target": is_target})
+            add_edge(f"card_{card_id}", f"txn_{t_id}", "MADE", f"${amt:.2f}")
+
+            # Link Device Profile
+            dev = t_obj.get("device_profile")
+            if dev and dev != "None | None | None | None":
+                dev_id = f"dev_{dev[:18]}"
+                dev_short = dev.split(" | ")[0]
+                add_node(dev_id, "DeviceProfile", dev_short)
+                add_edge(f"txn_{t_id}", dev_id, "FROM_DEVICE", "DEVICE")
+                devices_seen.add(dev)
+
+            # Link Billing Region
+            addr = t_obj.get("addr1")
+            if addr and str(addr).strip() != "":
+                reg_id = f"reg_{addr}"
+                add_node(reg_id, "BillingRegion", f"Region {addr}")
+                add_edge(f"txn_{t_id}", reg_id, "BILLED_IN", "REGION")
+                regions_seen.add(addr)
+
+        # 3. Multi-Card Syndicate Nexus (Shared Device Linkage)
+        for dev in list(devices_seen)[:2]:
+            shared_txns = self.store.txns_by_device.get(dev, [])
+            other_cards = set(t["card_id"] for t in shared_txns if t["card_id"] != card_id)
+            dev_id = f"dev_{dev[:18]}"
+            for oc in list(other_cards)[:2]:
+                oc_node_id = f"card_{oc}"
+                add_node(oc_node_id, "Card", f"Connected {oc}")
+                add_edge(dev_id, oc_node_id, "SHARED_WITH", "SHARED")
+
+        # 4. Historical Precedent Closed Cases (Memory Citations)
+        prior_cases = self.similar_cases(card_id, customer_id=cust_id)
+        for pc in prior_cases.get("similar_cases", [])[:2]:
+            pc_id = pc["case_id"]
+            pc_node_id = f"case_{pc_id}"
+            outcome = pc.get("outcome", "fraud")
+            add_node(pc_node_id, "Case", f"Precedent {pc_id} ({outcome})")
+            add_edge(f"card_{card_id}", pc_node_id, "PRECEDENT", outcome.upper())
 
         return {"nodes": nodes, "edges": edges}
 
