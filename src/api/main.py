@@ -1708,7 +1708,31 @@ def compare_three_way(case_id: str, scenario: str = Query("denies")):
     return three_way_comparator.evaluate_case(case_id=case_id, scenario=scenario)
 
 
+# Convenience routes for Landing & Console navigation
+ui_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../ui"))
+
+@app.get("/console")
+def get_console_page():
+    return FileResponse(os.path.join(ui_dir, "console.html"))
+
+@app.get("/login")
+def get_login_page():
+    return FileResponse(os.path.join(ui_dir, "login.html"))
+
+@app.get("/register")
+def get_register_page():
+    return FileResponse(os.path.join(ui_dir, "register.html"))
+
+@app.get("/terms")
+def get_terms_page():
+    return FileResponse(os.path.join(ui_dir, "terms.html"))
+
+@app.get("/privacy")
+def get_privacy_page():
+    return FileResponse(os.path.join(ui_dir, "privacy.html"))
+
+
 # Mount UI static directory
-ui_dir = os.path.join(os.path.dirname(__file__), "../../ui")
 if os.path.exists(ui_dir):
     app.mount("/", StaticFiles(directory=ui_dir, html=True), name="ui")
+

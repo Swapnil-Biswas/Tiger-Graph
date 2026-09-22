@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy & BSA Compliance Policy — TigerGraph Fraud Defense</title>
+  <meta name="description" content="Institutional Privacy and Bank Secrecy Act Compliance Policy for TigerGraph Autonomous Fraud Defense.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="legal-body">
+
+  <header class="legal-header">
+    <div class="legal-header-inner">
+      <a href="index.html" class="tg-brand-logo">
+        <svg class="tg-logo-icon" viewBox="0 0 32 32">
+          <path d="M16 2L3 9.5V22.5L16 30L29 22.5V9.5L16 2Z" fill="#ff5722"/>
+          <path d="M16 6L7 11V21L16 26L25 21V11L16 6Z" fill="#ffffff" fill-opacity="0.9"/>
+          <polygon points="16,9 10,13 16,17 22,13" fill="#ff5722"/>
+        </svg>
+        <div class="tg-brand-text">
+          <div class="tg-app-title">TigerGraph <span class="tg-accent">Investigator</span></div>
+          <div class="tg-app-subtitle">Compliance &amp; Data Protection</div>
+        </div>
+      </a>
+      <div style="display:flex; gap:0.75rem;">
+        <a href="index.html" class="tg-btn-ghost">&larr; Overview</a>
+        <a href="console.html" class="tg-btn-primary">Open Console</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="legal-container">
+    <div class="legal-card">
+      <div class="legal-badge">STATUTORY DATA GOVERNANCE &bull; BANK SECRECY ACT &bull; GDPR</div>
+      <h1 class="legal-title">Privacy &amp; Regulatory Data Protection Policy</h1>
+      <div class="legal-meta">Last Updated: September 23, 2026 &bull; Compliant with FinCEN 31 CFR &sect; 1020.320 &amp; GDPR Art. 22</div>
+
+      <hr class="legal-divider">
+
+      <section class="legal-section">
+        <h2>1. Ingestion Scope &amp; PII Tokenization</h2>
+        <p>
+          The TigerGraph Fraud Defense platform processes transaction graphs, card identifiers, hardware signatures, and geolocation records strictly for the purpose of financial crime detection, AML structuring detection, and threat neutralization. Personally Identifiable Information (PII) is subject to irreversible hashing and role-based cryptographic tokenization prior to ingress into GraphStore layers.
+        </p>
+      </section>
+
+      <section class="legal-section">
+        <h2>2. Dynamic Role-Based Access Control (RBAC) &amp; Masking</h2>
+        <p>
+          Access to raw customer account data, full primary account numbers (PAN), and device telemetry is governed by four strict RBAC clearance tiers:
+        </p>
+        <ul style="margin-top:0.5rem; padding-left:1.5rem; line-height:1.6;">
+          <li><strong>Tier L1 (Fraud Analyst):</strong> View case summaries, masked card numbers (e.g. <code>C12382-**</code>), and trigger verification inquiries.</li>
+          <li><strong>Tier L2 (Senior Fraud Ops):</strong> Authorize high-exposure mitigations (&ge; $1,000), examine unmasked multi-card nexuses, and approve SAR filings.</li>
+          <li><strong>AML Compliance Officer:</strong> Review FinCEN Form 111 XML payloads, override jurisdictional thresholds, and execute regulatory submissions.</li>
+          <li><strong>Chief Risk Officer:</strong> Executive governance, model drift auditing, and policy threshold reconfiguration.</li>
+        </ul>
+      </section>
+
+      <section class="legal-section">
+        <h2>3. Cryptographic Chain-of-Custody &amp; Audit Trail</h2>
+        <p>
+          Every API request, agent reasoning step, consensus vote, and human override generates an immutable entry in the cryptographic audit ledger. Each block contains an SHA-256 hash of the preceding record, a UTC timestamp, investigator identity, and an HMAC digital signature, guaranteeing non-repudiation under FRE 902.
+        </p>
+      </section>
+
+      <section class="legal-section">
+        <h2>4. Five-Year Mandatory Statutory Retention</h2>
+        <p>
+          Pursuant to 31 CFR &sect; 1020.320(d), all supporting documentation relating to filed SARs and investigated case dossiers must be retained for a minimum period of five (5) years from the date of filing. The platform enforces immutable retention locks preventing unauthorized record expungement during the statutory window.
+        </p>
+      </section>
+
+      <section class="legal-section">
+        <h2>5. Cross-Border Transfers &amp; FATF Corridor Compliance</h2>
+        <p>
+          Transaction hops spanning international jurisdictions are scrutinized against Financial Action Task Force (FATF) high-risk corridor matrices. Cross-border correspondent banking analysis automatically flags geographic mismatches and multi-jurisdiction structuring schemes.
+        </p>
+      </section>
+
+      <div style="margin-top:2.5rem; padding-top:1.5rem; border-top:1px solid var(--tg-border); display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:0.8rem; color:var(--tg-text-muted);">&copy; 2026 TigerGraph Global Financial Defense.</span>
+        <a href="terms.html" style="font-size:0.8rem; color:var(--tg-orange); font-weight:600;">View Terms of Service &rarr;</a>
+      </div>
+    </div>
+  </main>
+
+</body>
+</html>

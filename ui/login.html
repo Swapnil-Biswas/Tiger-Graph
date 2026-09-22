@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — TigerGraph Fraud Investigator</title>
+  <meta name="description" content="Sign in to the TigerGraph Autonomous Fraud Investigator & Next-Best-Action Console.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-body">
+
+  <div class="auth-container">
+    <div class="auth-header">
+      <a href="index.html" class="tg-brand-logo" style="justify-content:center; margin-bottom:1rem;">
+        <svg class="tg-logo-icon" viewBox="0 0 32 32">
+          <path d="M16 2L3 9.5V22.5L16 30L29 22.5V9.5L16 2Z" fill="#ff5722"/>
+          <path d="M16 6L7 11V21L16 26L25 21V11L16 6Z" fill="#ffffff" fill-opacity="0.9"/>
+          <polygon points="16,9 10,13 16,17 22,13" fill="#ff5722"/>
+          <polygon points="10,15 10,20 16,23 16,18" fill="#e64a19"/>
+          <polygon points="22,15 22,20 16,23 16,18" fill="#f4511e"/>
+        </svg>
+        <div class="tg-brand-text">
+          <div class="tg-app-title">TigerGraph <span class="tg-accent">Investigator</span></div>
+          <div class="tg-app-subtitle">Institutional Authentication Gateway</div>
+        </div>
+      </a>
+      <h2 class="auth-title">Investigator Sign In</h2>
+      <p class="auth-subtitle">Access the autonomous multi-agent swarm and multi-hop graph workspace.</p>
+    </div>
+
+    <div class="tg-card auth-card">
+      <form id="form-login" onsubmit="handleLoginSubmit(event)">
+        <div class="form-group" style="margin-bottom:1.25rem;">
+          <label for="login-email" class="form-label">Corporate Email / Analyst ID:</label>
+          <input type="text" id="login-email" class="custom-input" value="swapnil.biswas@tigergraph.com" required placeholder="name@bank.com">
+        </div>
+
+        <div class="form-group" style="margin-bottom:1.25rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+            <label for="login-password" class="form-label" style="margin-bottom:0;">Password / SmartCard Token:</label>
+            <a href="#" onclick="alert('In this environment, you can use any password or click Quick Demo Sign In.'); return false;" style="font-size:0.75rem; color:var(--tg-orange);">Forgot?</a>
+          </div>
+          <input type="password" id="login-password" class="custom-input" value="password123" required>
+        </div>
+
+        <div class="form-group" style="display:flex; align-items:center; gap:0.5rem; margin-bottom:1.5rem;">
+          <input type="checkbox" id="login-remember" checked>
+          <label for="login-remember" style="font-size:0.8rem; color:var(--tg-text-secondary); cursor:pointer;">Remember institutional session for 30 days</label>
+        </div>
+
+        <button type="submit" class="tg-btn-primary" style="width:100%; justify-content:center; padding:10px; font-size:0.9rem;">
+          Sign In to Investigation Console
+        </button>
+
+        <div style="text-align:center; margin:1.25rem 0; color:var(--tg-text-muted); font-size:0.8rem; position:relative;">
+          <span style="background:#ffffff; padding:0 10px; position:relative; z-index:1;">OR</span>
+          <div style="position:absolute; top:50%; left:0; right:0; height:1px; background:var(--tg-border); z-index:0;"></div>
+        </div>
+
+        <button type="button" class="tg-btn-outline" style="width:100%; justify-content:center; padding:9px; font-size:0.85rem;" onclick="quickDemoLogin()">
+          Quick Demo: Sign in as Swapnil Biswas (L2 Senior Ops)
+        </button>
+      </form>
+    </div>
+
+    <div class="auth-footer-links">
+      <div>Need an analyst account? <a href="register.html" style="color:var(--tg-orange); font-weight:600;">Register here</a></div>
+      <div style="margin-top:0.5rem;"><a href="index.html" style="color:var(--tg-text-secondary);">&larr; Return to Overview</a></div>
+    </div>
+  </div>
+
+  <script>
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value.trim();
+      let name = "Swapnil Biswas";
+      let username = "swapnil_ops";
+      let role = "L2 Senior Fraud Ops";
+
+      if (email.includes("@")) {
+        const parts = email.split("@")[0].split(".");
+        if (parts.length >= 2) {
+          name = parts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(" ");
+          username = email.split("@")[0];
+        }
+      }
+
+      const profile = {
+        name: name,
+        username: username,
+        institution: "TigerGraph Global Financial Defense",
+        role: role,
+        color: "#ff5722"
+      };
+
+      localStorage.setItem("tg_investigator_profile", JSON.stringify(profile));
+      window.location.href = "console.html";
+    }
+
+    function quickDemoLogin() {
+      const profile = {
+        name: "Swapnil Biswas",
+        username: "swapnil_ops",
+        institution: "TigerGraph Global Financial Defense",
+        role: "L2 Senior Fraud Ops",
+        color: "#ff5722"
+      };
+      localStorage.setItem("tg_investigator_profile", JSON.stringify(profile));
+      window.location.href = "console.html";
+    }
+  </script>
+</body>
+</html>

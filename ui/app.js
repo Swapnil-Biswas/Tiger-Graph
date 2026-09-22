@@ -4,13 +4,136 @@ let cyInstance = null;
 let currentCaseId = "HHG-001";
 let casesData = [];
 
+let userProfile = {
+  name: "Swapnil Biswas",
+  username: "swapnil_ops",
+  institution: "TigerGraph Global Financial Defense",
+  role: "L2 Senior Fraud Ops",
+  color: "#ff5722"
+};
+
 document.addEventListener("DOMContentLoaded", () => {
+  initUserProfile();
   initTabs();
   initCytoscape();
   loadCasesList();
   loadApprovals();
   setupEventListeners();
 });
+
+// Dynamic Profile & Customization Functions
+function getInitials(name) {
+  if (!name) return "SB";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function initUserProfile() {
+  const stored = localStorage.getItem("tg_investigator_profile");
+  if (stored) {
+    try {
+      userProfile = { ...userProfile, ...JSON.parse(stored) };
+    } catch (e) {
+      console.warn("Could not parse stored profile:", e);
+    }
+  }
+
+  applyUserProfileToUI();
+}
+
+function applyUserProfileToUI() {
+  const topAvatar = document.getElementById("top-user-avatar");
+  if (topAvatar) {
+    const initials = getInitials(userProfile.name);
+    topAvatar.textContent = initials;
+    topAvatar.style.backgroundColor = userProfile.color || "#ff5722";
+    topAvatar.title = `Investigator: ${userProfile.name} (${userProfile.role}) — Click to customize`;
+  }
+}
+
+function openProfileModal() {
+  const modal = document.getElementById("modal-profile");
+  if (!modal) return;
+
+  document.getElementById("input-full-name").value = userProfile.name || "";
+  document.getElementById("input-username").value = userProfile.username || "";
+  document.getElementById("input-institution").value = userProfile.institution || "";
+  
+  const roleSelect = document.getElementById("select-role");
+  if (roleSelect && userProfile.role) {
+    roleSelect.value = userProfile.role;
+  }
+
+  // Set color radio
+  const radios = document.querySelectorAll('input[name="avatar-color"]');
+  radios.forEach(r => {
+    r.checked = (r.value === userProfile.color);
+  });
+
+  updateProfileModalPreview();
+  modal.classList.add("active");
+}
+
+function closeProfileModal() {
+  const modal = document.getElementById("modal-profile");
+  if (modal) modal.classList.remove("active");
+}
+
+function updateProfileModalPreview() {
+  const name = (document.getElementById("input-full-name").value || userProfile.name || "Investigator").trim();
+  const org = (document.getElementById("input-institution").value || userProfile.institution || "Financial Institution").trim();
+  const roleSelect = document.getElementById("select-role");
+  const role = roleSelect ? roleSelect.value : userProfile.role;
+  
+  const checkedColor = document.querySelector('input[name="avatar-color"]:checked');
+  const color = checkedColor ? checkedColor.value : (userProfile.color || "#ff5722");
+
+  const initials = getInitials(name);
+  const previewAvatar = document.getElementById("modal-avatar-preview");
+  if (previewAvatar) {
+    previewAvatar.textContent = initials;
+    previewAvatar.style.backgroundColor = color;
+  }
+
+  const pName = document.getElementById("modal-preview-name");
+  if (pName) pName.textContent = name;
+
+  const pRole = document.getElementById("modal-preview-role");
+  if (pRole) pRole.textContent = `${role} • Tier L2 Approver`;
+
+  const pOrg = document.getElementById("modal-preview-org");
+  if (pOrg) pOrg.textContent = org;
+}
+
+function saveUserProfile(e) {
+  if (e) e.preventDefault();
+
+  const name = document.getElementById("input-full-name").value.trim();
+  const username = document.getElementById("input-username").value.trim();
+  const org = document.getElementById("input-institution").value.trim();
+  const role = document.getElementById("select-role").value;
+  const checkedColor = document.querySelector('input[name="avatar-color"]:checked');
+  const color = checkedColor ? checkedColor.value : "#ff5722";
+
+  userProfile = {
+    name: name,
+    username: username,
+    institution: org,
+    role: role,
+    color: color
+  };
+
+  localStorage.setItem("tg_investigator_profile", JSON.stringify(userProfile));
+  applyUserProfileToUI();
+  closeProfileModal();
+  showToast(`Profile updated: ${userProfile.name} (${userProfile.role})`);
+}
+
+function signOutUser() {
+  localStorage.removeItem("tg_investigator_profile");
+  window.location.href = "login.html";
+}
 
 // Tab Navigation & Enterprise Routing
 function initTabs() {
@@ -406,7 +529,7 @@ function setupEventListeners() {
         alert("Error during benchmark run: " + e.message);
       } finally {
         btnRunAll.disabled = false;
-        btnRunAll.textContent = "⚡ Run Full Benchmark (20 Cases)";
+        btnRunAll.textContent = "[ACTIVE] Run Full Benchmark (20 Cases)";
       }
     });
   }
@@ -530,21 +653,21 @@ function addTimelineStep(stepName, message) {
   div.className = "timeline-step active";
 
   const icons = {
-    TRIGGER: "🎯",
-    OPEN_CASE: "📂",
-    BUDGET_PLAN: "📊",
-    RETRIEVE_MEMORY: "🧠",
-    INVESTIGATE: "🔍",
-    GRAPHRAG_BM25: "📚",
-    ASSESS: "⚖️",
-    REQUEST_EVIDENCE: "💬",
-    DECIDE_ACTIONS: "🛡️",
-    SELF_CRITIQUE: "🔍",
-    COMPLETE: "✅"
+    TRIGGER: "[TARGET]",
+    OPEN_CASE: "",
+    BUDGET_PLAN: "[STATS]",
+    RETRIEVE_MEMORY: "[AI]",
+    INVESTIGATE: "Fit",
+    GRAPHRAG_BM25: "[DOCS]",
+    ASSESS: "[RULES]",
+    REQUEST_EVIDENCE: "[MSG]",
+    DECIDE_ACTIONS: "[VERIFIED]️",
+    SELF_CRITIQUE: "Fit",
+    COMPLETE: "[PASS]"
   };
 
   div.innerHTML = `
-    <div class="step-icon">${icons[stepName] || "⚙️"}</div>
+    <div class="step-icon">${icons[stepName] || "[CONFIG]"}</div>
     <div class="step-content">
       <h4>${stepName}</h4>
       <p>${message}</p>
@@ -978,7 +1101,7 @@ async function loadPlaybackTimeline(caseId) {
       Object.entries(playbackTimelineData.milestones).forEach(([name, fIdx]) => {
         const chip = document.createElement("span");
         chip.className = "milestone-chip";
-        chip.textContent = `★ Frame ${fIdx + 1}: ${name}`;
+        chip.textContent = `[FRAME] Frame ${fIdx + 1}: ${name}`;
         chip.onclick = () => renderPlaybackFrame(fIdx);
         mContainer.appendChild(chip);
       });
@@ -1056,12 +1179,12 @@ function togglePlaybackPlay() {
   if (playbackIntervalId) {
     clearInterval(playbackIntervalId);
     playbackIntervalId = null;
-    btn.textContent = "▶ Play";
+    btn.textContent = "Run Play";
     btn.classList.remove("btn-danger");
     btn.classList.add("btn-primary");
   } else {
     if (!playbackTimelineData) return;
-    btn.textContent = "⏸ Pause";
+    btn.textContent = "Pause Pause";
     btn.classList.remove("btn-primary");
     btn.classList.add("btn-danger");
 
@@ -1205,7 +1328,7 @@ async function loadStreamingAlerts() {
           <div class="alert-card-actions">
             <span class="alert-time">${a.timestamp} (Epoch: ${a.epoch_s})</span>
             <button class="btn btn-secondary btn-small" onclick="dispatchStreamingAction('${a.card_id}', '${a.rule_triggered}')">
-              ⚡ Authorize Action
+              [ACTIVE] Authorize Action
             </button>
           </div>
         </div>
@@ -1292,7 +1415,7 @@ async function postStreamingTransactions(txns, successMsg) {
     });
     const data = await res.json();
     if (statusPill) {
-      statusPill.textContent = `✓ ${successMsg} [${data.alerts_triggered} alert(s) emitted]`;
+      statusPill.textContent = `[OK] ${successMsg} [${data.alerts_triggered} alert(s) emitted]`;
       statusPill.classList.remove("hidden");
       setTimeout(() => statusPill.classList.add("hidden"), 4000);
     }
@@ -1585,14 +1708,14 @@ function switchServiceView(viewType) {
 function startAllServices() {
   showToast("All TigerGraph & Swarm Services: Starting components (NGINX, GSQL, RESTPP, KAFKA, GPE)...");
   setTimeout(() => {
-    showToast("✔ All 9 Cluster Services are Online and Healthy!");
+    showToast("[OK] All 9 Cluster Services are Online and Healthy!");
   }, 1200);
 }
 
 function restartAllServices() {
   showToast("Rolling restart initiated across Node-1 cluster...");
   setTimeout(() => {
-    showToast("✔ Rolling restart completed. Zero packet loss, GPE memory intact.");
+    showToast("[OK] Rolling restart completed. Zero packet loss, GPE memory intact.");
   }, 1500);
 }
 
@@ -1606,7 +1729,7 @@ function showToast(message) {
 
   const toast = document.createElement("div");
   toast.className = "tg-toast";
-  toast.innerHTML = `<span>⚡</span> <span>${message}</span>`;
+  toast.innerHTML = `<span>[ACTIVE]</span> <span>${message}</span>`;
   document.body.appendChild(toast);
 
   setTimeout(() => {
@@ -1645,7 +1768,7 @@ async function runThreeWayComparison() {
     }
     const data = await res.json();
     renderThreeWayComparison(data);
-    showToast(`✔ Completed 3-Way Comparative Evaluation for ${caseId}`);
+    showToast(`[OK] Completed 3-Way Comparative Evaluation for ${caseId}`);
   } catch (err) {
     console.warn("Using fallback local 3-way comparison renderer:", err);
     renderThreeWayComparisonFallback(caseId);

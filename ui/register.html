@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register Analyst Account — TigerGraph Fraud Investigator</title>
+  <meta name="description" content="Register an institutional investigator account for TigerGraph Autonomous Fraud Defense.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-body">
+
+  <div class="auth-container" style="max-width:520px;">
+    <div class="auth-header">
+      <a href="index.html" class="tg-brand-logo" style="justify-content:center; margin-bottom:1rem;">
+        <svg class="tg-logo-icon" viewBox="0 0 32 32">
+          <path d="M16 2L3 9.5V22.5L16 30L29 22.5V9.5L16 2Z" fill="#ff5722"/>
+          <path d="M16 6L7 11V21L16 26L25 21V11L16 6Z" fill="#ffffff" fill-opacity="0.9"/>
+          <polygon points="16,9 10,13 16,17 22,13" fill="#ff5722"/>
+          <polygon points="10,15 10,20 16,23 16,18" fill="#e64a19"/>
+          <polygon points="22,15 22,20 16,23 16,18" fill="#f4511e"/>
+        </svg>
+        <div class="tg-brand-text">
+          <div class="tg-app-title">TigerGraph <span class="tg-accent">Investigator</span></div>
+          <div class="tg-app-subtitle">Institutional Analyst Enrollment</div>
+        </div>
+      </a>
+      <h2 class="auth-title">Create Analyst Account</h2>
+      <p class="auth-subtitle">Configure your institutional identity and role-based security clearance.</p>
+    </div>
+
+    <div class="tg-card auth-card">
+      <div class="profile-preview-card" style="margin-bottom:1.5rem;">
+        <div class="profile-preview-avatar" id="register-avatar-preview">SB</div>
+        <div>
+          <div class="profile-preview-name" id="register-preview-name">Swapnil Biswas</div>
+          <div class="profile-preview-role" id="register-preview-role">L2 Senior Fraud Ops &bull; Tier L2 Approver</div>
+          <div class="profile-preview-org" id="register-preview-org">TigerGraph Global Financial Defense</div>
+        </div>
+      </div>
+
+      <form id="form-register" onsubmit="handleRegisterSubmit(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="reg-name" class="form-label">Full Name:</label>
+            <input type="text" id="reg-name" class="custom-input" value="Swapnil Biswas" required oninput="updateRegisterPreview()">
+          </div>
+          <div class="form-group">
+            <label for="reg-username" class="form-label">Username / Analyst ID:</label>
+            <input type="text" id="reg-username" class="custom-input" value="swapnil_ops" required>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:1.25rem;">
+          <label for="reg-email" class="form-label">Institutional Corporate Email:</label>
+          <input type="email" id="reg-email" class="custom-input" value="swapnil.biswas@tigergraph.com" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="reg-org" class="form-label">Financial Institution:</label>
+            <input type="text" id="reg-org" class="custom-input" value="TigerGraph Global Financial Defense" required oninput="updateRegisterPreview()">
+          </div>
+          <div class="form-group">
+            <label for="reg-role" class="form-label">Assigned Clearance Tier:</label>
+            <select id="reg-role" class="custom-select" onchange="updateRegisterPreview()">
+              <option value="L2 Senior Fraud Ops">L2 Senior Fraud Ops (Tier L2)</option>
+              <option value="L1 Fraud Analyst">L1 Fraud Analyst (Tier L1)</option>
+              <option value="AML Compliance Officer">AML Compliance Officer</option>
+              <option value="Chief Risk Officer">Chief Risk Officer</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:1.25rem;">
+          <label class="form-label">Select Avatar Accent Color:</label>
+          <div class="color-picker-row">
+            <label class="color-option">
+              <input type="radio" name="reg-avatar-color" value="#ff5722" checked onchange="updateRegisterPreview()">
+              <span class="color-swatch" style="background:#ff5722;" title="TigerGraph Orange"></span>
+            </label>
+            <label class="color-option">
+              <input type="radio" name="reg-avatar-color" value="#0ea5e9" onchange="updateRegisterPreview()">
+              <span class="color-swatch" style="background:#0ea5e9;" title="Ocean Blue"></span>
+            </label>
+            <label class="color-option">
+              <input type="radio" name="reg-avatar-color" value="#10b981" onchange="updateRegisterPreview()">
+              <span class="color-swatch" style="background:#10b981;" title="Emerald Green"></span>
+            </label>
+            <label class="color-option">
+              <input type="radio" name="reg-avatar-color" value="#8b5cf6" onchange="updateRegisterPreview()">
+              <span class="color-swatch" style="background:#8b5cf6;" title="Royal Purple"></span>
+            </label>
+            <label class="color-option">
+              <input type="radio" name="reg-avatar-color" value="#f43f5e" onchange="updateRegisterPreview()">
+              <span class="color-swatch" style="background:#f43f5e;" title="Cyber Rose"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group" style="display:flex; align-items:flex-start; gap:0.5rem; margin-bottom:1.5rem;">
+          <input type="checkbox" id="reg-agree" required checked style="margin-top:3px;">
+          <label for="reg-agree" style="font-size:0.75rem; color:var(--tg-text-secondary); line-height:1.4;">
+            I agree to the <a href="terms.html" target="_blank" style="color:var(--tg-orange);">Terms of Service</a> and confirm authorization under the <a href="privacy.html" target="_blank" style="color:var(--tg-orange);">Bank Secrecy Act Compliance Policy</a>.
+          </label>
+        </div>
+
+        <button type="submit" class="tg-btn-primary" style="width:100%; justify-content:center; padding:10px; font-size:0.9rem;">
+          Complete Registration & Enter Console
+        </button>
+      </form>
+    </div>
+
+    <div class="auth-footer-links">
+      <div>Already have an institutional credential? <a href="login.html" style="color:var(--tg-orange); font-weight:600;">Sign in here</a></div>
+      <div style="margin-top:0.5rem;"><a href="index.html" style="color:var(--tg-text-secondary);">&larr; Return to Overview</a></div>
+    </div>
+  </div>
+
+  <script>
+    function getInitials(name) {
+      if (!name) return "SB";
+      const parts = name.trim().split(/\s+/);
+      if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
+    function updateRegisterPreview() {
+      const name = document.getElementById("reg-name").value.trim() || "Investigator";
+      const org = document.getElementById("reg-org").value.trim() || "Financial Institution";
+      const role = document.getElementById("reg-role").value;
+      const colorInput = document.querySelector('input[name="reg-avatar-color"]:checked');
+      const color = colorInput ? colorInput.value : "#ff5722";
+
+      const initials = getInitials(name);
+      const av = document.getElementById("register-avatar-preview");
+      av.textContent = initials;
+      av.style.backgroundColor = color;
+
+      document.getElementById("register-preview-name").textContent = name;
+      document.getElementById("register-preview-role").textContent = role;
+      document.getElementById("register-preview-org").textContent = org;
+    }
+
+    function handleRegisterSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById("reg-name").value.trim();
+      const username = document.getElementById("reg-username").value.trim();
+      const org = document.getElementById("reg-org").value.trim();
+      const role = document.getElementById("reg-role").value;
+      const colorInput = document.querySelector('input[name="reg-avatar-color"]:checked');
+      const color = colorInput ? colorInput.value : "#ff5722";
+
+      const profile = {
+        name: name,
+        username: username,
+        institution: org,
+        role: role,
+        color: color
+      };
+
+      localStorage.setItem("tg_investigator_profile", JSON.stringify(profile));
+      window.location.href = "console.html";
+    }
+
+    document.addEventListener("DOMContentLoaded", updateRegisterPreview);
+  </script>
+</body>
+</html>
